@@ -73,8 +73,9 @@ template <typename XP, typename Index, std::size_t N, std::size_t M>
 #endif
 ALWAYS_INLINE void batch_div_arm_sve(XP xp,
                                      const Array<Index, N>& indexes,
-                                     Array<int64_t, M>& xpm_cache,
-                                     std::size_t m_count)
+                                     Array<int64_t, M>& xpm_low,
+                                     std::size_t m_count,
+                                     uint64_t low)
 {
   std::size_t i = 0;
   std::size_t lanes = svcntd();
@@ -85,7 +86,8 @@ ALWAYS_INLINE void batch_div_arm_sve(XP xp,
     svbool_t pg = svwhilelt_b64(i, m_count);
     svuint64_t m = BaseFactorTable::to_number_arm_sve(pg, &indexes[i]);
     svuint64_t q = sve_div64(pg, xp, m);
-    svst1_s64(pg, &xpm_cache[i], svreinterpret_s64_u64(q));
+    svuint64_t q_low = svsub_n_u64_x(pg, q, low);
+    svst1_s64(pg, &xpm_low[i], svreinterpret_s64_u64(q_low));
   }
 }
 
@@ -125,7 +127,7 @@ T D_thread_arm_sve(T x,
 
   INDETERMINATE Array<uint32_t, 128> m_indexes32;
   INDETERMINATE Array< int64_t, 128> m_indexes64;
-  INDETERMINATE Array< int64_t, 128> xpm_cache;
+  INDETERMINATE Array< int64_t, 128> xpm_low;
   const auto* factor_table = factor.data();
 
   // Segmented sieve of Eratosthenes
@@ -187,19 +189,18 @@ T D_thread_arm_sve(T x,
 
           if (m_count > max_m_count)
           {
-            // Batch calculate xp/m to improve CPU pipelining
+            // Batch calculate (xp/m - low) to improve CPU pipelining
             if (xp <= UINT64_MAX)
-              batch_div_arm_sve(uint64_t(xp), m_indexes32, xpm_cache, m_count);
+              batch_div_arm_sve(uint64_t(xp), m_indexes32, xpm_low, m_count, low);
             else
-              batch_div_arm_sve(xp, m_indexes32, xpm_cache, m_count);
+              batch_div_arm_sve(xp, m_indexes32, xpm_low, m_count, low);
 
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t xpm = xpm_cache[i];
-              int64_t count = sieve.count_arm_sve(xpm - low);
+              int64_t count = sieve.count_arm_sve(xpm_low[i]);
               int64_t phi_xpm = phi[b] + count;
               sum -= factor.mu(m_indexes32[i]) * phi_xpm;
             }
@@ -225,17 +226,16 @@ T D_thread_arm_sve(T x,
           m_count += matches;
         }
 
-        // Batch calculate xp/m to improve CPU pipelining
+        // Batch calculate (xp/m - low) to improve CPU pipelining
         if (xp <= UINT64_MAX)
-          batch_div_arm_sve(uint64_t(xp), m_indexes32, xpm_cache, m_count);
+          batch_div_arm_sve(uint64_t(xp), m_indexes32, xpm_low, m_count, low);
         else
-          batch_div_arm_sve(xp, m_indexes32, xpm_cache, m_count);
+          batch_div_arm_sve(xp, m_indexes32, xpm_low, m_count, low);
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t xpm = xpm_cache[i];
-          int64_t count = sieve.count_arm_sve(xpm - low);
+          int64_t count = sieve.count_arm_sve(xpm_low[i]);
           int64_t phi_xpm = phi[b] + count;
           sum -= factor.mu(m_indexes32[i]) * phi_xpm;
         }
@@ -262,19 +262,18 @@ T D_thread_arm_sve(T x,
 
           if (m_count > max_m_count)
           {
-            // Batch calculate xp/m to improve CPU pipelining
+            // Batch calculate (xp/m - low) to improve CPU pipelining
             if (xp <= UINT64_MAX)
-              batch_div_arm_sve(uint64_t(xp), m_indexes64, xpm_cache, m_count);
+              batch_div_arm_sve(uint64_t(xp), m_indexes64, xpm_low, m_count, low);
             else
-              batch_div_arm_sve(xp, m_indexes64, xpm_cache, m_count);
+              batch_div_arm_sve(xp, m_indexes64, xpm_low, m_count, low);
 
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t xpm = xpm_cache[i];
-              int64_t count = sieve.count_arm_sve(xpm - low);
+              int64_t count = sieve.count_arm_sve(xpm_low[i]);
               int64_t phi_xpm = phi[b] + count;
               sum -= factor.mu(m_indexes64[i]) * phi_xpm;
             }
@@ -300,17 +299,16 @@ T D_thread_arm_sve(T x,
           m_count += matches;
         }
 
-        // Batch calculate xp/m to improve CPU pipelining
+        // Batch calculate (xp/m - low) to improve CPU pipelining
         if (xp <= UINT64_MAX)
-          batch_div_arm_sve(uint64_t(xp), m_indexes64, xpm_cache, m_count);
+          batch_div_arm_sve(uint64_t(xp), m_indexes64, xpm_low, m_count, low);
         else
-          batch_div_arm_sve(xp, m_indexes64, xpm_cache, m_count);
+          batch_div_arm_sve(xp, m_indexes64, xpm_low, m_count, low);
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t xpm = xpm_cache[i];
-          int64_t count = sieve.count_arm_sve(xpm - low);
+          int64_t count = sieve.count_arm_sve(xpm_low[i]);
           int64_t phi_xpm = phi[b] + count;
           sum -= factor.mu(m_indexes64[i]) * phi_xpm;
         }

@@ -100,7 +100,7 @@ T D_thread_default(T x,
 
   INDETERMINATE Array<uint32_t, 128> m_indexes32;
   INDETERMINATE Array< int64_t, 128> m_indexes64;
-  INDETERMINATE Array< int64_t, 128> xpm_cache;
+  INDETERMINATE Array< int64_t, 128> xpm_low;
   const auto* factor_table = factor.data();
 
   // Segmented sieve of Eratosthenes
@@ -159,11 +159,11 @@ T D_thread_default(T x,
 
           if (m_count > max_m_count)
           {
-            // Batch calculate xp/m to improve CPU pipelining
+            // Batch calculate (xp/m - low) to improve CPU pipelining
             for (std::size_t i = 0; i < m_count; i++)
             {
               int64_t m = factor.to_number(m_indexes32[i]);
-              xpm_cache[i] = fast_div64(xp, m);
+              xpm_low[i] = fast_div64(xp, m) - low;
             }
 
             // Process the next few special leaves that are
@@ -171,8 +171,7 @@ T D_thread_default(T x,
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t xpm = xpm_cache[i];
-              int64_t count = sieve.count(xpm - low);
+              int64_t count = sieve.count(xpm_low[i]);
               int64_t phi_xpm = phi[b] + count;
               sum -= factor.mu(m_indexes32[i]) * phi_xpm;
             }
@@ -188,18 +187,17 @@ T D_thread_default(T x,
           m_count += (factor_table[m] > encoded_prime);
         }
 
-        // Batch calculate xp/m to improve CPU pipelining
+        // Batch calculate (xp/m - low) to improve CPU pipelining
         for (std::size_t i = 0; i < m_count; i++)
         {
           int64_t m = factor.to_number(m_indexes32[i]);
-          xpm_cache[i] = fast_div64(xp, m);
+          xpm_low[i] = fast_div64(xp, m) - low;
         }
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t xpm = xpm_cache[i];
-          int64_t count = sieve.count(xpm - low);
+          int64_t count = sieve.count(xpm_low[i]);
           int64_t phi_xpm = phi[b] + count;
           sum -= factor.mu(m_indexes32[i]) * phi_xpm;
         }
@@ -223,11 +221,11 @@ T D_thread_default(T x,
 
           if (m_count > max_m_count)
           {
-            // Batch calculate xp/m to improve CPU pipelining
+            // Batch calculate (xp/m - low) to improve CPU pipelining
             for (std::size_t i = 0; i < m_count; i++)
             {
               int64_t m = factor.to_number(m_indexes64[i]);
-              xpm_cache[i] = fast_div64(xp, m);
+              xpm_low[i] = fast_div64(xp, m) - low;
             }
 
             // Process the next few special leaves that are
@@ -235,8 +233,7 @@ T D_thread_default(T x,
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t xpm = xpm_cache[i];
-              int64_t count = sieve.count(xpm - low);
+              int64_t count = sieve.count(xpm_low[i]);
               int64_t phi_xpm = phi[b] + count;
               sum -= factor.mu(m_indexes64[i]) * phi_xpm;
             }
@@ -252,18 +249,17 @@ T D_thread_default(T x,
           m_count += (factor_table[m] > encoded_prime);
         }
 
-        // Batch calculate xp/m to improve CPU pipelining
+        // Batch calculate (xp/m - low) to improve CPU pipelining
         for (std::size_t i = 0; i < m_count; i++)
         {
           int64_t m = factor.to_number(m_indexes64[i]);
-          xpm_cache[i] = fast_div64(xp, m);
+          xpm_low[i] = fast_div64(xp, m) - low;
         }
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t xpm = xpm_cache[i];
-          int64_t count = sieve.count(xpm - low);
+          int64_t count = sieve.count(xpm_low[i]);
           int64_t phi_xpm = phi[b] + count;
           sum -= factor.mu(m_indexes64[i]) * phi_xpm;
         }
