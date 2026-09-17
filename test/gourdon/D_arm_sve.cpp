@@ -80,7 +80,7 @@ template <typename Index>
 void check_batch_arm_sve(uint64_t base)
 {
   Array<Index, 128> indexes;
-  Array<int64_t, 129> cache;
+  Array<int64_t, 129> results;
 
   for (uint64_t i = 0; i < indexes.size(); i++)
     indexes[i] = Index(base + indexes.size() - 1 - i);
@@ -92,12 +92,27 @@ void check_batch_arm_sve(uint64_t base)
   {
     for (uint64_t xp : numerators)
     {
-      cache[size] = -1;
-      batch_div_arm_sve(xp, indexes, cache, size);
-      check(cache[size] == -1);
+      results[size] = -1;
+      batch_div_arm_sve(xp, indexes, results, size, 0);
+      check(results[size] == -1);
 
       for (uint64_t i = 0; i < size; i++)
-        check(cache[i] == int64_t(xp / BaseFactorTable::to_number(indexes[i])));
+        check(results[i] == int64_t(xp / BaseFactorTable::to_number(indexes[i])));
+    }
+
+    // Test the low subtraction added to batch_div_arm_sve().
+    {
+      uint64_t xp = UINT64_MAX;
+      uint64_t low = 1;
+      results[size] = -1;
+      batch_div_arm_sve(xp, indexes, results, size, low);
+      check(results[size] == -1);
+
+      for (uint64_t i = 0; i < size; i++)
+      {
+        uint64_t m = BaseFactorTable::to_number(indexes[i]);
+        check(results[i] == int64_t(xp / m - low));
+      }
     }
 
     #ifdef HAVE_INT128_T
@@ -105,12 +120,12 @@ void check_batch_arm_sve(uint64_t base)
 
       for (uint64_t remainder : { uint64_t(0), min_m - 1 })
       {
-        cache[size] = -1;
-        batch_div_arm_sve(xp + remainder, indexes, cache, size);
-        check(cache[size] == -1);
+        results[size] = -1;
+        batch_div_arm_sve(xp + remainder, indexes, results, size, 0);
+        check(results[size] == -1);
 
         for (uint64_t i = 0; i < size; i++)
-          check(cache[i] == int64_t((xp + remainder) / BaseFactorTable::to_number(indexes[i])));
+          check(results[i] == int64_t((xp + remainder) / BaseFactorTable::to_number(indexes[i])));
       }
     #endif
   }
