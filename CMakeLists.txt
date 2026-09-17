@@ -242,7 +242,7 @@ else()
     find_package(primesieve REQUIRED)
 
     if(primesieve_VERSION VERSION_LESS 11.0)
-        message(FATAL_ERROR "Found libprimesive-${primesieve_VERSION}, but primecount requires libprimesive >= 11.0")
+        message(FATAL_ERROR "Found libprimesieve-${primesieve_VERSION}, but primecount requires libprimesieve >= 11.0")
     endif()
 endif()
 
