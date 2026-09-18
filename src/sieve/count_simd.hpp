@@ -76,9 +76,18 @@
     uint32x4_t cnt32 = vpaddlq_u16(cnt16); \
     vcnt = vaddq_u64(vcnt, vpaddlq_u32(cnt32)); \
   } \
-  uint64_t cnt = vgetq_lane_u64(vcnt, 0) + vgetq_lane_u64(vcnt, 1); \
-  if (i < stop_idx) \
-    cnt += popcnt64_native(sieve[i]);
+  /* Branchfree computation of: */ \
+  /* if (i < stop_idx) */ \
+  /*   cnt += popcnt64(sieve[stop_idx - 1]); */ \
+  uint64_t has_tail = (i - stop_idx) >> 63; \
+  uint64_t tail_mask = 0 - has_tail; \
+  uint64_t tail_bits = sieve[stop_idx + tail_mask] & tail_mask; \
+  uint64x2_t vec = vsetq_lane_u64(tail_bits, vdupq_n_u64(0), 0); \
+  uint8x16_t cnt8 = vcntq_u8(vreinterpretq_u8_u64(vec)); \
+  uint16x8_t cnt16 = vpaddlq_u8(cnt8); \
+  uint32x4_t cnt32 = vpaddlq_u16(cnt16); \
+  vcnt = vaddq_u64(vcnt, vpaddlq_u32(cnt32)); \
+  uint64_t cnt = vaddvq_u64(vcnt);
 
 #elif defined(ENABLE_COUNT_PORTABLE)
 
