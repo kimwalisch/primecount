@@ -34,12 +34,12 @@
 #endif
 
 #if defined(ENABLE_ARM_NEON) && \
-    defined(ENABLE_COUNT_PORTABLE)
+    defined(ENABLE_COUNT_DEFAULT)
 
 /// ARM NEON /////////////////////////////////////////////////////////
 
 /// Count 1 bits inside [start, stop] using ARM NEON
-#define SIEVE_COUNT_PORTABLE(start, stop) \
+#define SIEVE_COUNT_DEFAULT(start, stop) \
   ASSERT(start <= stop); \
   ASSERT(stop - start < segment_size()); \
   uint64_t start_idx = start / 240; \
@@ -87,12 +87,12 @@
   vcnt = vaddq_u64(vcnt, vpaddlq_u32(cnt32)); \
   uint64_t cnt = vaddvq_u64(vcnt);
 
-#elif defined(ENABLE_COUNT_PORTABLE)
+#elif defined(ENABLE_COUNT_DEFAULT)
 
 /// POPCNT64 /////////////////////////////////////////////////////////
 
 /// Count 1 bits inside [start, stop] using POPCNT64
-#define SIEVE_COUNT_PORTABLE(start, stop) \
+#define SIEVE_COUNT_DEFAULT(start, stop) \
   ASSERT(start <= stop); \
   ASSERT(stop - start < segment_size()); \
   uint64_t start_idx = start / 240; \

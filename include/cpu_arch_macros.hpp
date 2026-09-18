@@ -23,14 +23,14 @@
       __has_include(<immintrin.h>)
   #define ENABLE_AVX512_VPOPCNT
 #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-  #define ENABLE_COUNT_PORTABLE
+  #define ENABLE_COUNT_DEFAULT
 #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #define ENABLE_COUNT_PORTABLE
+  #define ENABLE_COUNT_DEFAULT
 #else
-  #define ENABLE_COUNT_PORTABLE
+  #define ENABLE_COUNT_DEFAULT
 #endif
 
-#if defined(ENABLE_COUNT_PORTABLE) && \
+#if defined(ENABLE_COUNT_DEFAULT) && \
     (defined(__aarch64__) || \
      defined(_M_ARM64) || \
      defined(__ARM_NEON)) && \

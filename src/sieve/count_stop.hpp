@@ -36,7 +36,7 @@ namespace primecount {
 /// This method is safe to run on any CPU without runtime
 /// CPUID checks. In most cases (e.g. when compiled
 /// without -march=native) this will call the
-/// count_portable() method.
+/// count_default() method.
 ///
 ALWAYS_INLINE uint64_t Sieve::count(uint64_t stop)
 {
@@ -45,14 +45,14 @@ ALWAYS_INLINE uint64_t Sieve::count(uint64_t stop)
   #elif defined(ENABLE_ARM_SVE)
     return count_arm_sve(stop);
   #else
-    return count_portable(stop);
+    return count_default(stop);
   #endif
 }
 
-#if defined(ENABLE_COUNT_PORTABLE)
+#if defined(ENABLE_COUNT_DEFAULT)
 
 /// Count 1 bits inside [0, stop]
-ALWAYS_INLINE uint64_t Sieve::count_portable(uint64_t stop)
+ALWAYS_INLINE uint64_t Sieve::count_default(uint64_t stop)
 {
   ASSERT(stop >= prev_stop_);
   uint64_t start = prev_stop_ + 1;
@@ -82,7 +82,7 @@ ALWAYS_INLINE uint64_t Sieve::count_portable(uint64_t stop)
   // (stop - start) < counter_.dist, hence we simply
   // count the remaining number of unsieved elements by
   // linearly iterating over the sieve array.
-  SIEVE_COUNT_PORTABLE(start, stop);
+  SIEVE_COUNT_DEFAULT(start, stop);
   count_ += cnt;
 
   return count_;
