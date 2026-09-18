@@ -162,7 +162,7 @@ T D_thread_avx512(T x,
 
   INDETERMINATE Array<uint32_t, 128> m_indexes32;
   INDETERMINATE Array< int64_t, 128> m_indexes64;
-  INDETERMINATE Array< int64_t, 128> xpm_cache;
+  INDETERMINATE Array< int64_t, 128> xpm_low;
   const auto* factor_table = factor.data();
 
   __m512i reverse32 = _mm512_setr_epi32(15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
@@ -226,11 +226,11 @@ T D_thread_avx512(T x,
 
           if (m_count > max_m_count)
           {
-            // Batch calculate xp/m to improve CPU pipelining
+            // Batch calculate (xp/m - low) to improve CPU pipelining
             for (std::size_t i = 0; i < m_count; i++)
             {
               int64_t m = factor.to_number(m_indexes32[i]);
-              xpm_cache[i] = fast_div64(xp, m);
+              xpm_low[i] = fast_div64(xp, m) - low;
             }
 
             // Process the next few special leaves that are
@@ -238,8 +238,8 @@ T D_thread_avx512(T x,
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t xpm = xpm_cache[i];
-              int64_t count = sieve.count_avx512(xpm - low);
+              // sieve.count(xp/m - low)
+              int64_t count = sieve.count_avx512(xpm_low[i]);
               int64_t phi_xpm = phi[b] + count;
               sum -= factor.mu(m_indexes32[i]) * phi_xpm;
             }
@@ -260,18 +260,18 @@ T D_thread_avx512(T x,
           m_count += popcnt64_native(mask);
         }
 
-        // Batch calculate xp/m to improve CPU pipelining
+        // Batch calculate (xp/m - low) to improve CPU pipelining
         for (std::size_t i = 0; i < m_count; i++)
         {
           int64_t m = factor.to_number(m_indexes32[i]);
-          xpm_cache[i] = fast_div64(xp, m);
+          xpm_low[i] = fast_div64(xp, m) - low;
         }
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t xpm = xpm_cache[i];
-          int64_t count = sieve.count_avx512(xpm - low);
+          // sieve.count(xp/m - low)
+          int64_t count = sieve.count_avx512(xpm_low[i]);
           int64_t phi_xpm = phi[b] + count;
           sum -= factor.mu(m_indexes32[i]) * phi_xpm;
         }
@@ -293,11 +293,11 @@ T D_thread_avx512(T x,
 
           if (m_count > max_m_count)
           {
-            // Batch calculate xp/m to improve CPU pipelining
+            // Batch calculate (xp/m - low) to improve CPU pipelining
             for (std::size_t i = 0; i < m_count; i++)
             {
               int64_t m = factor.to_number(m_indexes64[i]);
-              xpm_cache[i] = fast_div64(xp, m);
+              xpm_low[i] = fast_div64(xp, m) - low;
             }
 
             // Process the next few special leaves that are
@@ -305,8 +305,8 @@ T D_thread_avx512(T x,
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t xpm = xpm_cache[i];
-              int64_t count = sieve.count_avx512(xpm - low);
+              // sieve.count(xp/m - low)
+              int64_t count = sieve.count_avx512(xpm_low[i]);
               int64_t phi_xpm = phi[b] + count;
               sum -= factor.mu(m_indexes64[i]) * phi_xpm;
             }
@@ -327,18 +327,18 @@ T D_thread_avx512(T x,
           m_count += popcnt64_native(mask);
         }
 
-        // Batch calculate xp/m to improve CPU pipelining
+        // Batch calculate (xp/m - low) to improve CPU pipelining
         for (std::size_t i = 0; i < m_count; i++)
         {
           int64_t m = factor.to_number(m_indexes64[i]);
-          xpm_cache[i] = fast_div64(xp, m);
+          xpm_low[i] = fast_div64(xp, m) - low;
         }
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t xpm = xpm_cache[i];
-          int64_t count = sieve.count_avx512(xpm - low);
+          // sieve.count(xp/m - low)
+          int64_t count = sieve.count_avx512(xpm_low[i]);
           int64_t phi_xpm = phi[b] + count;
           sum -= factor.mu(m_indexes64[i]) * phi_xpm;
         }

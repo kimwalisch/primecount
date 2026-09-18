@@ -1,10 +1,13 @@
-Changes in primecount-8.8, 2026-09-16
+Changes in primecount-8.8, 2026-09-18
 
 * Fix potential MinGW GCC 16 assertion warning in debug mode.
 * AC_libdivide.hpp: Factor out inner-loop arithmetic using sum_pi_libdivide().
 * AC.cpp: Factor out inner-loop arithmetic using sum_pi().
 * Remove unnecessary integer literal suffixes.
 * D_arm_sve.hpp: Use manual ARM SVE vectorization instead of relying on auto-vectorization.
+* D_arm_sve.hpp: Improve CPU pipelining.
+* D_axv512.hpp: Improve CPU pipelining.
+* D.cpp: Improve CPU pipelining.
 * AC_arm_sve.hpp: Add ARM SVE implementation of AC algorithm.
 * AC.cpp: Add ARM SVE runtime dispatch.
 * fast_div.hpp: Add ARM SVE integer division functions.
