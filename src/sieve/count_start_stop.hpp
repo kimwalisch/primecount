@@ -72,10 +72,10 @@ ALWAYS_INLINE uint64_t bytes_per_count_instruction()
   #elif defined(ENABLE_ARM_NEON)
     // count_portable() algorithm using ARM NEON
     return sizeof(uint64_t) * 2;
-  #else
-    // count_portable() algorithm using popcnt64()
-    return sizeof(uint64_t);
   #endif
+
+  // count_portable() algorithm using popcnt64()
+  return sizeof(uint64_t);
 }
 
 } // namespace
