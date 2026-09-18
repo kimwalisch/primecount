@@ -345,6 +345,12 @@ T D_thread(Args&&... args)
 
 string_view_t D_algo_name()
 {
+  #if defined(ENABLE_ARM_NEON)
+    #define PORTABLE_ALGO_NAME "Algorithm: ARM NEON"
+  #else
+    #define PORTABLE_ALGO_NAME "Algorithm: POPCNT64"
+  #endif
+
   #if defined(ENABLE_AVX512_VPOPCNT)
     return "Algorithm: AVX512";
   #elif defined(ENABLE_ARM_SVE)
@@ -352,13 +358,13 @@ string_view_t D_algo_name()
   #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     return cpu_supports_avx512_vpopcnt
       ? "Algorithm: AVX512"
-      : "Algorithm: POPCNT64";
+      : PORTABLE_ALGO_NAME;
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
     return cpu_supports_sve
       ? "Algorithm: ARM SVE"
-      : "Algorithm: POPCNT64";
+      : PORTABLE_ALGO_NAME;
   #else
-    return "Algorithm: POPCNT64";
+    return PORTABLE_ALGO_NAME;
   #endif
 }
 
