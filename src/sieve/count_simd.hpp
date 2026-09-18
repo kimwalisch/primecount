@@ -78,7 +78,7 @@
   } \
   /* Branchfree computation of: */ \
   /* if (i < stop_idx) */ \
-  /*   cnt += popcnt64(sieve[stop_idx - 1]); */ \
+  /*   cnt += popcnt64(sieve[i]); */ \
   uint64_t tail_bits = sieve[i & -(i < stop_idx)] & -(i < stop_idx); \
   uint64x2_t vec = vsetq_lane_u64(tail_bits, vdupq_n_u64(0), 0); \
   uint8x16_t cnt8 = vcntq_u8(vreinterpretq_u8_u64(vec)); \
