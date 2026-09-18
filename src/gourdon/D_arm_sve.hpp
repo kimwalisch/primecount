@@ -200,6 +200,7 @@ T D_thread_arm_sve(T x,
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
+              // sieve.count(xp/m - low)
               int64_t count = sieve.count_arm_sve(xpm_low[i]);
               int64_t phi_xpm = phi[b] + count;
               sum -= factor.mu(m_indexes32[i]) * phi_xpm;
@@ -235,6 +236,7 @@ T D_thread_arm_sve(T x,
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
+          // sieve.count(xp/m - low)
           int64_t count = sieve.count_arm_sve(xpm_low[i]);
           int64_t phi_xpm = phi[b] + count;
           sum -= factor.mu(m_indexes32[i]) * phi_xpm;
@@ -273,6 +275,7 @@ T D_thread_arm_sve(T x,
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
+              // sieve.count(xp/m - low)
               int64_t count = sieve.count_arm_sve(xpm_low[i]);
               int64_t phi_xpm = phi[b] + count;
               sum -= factor.mu(m_indexes64[i]) * phi_xpm;
@@ -308,6 +311,7 @@ T D_thread_arm_sve(T x,
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
+          // sieve.count(xp/m - low)
           int64_t count = sieve.count_arm_sve(xpm_low[i]);
           int64_t phi_xpm = phi[b] + count;
           sum -= factor.mu(m_indexes64[i]) * phi_xpm;
