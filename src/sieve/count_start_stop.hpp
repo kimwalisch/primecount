@@ -69,9 +69,12 @@ ALWAYS_INLINE uint64_t bytes_per_count_instruction()
     // count_arm_sve() algorithm
     if (cpu_supports_sve)
       return get_svcntd() * sizeof(uint64_t);
+  #elif defined(ENABLE_ARM_NEON)
+    // count_default() algorithm using ARM NEON
+    return sizeof(uint64_t) * 2;
   #endif
 
-  // Default count_popcnt64() algorithm
+  // count_default() algorithm using popcnt64()
   return sizeof(uint64_t);
 }
 
@@ -87,27 +90,27 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   #elif defined(ENABLE_AVX512_VPOPCNT)
     return count_avx512(start, stop);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    return cpu_supports_sve ? count_arm_sve(start, stop) : count_popcnt64(start, stop);
+    return cpu_supports_sve ? count_arm_sve(start, stop) : count_default(start, stop);
   #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    return cpu_supports_avx512_vpopcnt ? count_avx512(start, stop) : count_popcnt64(start, stop);
+    return cpu_supports_avx512_vpopcnt ? count_avx512(start, stop) : count_default(start, stop);
   #else
-    return count_popcnt64(start, stop);
+    return count_default(start, stop);
   #endif
 }
 
-#if defined(ENABLE_PORTABLE_POPCNT64)
+#if defined(ENABLE_COUNT_DEFAULT)
 
 /// Count 1 bits inside [start, stop].
 /// The distance [start, stop] is small here < sqrt(segment_size),
 /// hence we simply count the number of unsieved elements
 /// by linearly iterating over the sieve array.
 ///
-uint64_t Sieve::count_popcnt64(uint64_t start, uint64_t stop) const
+uint64_t Sieve::count_default(uint64_t start, uint64_t stop) const
 {
   if (start > stop)
     return 0;
 
-  SIEVE_COUNT_POPCNT64(start, stop);
+  SIEVE_COUNT_DEFAULT(start, stop);
   return cnt;
 }
 

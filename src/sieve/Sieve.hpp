@@ -70,12 +70,12 @@ public:
       cross_off(primes[i], i);
   }
 
-#if defined(ENABLE_PORTABLE_POPCNT64)
+#if defined(ENABLE_COUNT_DEFAULT)
   /// Count 1 bits inside [0, stop]
-  uint64_t count_popcnt64(uint64_t stop);
+  uint64_t count_default(uint64_t stop);
 
   /// Count 1 bits inside [start, stop]
-  uint64_t count_popcnt64(uint64_t start, uint64_t stop) const;
+  uint64_t count_default(uint64_t start, uint64_t stop) const;
 #endif
 
 #if defined(ENABLE_AVX512_VPOPCNT) || \

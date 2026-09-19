@@ -29,10 +29,68 @@
   #include <immintrin.h>
 #endif
 
+#if defined(ENABLE_ARM_NEON) && \
+    defined(ENABLE_COUNT_DEFAULT)
+
+#include <arm_neon.h>
+
+/// ARM NEON /////////////////////////////////////////////////////////
+
+/// Count 1 bits inside [start, stop] using ARM NEON
+#define SIEVE_COUNT_DEFAULT(start, stop) \
+  ASSERT(start <= stop); \
+  ASSERT(stop - start < segment_size()); \
+  uint64_t start_idx = start / 240; \
+  uint64_t stop_idx = stop / 240; \
+  uint64_t m1 = unset_smaller[start % 240]; \
+  uint64_t m2 = unset_larger[stop % 240]; \
+  \
+  /* Branchfree bitmask calculation: */ \
+  /* if (start_idx == stop_idx) m1 = m1 & m2; */ \
+  /* if (start_idx == stop_idx) m2 = 0; */ \
+  CONDITIONAL_MOVE(start_idx == stop_idx, m1, m1 & m2); \
+  CONDITIONAL_MOVE(start_idx == stop_idx, m2, 0); \
+  \
+  const uint64_t* sieve = sieve_.data(); \
+  uint64_t start_bits = sieve[start_idx] & m1; \
+  uint64x2_t vec = vsetq_lane_u64(start_bits, vdupq_n_u64(0), 0); \
+  uint8x16_t cnt8 = vcntq_u8(vreinterpretq_u8_u64(vec)); \
+  uint16x8_t cnt16 = vpaddlq_u8(cnt8); \
+  uint32x4_t cnt32 = vpaddlq_u16(cnt16); \
+  uint64x2_t vcnt = vpaddlq_u32(cnt32); \
+  uint64_t i = start_idx + 1; \
+  \
+  /* Compute this for loop using ARM NEON. */ \
+  /* for (i = start_idx + 1; i < stop_idx; i++) */ \
+  /*   cnt += popcnt64(sieve[i]); */ \
+  NO_UNROLL_LOOP \
+  for (; i + 2 <= stop_idx; i += 2) \
+  { \
+    uint64x2_t vec = vld1q_u64(&sieve[i]); \
+    cnt8 = vcntq_u8(vreinterpretq_u8_u64(vec)); \
+    cnt16 = vpaddlq_u8(cnt8); \
+    cnt32 = vpaddlq_u16(cnt16); \
+    vcnt = vaddq_u64(vcnt, vpaddlq_u32(cnt32)); \
+  } \
+  /* Branchfree computation of: */ \
+  /* if (i < stop_idx) */ \
+  /*   cnt += popcnt64(sieve[i]); */ \
+  /* cnt += popcnt64(sieve[stop_idx]); */ \
+  uint64_t i_bits = sieve[stop_idx - (i < stop_idx)] & -(i < stop_idx); \
+  uint64_t stop_bits = sieve[stop_idx] & m2; \
+  vec = vsetq_lane_u64(i_bits, vdupq_n_u64(stop_bits), 0); \
+  cnt8 = vcntq_u8(vreinterpretq_u8_u64(vec)); \
+  cnt16 = vpaddlq_u8(cnt8); \
+  cnt32 = vpaddlq_u16(cnt16); \
+  vcnt = vaddq_u64(vcnt, vpaddlq_u32(cnt32)); \
+  uint64_t cnt = vaddvq_u64(vcnt);
+
+#elif defined(ENABLE_COUNT_DEFAULT)
+
 /// POPCNT64 /////////////////////////////////////////////////////////
 
 /// Count 1 bits inside [start, stop] using POPCNT64
-#define SIEVE_COUNT_POPCNT64(start, stop) \
+#define SIEVE_COUNT_DEFAULT(start, stop) \
   ASSERT(start <= stop); \
   ASSERT(stop - start < segment_size()); \
   uint64_t start_idx = start / 240; \
@@ -55,6 +113,8 @@
   NO_UNROLL_LOOP \
   for (uint64_t i = start_idx + 1; i < stop_idx; i++) \
     cnt += popcnt64(sieve[i]);
+
+#endif
 
 /// AVX512 ///////////////////////////////////////////////////////////
 
