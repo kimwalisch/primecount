@@ -53,13 +53,11 @@
   \
   const uint64_t* sieve = sieve_.data(); \
   uint64_t start_bits = sieve[start_idx] & m1; \
-  uint64_t stop_bits = sieve[stop_idx] & m2; \
-  uint64x2_t bounds = vdupq_n_u64(start_bits); \
-  bounds = vsetq_lane_u64(stop_bits, bounds, 1); \
-  uint8x16_t bounds_cnt8 = vcntq_u8(vreinterpretq_u8_u64(bounds)); \
-  uint16x8_t bounds_cnt16 = vpaddlq_u8(bounds_cnt8); \
-  uint32x4_t bounds_cnt32 = vpaddlq_u16(bounds_cnt16); \
-  uint64x2_t vcnt = vpaddlq_u32(bounds_cnt32); \
+  uint64x2_t vec = vsetq_lane_u64(start_bits, vdupq_n_u64(0), 0); \
+  uint8x16_t cnt8 = vcntq_u8(vreinterpretq_u8_u64(vec)); \
+  uint16x8_t cnt16 = vpaddlq_u8(cnt8); \
+  uint32x4_t cnt32 = vpaddlq_u16(cnt16); \
+  uint64x2_t vcnt = vpaddlq_u32(cnt32); \
   uint64_t i = start_idx + 1; \
   \
   /* Compute this for loop using ARM NEON. */ \
@@ -69,19 +67,21 @@
   for (; i + 2 <= stop_idx; i += 2) \
   { \
     uint64x2_t vec = vld1q_u64(&sieve[i]); \
-    uint8x16_t cnt8 = vcntq_u8(vreinterpretq_u8_u64(vec)); \
-    uint16x8_t cnt16 = vpaddlq_u8(cnt8); \
-    uint32x4_t cnt32 = vpaddlq_u16(cnt16); \
+    cnt8 = vcntq_u8(vreinterpretq_u8_u64(vec)); \
+    cnt16 = vpaddlq_u8(cnt8); \
+    cnt32 = vpaddlq_u16(cnt16); \
     vcnt = vaddq_u64(vcnt, vpaddlq_u32(cnt32)); \
   } \
   /* Branchfree computation of: */ \
   /* if (i < stop_idx) */ \
   /*   cnt += popcnt64(sieve[i]); */ \
-  uint64_t tail_bits = sieve[stop_idx - (i < stop_idx)] & -(i < stop_idx); \
-  uint64x2_t vec = vsetq_lane_u64(tail_bits, vdupq_n_u64(0), 0); \
-  uint8x16_t cnt8 = vcntq_u8(vreinterpretq_u8_u64(vec)); \
-  uint16x8_t cnt16 = vpaddlq_u8(cnt8); \
-  uint32x4_t cnt32 = vpaddlq_u16(cnt16); \
+  /* cnt += popcnt64(sieve[stop_idx]); */ \
+  uint64_t i_bits = sieve[stop_idx - (i < stop_idx)] & -(i < stop_idx); \
+  uint64_t stop_bits = sieve[stop_idx] & m2; \
+  vec = vsetq_lane_u64(i_bits, vdupq_n_u64(stop_bits), 0); \
+  cnt8 = vcntq_u8(vreinterpretq_u8_u64(vec)); \
+  cnt16 = vpaddlq_u8(cnt8); \
+  cnt32 = vpaddlq_u16(cnt16); \
   vcnt = vaddq_u64(vcnt, vpaddlq_u32(cnt32)); \
   uint64_t cnt = vaddvq_u64(vcnt);
 
