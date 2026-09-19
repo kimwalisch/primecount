@@ -35,7 +35,7 @@ namespace primecount {
 /// Count 1 bits inside [0, stop].
 /// This method is safe to run on any CPU without runtime
 /// CPUID checks. In most cases (e.g. when compiled
-/// without -march=native) this will call the
+/// without -march=native) this will call the portable
 /// count_default() method.
 ///
 ALWAYS_INLINE uint64_t Sieve::count(uint64_t stop)
