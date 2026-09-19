@@ -1,13 +1,8 @@
 ///
-/// @file  AC_libdivide.hpp
-/// @brief Scalar libdivide implementation of the A + C formulas in
-///        Xavier Gourdon's prime counting algorithm. Wide numerators
-///        use the shared scalar helpers in AC_default.hpp.
-///
-///        The libdivide C/C++ library allows to replace expensive
-///        integer division instructions by a sequence of shift, add
-///        and multiply instructions that will calculate the integer
-///        division much faster, especially on older CPUs.
+/// @file  AC_default.hpp
+/// @brief Scalar implementation of the A + C formulas in Xavier
+///        Gourdon's prime counting algorithm. The scalar formula
+///        helpers are also used by AC_libdivide.hpp.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -15,11 +10,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef AC_LIBDIVIDE_HPP
-#define AC_LIBDIVIDE_HPP
-
-#include "AC_default.hpp"
-#include <libdivide.h>
+#ifndef AC_DEFAULT_HPP
+#define AC_DEFAULT_HPP
 
 namespace {
 
@@ -27,13 +19,14 @@ using namespace primecount;
 
 template <typename T,
           int MULTIPLIER,
-          typename LibdividePrimes>
-ALWAYS_INLINE T sum_pi_libdivide(uint64_t xp,
-                                 uint64_t i,
-                                 uint64_t last,
-                                 uint64_t b,
-                                 const LibdividePrimes& primes,
-                                 const SegmentedPiTable& segmentedPi)
+          typename XP,
+          typename Primes>
+ALWAYS_INLINE T sum_pi(XP xp,
+                       uint64_t i,
+                       uint64_t last,
+                       uint64_t b,
+                       const Primes& primes,
+                       const SegmentedPiTable& segmentedPi)
 {
   if (i > last)
     return 0;
@@ -44,10 +37,10 @@ ALWAYS_INLINE T sum_pi_libdivide(uint64_t xp,
   // Unroll loop to increase instruction level parallelism
   for (; i + 3 <= last; i += 4)
   {
-    uint64_t xpq0 = xp / primes[i];
-    uint64_t xpq1 = xp / primes[i+1];
-    uint64_t xpq2 = xp / primes[i+2];
-    uint64_t xpq3 = xp / primes[i+3];
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
 
     sum += segmentedPi[xpq0] +
            segmentedPi[xpq1] +
@@ -58,31 +51,32 @@ ALWAYS_INLINE T sum_pi_libdivide(uint64_t xp,
   NO_UNROLL_LOOP
   for (; i <= last; i++)
   {
-    uint64_t xpq = xp / primes[i];
+    uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq];
   }
 
   return sum * MULTIPLIER + size * 2 - size * T(b);
 }
 
-/// Compute the A formula using libdivide.
-/// 64-bit numerator: xp < 2^64
+/// Compute the A formula.
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
-          typename LibdividePrimes>
-T A_libdivide(T xlow,
-              T xhigh,
-              uint64_t xp,
-              uint64_t y,
-              uint64_t prime,
-              const LibdividePrimes& primes,
-              const PiTable& pi,
-              const SegmentedPiTable& segmentedPi)
+          typename XP,
+          typename Primes>
+T A(T xlow,
+    T xhigh,
+    XP xp,
+    uint64_t y,
+    uint64_t b,
+    const Primes& primes,
+    const PiTable& pi,
+    const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
+  uint64_t prime = primes[b];
   uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
@@ -92,18 +86,17 @@ T A_libdivide(T xlow,
 
   // for (; i <= max_i1; i++)
   //   sum += segmentedPi[xp / primes[i]];
-  sum += sum_pi_libdivide<T, 1>(xp, i, max_i1, 2, primes, segmentedPi);
+  sum += sum_pi<T, 1>(xp, i, max_i1, 2, primes, segmentedPi);
   i = max(i, max_i1 + 1);
 
   // for (; i <= max_i2; i++)
   //   sum += segmentedPi[xp / primes[i]] * 2;
-  sum += sum_pi_libdivide<T, 2>(xp, i, max_i2, 2, primes, segmentedPi);
+  sum += sum_pi<T, 2>(xp, i, max_i2, 2, primes, segmentedPi);
 
   return sum;
 }
 
-/// Compute the 1st part of the C formula using libdivide.
-/// 64-bit numerator: xp < 2^64
+/// Compute the 1st part of the C formula.
 /// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
 /// x / (primes[b] * m) <= z
 /// low <= x / (primes[b] * m) < high
@@ -115,23 +108,22 @@ T A_libdivide(T xlow,
 /// m cannot contain more than 2 prime factors.
 ///
 template <typename T,
-          typename LibdividePrimes,
+          typename XP,
           typename Primes>
-T C1_libdivide(T xlow,
-               T xhigh,
-               uint64_t xp,
-               uint64_t b,
-               uint64_t y,
-               uint64_t z,
-               const LibdividePrimes& lprimes,
-               const Primes& primes,
-               const PiTable& pi,
-               const SegmentedPiTable& segmentedPi)
+T C1(T xlow,
+     T xhigh,
+     XP xp,
+     uint64_t b,
+     uint64_t y,
+     uint64_t z,
+     const Primes& primes,
+     const PiTable& pi,
+     const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
   uint64_t prime = primes[b];
   uint64_t max_m = min(xlow / prime, z);
-  uint64_t x_div_prime3 = xp / (prime * prime);
+  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   uint64_t min_m = fast_div64(xhigh, prime);
   min_m = max3(min_m, x_div_prime3, z / prime);
 
@@ -148,7 +140,7 @@ T C1_libdivide(T xlow,
 
     // for (i = min_i; i <= max_i; i++)
     //   sum -= segmentedPi[xp / primes[i]] - b + 2;
-    sum -= sum_pi_libdivide<T, 1>(xp, min_i, max_i, b, lprimes, segmentedPi);
+    sum -= sum_pi<T, 1>(xp, min_i, max_i, b, primes, segmentedPi);
   }
 
   // m = primes[i] * primes[j]
@@ -163,48 +155,48 @@ T C1_libdivide(T xlow,
     for (uint64_t i = min_q_i; i <= max_q_i; i++)
     {
       uint64_t q = primes[i];
-      uint64_t min_r = max(q, min_m / lprimes[i]);
-      uint64_t max_r = min(y, max_m / lprimes[i]);
+      uint64_t min_r = max(q, min_m / q);
+      uint64_t max_r = min(y, max_m / q);
 
       if (min_r >= max_r)
         continue;
 
       uint64_t min_j = pi[min_r] + 1;
       uint64_t max_j = pi[max_r];
-      uint64_t xpq = xp / lprimes[i];
+      XP xpq = fast_div(xp, q);
 
       // for (j = min_j; j <= max_j; j++)
       //   sum += segmentedPi[xpq / primes[j]] - b + 2;
-      sum += sum_pi_libdivide<T, 1>(xpq, min_j, max_j, b, lprimes, segmentedPi);
+      sum += sum_pi<T, 1>(xpq, min_j, max_j, b, primes, segmentedPi);
     }
   }
 
   return sum;
 }
 
-/// Compute the 2nd part of the C formula using libdivide.
+/// Compute the 2nd part of the C formula.
 /// Computes the clustered and sparse easy leaves of the C
 /// formula for which the second factor is necessarily prime.
-/// 64-bit numerator: xp < 2^64
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
-          typename LibdividePrimes>
-T C2_libdivide(T xlow,
-               T xhigh,
-               uint64_t xp,
-               uint64_t y,
-               uint64_t b,
-               uint64_t pi_y,
-               uint64_t max_clustered_global,
-               uint64_t prime,
-               const LibdividePrimes& primes,
-               const PiTable& pi,
-               const SegmentedPiTable& segmentedPi)
+          typename XP,
+          typename Primes>
+T C2(T xlow,
+     T xhigh,
+     XP xp,
+     uint64_t y,
+     uint64_t b,
+     uint64_t pi_y,
+     uint64_t max_clustered_global,
+     const Primes& primes,
+     const PiTable& pi,
+     const SegmentedPiTable& segmentedPi)
 {
+  uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  uint64_t x_div_prime3 = xp / (prime * prime);
+  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   uint64_t xhigh_div_prime = fast_div64(xhigh, prime);
   uint64_t min_m = max3(xhigh_div_prime, x_div_prime3, prime);
 
@@ -249,36 +241,38 @@ T C2_libdivide(T xlow,
   // Sparse leaves below the reflected range.
   // for (; i <= pi_conj_lo; i++)
   //   sum += segmentedPi[xp / primes[i]] - b + 2;
-  sum += sum_pi_libdivide<T, 1>(xp, i, pi_conj_lo, b, primes, segmentedPi);
+  sum += sum_pi<T, 1>(xp, i, pi_conj_lo, b, primes, segmentedPi);
   i = pi_conj_lo + 1;
 
   // Reflected leaves are counted once as a
   // sparse leaf and once as a conjugate.
   // for (; i <= pi_conj_hi; i++)
   //   sum += segmentedPi[xp / primes[i]] * 2 - b + 2;
-  sum += sum_pi_libdivide<T, 2>(xp, i, pi_conj_hi, b, primes, segmentedPi);
+  sum += sum_pi<T, 2>(xp, i, pi_conj_hi, b, primes, segmentedPi);
   i = pi_conj_hi + 1;
 
   // Sparse leaves above the reflected range.
   // for (; i <= pi_min_clustered; i++)
   //   sum += segmentedPi[xp / primes[i]] - b + 2;
-  sum += sum_pi_libdivide<T, 1>(xp, i, pi_min_clustered, b, primes, segmentedPi);
+  sum += sum_pi<T, 1>(xp, i, pi_min_clustered, b, primes, segmentedPi);
 
   return sum;
 }
 
+#if !defined(ENABLE_LIBDIVIDE)
+
 /// Compute A + C
 template <typename T,
           typename Primes>
-T AC_OpenMP_libdivide(T x,
-                      int64_t y,
-                      int64_t z,
-                      int64_t k,
-                      int64_t x_star,
-                      const PiTable& pi,
-                      const Primes& primes,
-                      int threads,
-                      bool is_print)
+T AC_OpenMP_default(T x,
+                    int64_t y,
+                    int64_t z,
+                    int64_t k,
+                    int64_t x_star,
+                    const PiTable& pi,
+                    const Primes& primes,
+                    int threads,
+                    bool is_print)
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
@@ -300,23 +294,6 @@ T AC_OpenMP_libdivide(T x,
   int64_t pi_sqrtz = pi[sqrtz];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
-
-  // Initialize libdivide vector from primes vector
-  Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
-  lprimes.resize(primes.size());
-
-  int64_t min_thread_size = (int64_t) 1e6;
-  int64_t primes_size = lprimes.size();
-  int init_threads = ideal_num_threads(primes_size, threads, min_thread_size);
-  int64_t thread_dist = ceil_div(primes_size, init_threads);
-
-  #pragma omp parallel for num_threads(init_threads) schedule(static, 1)
-  for (int64_t low = 1; low < primes_size; low += thread_dist)
-  {
-    int64_t high = min(low + thread_dist, primes_size);
-    for (int64_t i = low; i < high; i++)
-      lprimes[i] = primes[i];
-  }
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -374,7 +351,7 @@ T AC_OpenMP_libdivide(T x,
             T xp = x / primes[b];
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum -= C1_libdivide(xlow, xhigh, uint64_t(xp), b, y, z, lprimes, primes, pi, segmentedPi);
+              sum -= C1(xlow, xhigh, uint64_t(xp), b, y, z, primes, pi, segmentedPi);
             else
               sum -= C1(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
           }
@@ -402,11 +379,10 @@ T AC_OpenMP_libdivide(T x,
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2_clustered; b++)
         {
-          int64_t prime = primes[b];
-          T xp = x / prime;
+          T xp = x / primes[b];
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_libdivide(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
+            sum += C2(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -414,11 +390,10 @@ T AC_OpenMP_libdivide(T x,
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2_sparse; b <= max_c2; b++)
         {
-          int64_t prime = primes[b];
-          T xp = x / prime;
+          T xp = x / primes[b];
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_libdivide(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
+            sum += C2(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -426,11 +401,10 @@ T AC_OpenMP_libdivide(T x,
         // A formula: pi[x_star] < b <= pi[x13]
         for (int64_t b = min_a; b <= max_a; b++)
         {
-          int64_t prime = primes[b];
-          T xp = x / prime;
+          T xp = x / primes[b];
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += A_libdivide(xlow, xhigh, uint64_t(xp), y, prime, lprimes, pi, segmentedPi);
+            sum += A(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi);
           else
             sum += A(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
         }
@@ -440,6 +414,8 @@ T AC_OpenMP_libdivide(T x,
 
   return sum;
 }
+
+#endif
 
 } // namespace
 

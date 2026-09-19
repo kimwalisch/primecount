@@ -1,5 +1,8 @@
-Changes in primecount-8.8, 2026-09-18
+Changes in primecount-8.8, 2026-09-19
 
+* AC_default.hpp: Move the scalar AC algorithm and shared helpers into a header.
+* D_default.hpp: Move the scalar D algorithm into a header.
+* D_arm_neon.hpp: Add ARM NEON filtering for Gourdon's D algorithm.
 * Fix potential MinGW GCC 16 assertion warning in debug mode.
 * AC_libdivide.hpp: Factor out inner-loop arithmetic using sum_pi_libdivide().
 * AC.cpp: Factor out inner-loop arithmetic using sum_pi().
