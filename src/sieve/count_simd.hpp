@@ -21,20 +21,18 @@
 
 #include <stdint.h>
 
-#if defined(ENABLE_ARM_NEON)
-  #include <arm_neon.h>
-#endif
 #if defined(ENABLE_ARM_SVE) || \
     defined(ENABLE_MULTIARCH_ARM_SVE)
   #include <arm_sve.h>
-#endif
-#if defined(ENABLE_AVX512_VPOPCNT) || \
-    defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+#elif defined(ENABLE_AVX512_VPOPCNT) || \
+      defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
   #include <immintrin.h>
 #endif
 
 #if defined(ENABLE_ARM_NEON) && \
     defined(ENABLE_COUNT_DEFAULT)
+
+#include <arm_neon.h>
 
 /// ARM NEON /////////////////////////////////////////////////////////
 
