@@ -30,10 +30,11 @@
   #define ENABLE_COUNT_DEFAULT
 #endif
 
+// Our ARM NEON code uses vaddvq() and vpaddq() intrinsics
+// which are supported on 64-bit but not on 32-bit ARM CPUs.
 #if defined(ENABLE_COUNT_DEFAULT) && \
     (defined(__aarch64__) || \
-     defined(_M_ARM64) || \
-     defined(__ARM_NEON)) && \
+     defined(_M_ARM64)) && \
     __has_include(<arm_neon.h>)
   #define ENABLE_ARM_NEON
 #endif

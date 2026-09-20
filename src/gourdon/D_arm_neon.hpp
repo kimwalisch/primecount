@@ -1,0 +1,334 @@
+///
+/// @file  D_arm_neon.hpp
+/// @brief ARM NEON implementation of the D formula (hard special leaves)
+///        in Xavier Gourdon's prime counting algorithm. This algorithm
+///        is identical to D_thread_default() in D_default.hpp except for
+///        NEON vectorization of index filtering.
+///
+///        In-depth description of this algorithm:
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf
+///
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
+///
+/// This file is distributed under the BSD License. See the COPYING
+/// file in the top level directory.
+///
+
+#ifndef D_ARM_NEON_HPP
+#define D_ARM_NEON_HPP
+
+#include <primecount-internal.hpp>
+#include <fast_div.hpp>
+#include <imath.hpp>
+#include <LoadBalancerS2.hpp>
+#include <macros.hpp>
+#include <min.hpp>
+#include <phi_vector.hpp>
+#include <PiTable.hpp>
+#include <sieve/Sieve.hpp>
+#include <Vector.hpp>
+
+#include <stdint.h>
+#include <arm_neon.h>
+
+namespace {
+
+using namespace primecount;
+
+template <typename Index, int Bits>
+struct NeonCompactOffsets
+{
+  // Selected offsets are packed first; unused slots remain zero.
+  alignas(16) Index values[1 << Bits][Bits];
+
+  constexpr NeonCompactOffsets() : values{}
+  {
+    for (int mask = 0; mask < (1 << Bits); mask++)
+    {
+      int count = 0;
+      for (int bit = 0; bit < Bits; bit++)
+        if (mask & (1 << bit))
+          values[mask][count++] = bit;
+    }
+  }
+};
+
+constexpr NeonCompactOffsets<uint32_t, 8> neon_compact_offsets;
+
+ALWAYS_INLINE uint32_t mask_count8_arm_neon(const uint16_t* factor_table,
+                                            uint32_t encoded_prime)
+{
+  // Each match contributes a mask bit and 256 to the count
+  const uint16x8_t weights = { 256 + 0x80, 256 + 0x40, 256 + 0x20, 256 + 0x10,
+                               256 + 0x08, 256 + 0x04, 256 + 0x02, 256 + 0x01 };
+  ASSERT(encoded_prime <= UINT16_MAX);
+  uint16x8_t factors = vld1q_u16(factor_table);
+  uint16x8_t cmp = vcgtq_u16(factors, vdupq_n_u16(uint16_t(encoded_prime)));
+  return vaddvq_u16(vandq_u16(cmp, weights));
+}
+
+ALWAYS_INLINE uint32_t mask_count8_arm_neon(const uint32_t* factor_table,
+                                            uint32_t encoded_prime)
+{
+  // Each match contributes a mask bit and 256 to the count
+  const uint32x4_t low_weights  = { 256 + 0x80, 256 + 0x40, 256 + 0x20, 256 + 0x10 };
+  const uint32x4_t high_weights = { 256 + 0x08, 256 + 0x04, 256 + 0x02, 256 + 0x01 };
+  uint32x4_t factor_low = vld1q_u32(factor_table);
+  uint32x4_t factor_high = vld1q_u32(factor_table + 4);
+  uint32x4_t cmp_low = vcgtq_u32(factor_low, vdupq_n_u32(encoded_prime));
+  uint32x4_t cmp_high = vcgtq_u32(factor_high, vdupq_n_u32(encoded_prime));
+  uint32x4_t weighted_low = vandq_u32(cmp_low, low_weights);
+  uint32x4_t weighted_high = vandq_u32(cmp_high, high_weights);
+  return vaddvq_u32(vpaddq_u32(weighted_low, weighted_high));
+}
+
+/// Compute the contribution of the hard special leaves using
+/// a segmented sieve. Each thread processes the interval
+/// [low, low + segment_size * segments[.
+///
+template <typename T, typename Primes, typename FactorTable>
+T D_thread_arm_neon(T x,
+                    int64_t x_star,
+                    int64_t xz,
+                    int64_t y,
+                    int64_t z,
+                    int64_t k,
+                    const Primes& primes,
+                    const PiTable& pi,
+                    const FactorTable& factor,
+                    ThreadData& thread)
+{
+  T sum = 0;
+
+  int64_t low = thread.low;
+  int64_t low1 = max(low, 1);
+  int64_t segments = thread.segments;
+  int64_t segment_size = thread.segment_size;
+  int64_t pi_sqrtz = pi[isqrt(z)];
+  int64_t limit = min(low + segment_size * segments, xz);
+  int64_t max_b = pi[min3(isqrt(x / low1), isqrt(limit), x_star)];
+  int64_t min_b = pi[min(xz / limit, x_star)];
+  min_b = max(k, min_b) + 1;
+
+  if (min_b > max_b)
+    return 0;
+
+  Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
+  Sieve sieve(low, segment_size, max_b);
+  thread.init_time = get_time();
+
+  INDETERMINATE Array<uint32_t, 128> m_indexes32;
+  INDETERMINATE Array< int64_t, 128> m_indexes64;
+  INDETERMINATE Array< int64_t, 128> xpm_low;
+  const auto* factor_table = factor.data();
+
+  // Segmented sieve of Eratosthenes
+  for (; low < limit; low += segment_size)
+  {
+    // current segment [low, high[
+    int64_t high = min(low + segment_size, limit);
+    low1 = max(low, 1);
+
+    // For b < min_b there are no special leaves:
+    // low <= x / (primes[b] * m) < high
+    sieve.pre_sieve(primes, min_b - 1, low, high);
+    sieve.init_counter(low, high);
+    int64_t b = min_b;
+
+    // For k + 1 <= b <= pi_sqrtz
+    // Find all special leaves in the current segment that are
+    // composed of a prime and a square free number:
+    // low <= x / (primes[b] * m) < high
+    for (int64_t last = min(pi_sqrtz, max_b); b <= last; b++)
+    {
+      int64_t prime = primes[b];
+      T xp = x / prime;
+      int64_t xp_low = min(fast_div(xp, low1), z);
+      int64_t xp_high = min(fast_div(xp, high), z);
+      int64_t min_m = max(xp_high, z / prime);
+      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
+
+      if (prime >= max_m)
+        goto next_segment;
+
+      min_m = FactorTable::to_index(min_m);
+      max_m = FactorTable::to_index(max_m);
+      int64_t encoded_prime = FactorTable::encode(b);
+      int64_t m = max_m;
+      std::size_t m_count = 0;
+
+      // ARM NEON 32-bit
+      if (max_m <= UINT32_MAX ||
+          sizeof(T) <= sizeof(uint64_t))
+      {
+        constexpr std::size_t max_m_count = m_indexes32.size() - 8;
+        ASSERT(encoded_prime <= UINT32_MAX);
+        uint32x4_t m_base = vdupq_n_u32(uint32_t(m));
+        uint32x4_t lane_step = vdupq_n_u32(8);
+
+        // Filter out square free m values using ARM NEON
+        // that satisfy: factor_table[m] > encoded_prime
+        for (; m >= min_m + 8; m -= 8)
+        {
+          uint32_t mask_count = mask_count8_arm_neon(&factor_table[m - 7], uint32_t(encoded_prime));
+          const uint32_t* offsets = neon_compact_offsets.values[mask_count & 0xff];
+          vst1q_u32(&m_indexes32[m_count], vsubq_u32(m_base, vld1q_u32(offsets)));
+          vst1q_u32(&m_indexes32[m_count + 4], vsubq_u32(m_base, vld1q_u32(offsets + 4)));
+          m_count += mask_count >> 8;
+          m_base = vsubq_u32(m_base, lane_step);
+
+          if (m_count > max_m_count)
+          {
+            // Batch calculate (xp/m - low) to improve CPU pipelining
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = factor.to_number(m_indexes32[i]);
+              xpm_low[i] = fast_div64(xp, m) - low;
+            }
+
+            // Process the next few special leaves that are
+            // composed of a prime and a square free number:
+            // low <= x / (primes[b] * m) < high
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              // sieve.count(xp/m - low)
+              int64_t count = sieve.count(xpm_low[i]);
+              int64_t phi_xpm = phi[b] + count;
+              sum -= factor.mu(m_indexes32[i]) * phi_xpm;
+            }
+
+            m_count = 0;
+          }
+        }
+
+        // Filter out the last few square free m
+        for (; m > min_m; m--)
+        {
+          m_indexes32[m_count] = uint32_t(m);
+          m_count += (factor_table[m] > encoded_prime);
+        }
+
+        // Batch calculate (xp/m - low) to improve CPU pipelining
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = factor.to_number(m_indexes32[i]);
+          xpm_low[i] = fast_div64(xp, m) - low;
+        }
+
+        // Process the last few m values
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          // sieve.count(xp/m - low)
+          int64_t count = sieve.count(xpm_low[i]);
+          int64_t phi_xpm = phi[b] + count;
+          sum -= factor.mu(m_indexes32[i]) * phi_xpm;
+        }
+      }
+      else // Scalar 64-bit
+      {
+        constexpr std::size_t max_m_count = m_indexes64.size() - 4;
+
+        // Filter out square free m values branchlessly
+        // that satisfy: factor_table[m] > encoded_prime
+        for (; m >= min_m + 4; m -= 4)
+        {
+          m_indexes64[m_count] = m;
+          m_count += (factor_table[m] > encoded_prime);
+          m_indexes64[m_count] = m - 1;
+          m_count += (factor_table[m - 1] > encoded_prime);
+          m_indexes64[m_count] = m - 2;
+          m_count += (factor_table[m - 2] > encoded_prime);
+          m_indexes64[m_count] = m - 3;
+          m_count += (factor_table[m - 3] > encoded_prime);
+
+          if (m_count > max_m_count)
+          {
+            // Batch calculate (xp/m - low) to improve CPU pipelining
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = factor.to_number(m_indexes64[i]);
+              xpm_low[i] = fast_div64(xp, m) - low;
+            }
+
+            // Process the next few special leaves that are
+            // composed of a prime and a square free number:
+            // low <= x / (primes[b] * m) < high
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              // sieve.count(xp/m - low)
+              int64_t count = sieve.count(xpm_low[i]);
+              int64_t phi_xpm = phi[b] + count;
+              sum -= factor.mu(m_indexes64[i]) * phi_xpm;
+            }
+
+            m_count = 0;
+          }
+        }
+
+        // Filter out the last few square free m
+        for (; m > min_m; m--)
+        {
+          m_indexes64[m_count] = m;
+          m_count += (factor_table[m] > encoded_prime);
+        }
+
+        // Batch calculate (xp/m - low) to improve CPU pipelining
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = factor.to_number(m_indexes64[i]);
+          xpm_low[i] = fast_div64(xp, m) - low;
+        }
+
+        // Process the last few m values
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          // sieve.count(xp/m - low)
+          int64_t count = sieve.count(xpm_low[i]);
+          int64_t phi_xpm = phi[b] + count;
+          sum -= factor.mu(m_indexes64[i]) * phi_xpm;
+        }
+      }
+
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
+    }
+
+    // For pi_sqrtz < b <= pi_x_star
+    // Find all special leaves in the current segment
+    // that are composed of 2 primes:
+    // low <= x / (primes[b] * primes[l]) < high
+    for (; b <= max_b; b++)
+    {
+      int64_t prime = primes[b];
+      T xp = x / prime;
+      int64_t xp_low = min(fast_div(xp, low1), y);
+      int64_t xp_high = min(fast_div(xp, high), y);
+      int64_t min_m = max(xp_high, prime);
+      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
+      int64_t l = pi[max_m];
+
+      if (prime >= primes[l])
+        goto next_segment;
+
+      for (; primes[l] > min_m; l--)
+      {
+        int64_t xpq = fast_div64(xp, primes[l]);
+        int64_t count = sieve.count(xpq - low);
+        int64_t phi_xpq = phi[b] + count;
+        sum += phi_xpq;
+      }
+
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
+    }
+
+    next_segment:;
+  }
+
+  return sum;
+}
+
+} // namespace
+
+#endif

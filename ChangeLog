@@ -1,5 +1,6 @@
 Changes in primecount-8.8, 2026-09-20
 
+* D_arm_neon.hpp: ARM NEON filtering for Gourdon's D algorithm.
 * D.cpp: Refactor runtime SIMD dispatching.
 * AC.cpp: Refactor runtime SIMD dispatching.
 * Fix potential MinGW GCC 16 assertion warning in debug mode.

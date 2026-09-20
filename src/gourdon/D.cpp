@@ -40,10 +40,20 @@
   #include <cpu_supports_avx512_vpopcnt.hpp>
 #endif
 
+#if defined(ENABLE_ARM_NEON)
+  #define D_DEFAULT_HEADER "D_arm_neon.hpp"
+  #define D_DEFAULT_ALGO_NAME "Algorithm: ARM NEON"
+  #define D_THREAD_DEFAULT D_thread_arm_neon
+#else
+  #define D_DEFAULT_HEADER "D_default.hpp"
+  #define D_DEFAULT_ALGO_NAME "Algorithm: POPCNT64"
+  #define D_THREAD_DEFAULT D_thread_default
+#endif
+
 // Portable fallback D algorithm
 #if !defined(ENABLE_ARM_SVE) && \
     !defined(ENABLE_AVX512_VPOPCNT)
-  #include "D_default.hpp"
+  #include D_DEFAULT_HEADER
 #endif
 
 namespace {
@@ -67,24 +77,18 @@ T D_thread(Args&&... args)
   #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     return cpu_supports_avx512_vpopcnt
       ? D_thread_avx512<UT>(std::forward<Args>(args)...)
-      : D_thread_default<UT>(std::forward<Args>(args)...);
+      : D_THREAD_DEFAULT<UT>(std::forward<Args>(args)...);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
     return cpu_supports_sve
       ? D_thread_arm_sve<UT>(std::forward<Args>(args)...)
-      : D_thread_default<UT>(std::forward<Args>(args)...);
+      : D_THREAD_DEFAULT<UT>(std::forward<Args>(args)...);
   #else
-    return D_thread_default<UT>(std::forward<Args>(args)...);
+    return D_THREAD_DEFAULT<UT>(std::forward<Args>(args)...);
   #endif
 }
 
 string_view_t D_algo_name()
 {
-  #if defined(ENABLE_ARM_NEON)
-    #define DEFAULT_ALGO_NAME "Algorithm: ARM NEON"
-  #else
-    #define DEFAULT_ALGO_NAME "Algorithm: POPCNT64"
-  #endif
-
   #if defined(ENABLE_AVX512_VPOPCNT)
     return "Algorithm: AVX512";
   #elif defined(ENABLE_ARM_SVE)
@@ -92,13 +96,13 @@ string_view_t D_algo_name()
   #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     return cpu_supports_avx512_vpopcnt
       ? "Algorithm: AVX512"
-      : DEFAULT_ALGO_NAME;
+      : D_DEFAULT_ALGO_NAME;
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
     return cpu_supports_sve
       ? "Algorithm: ARM SVE"
-      : DEFAULT_ALGO_NAME;
+      : D_DEFAULT_ALGO_NAME;
   #else
-    return DEFAULT_ALGO_NAME;
+    return D_DEFAULT_ALGO_NAME;
   #endif
 }
 
