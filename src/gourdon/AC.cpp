@@ -47,6 +47,7 @@
   #define AC_OPENMP_DEFAULT AC_OpenMP_default
 #endif
 
+// Portable fallback AC algorithm
 #if !defined(ENABLE_ARM_SVE)
   #include AC_DEFAULT_HEADER
 #endif

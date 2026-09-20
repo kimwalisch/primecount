@@ -43,6 +43,7 @@
   #include <cpu_supports_avx512_vpopcnt.hpp>
 #endif
 
+// Portable fallback D algorithm
 #if !defined(ENABLE_ARM_SVE) && \
     !defined(ENABLE_AVX512_VPOPCNT)
   #include "D_default.hpp"
