@@ -2,7 +2,7 @@
 /// @file  D_avx512.hpp
 /// @brief AVX512 implementation of the D formula (hard special
 ///        leaves) in Xavier Gourdon's prime counting algorithm. This
-///        algorithm is identical to D_thread_default() in D.cpp
+///        algorithm is identical to D_thread_default() in D_default.hpp
 ///        except that this algorithm has been partially vectorized
 ///        using AVX512.
 ///

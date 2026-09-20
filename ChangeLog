@@ -1,5 +1,7 @@
-Changes in primecount-8.8, 2026-09-18
+Changes in primecount-8.8, 2026-09-20
 
+* D.cpp: Refactor runtime SIMD dispatching.
+* AC.cpp: Refactor runtime SIMD dispatching.
 * Fix potential MinGW GCC 16 assertion warning in debug mode.
 * AC_libdivide.hpp: Factor out inner-loop arithmetic using sum_pi_libdivide().
 * AC.cpp: Factor out inner-loop arithmetic using sum_pi().
