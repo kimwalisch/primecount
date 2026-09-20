@@ -158,7 +158,7 @@ T D_thread_arm_neon(T x,
       int64_t m = max_m;
       std::size_t m_count = 0;
 
-      // 32-bit code path
+      // ARM NEON 32-bit
       if (max_m <= UINT32_MAX ||
           sizeof(T) <= sizeof(uint64_t))
       {
@@ -167,7 +167,7 @@ T D_thread_arm_neon(T x,
         uint32x4_t m_base = vdupq_n_u32(uint32_t(m));
         uint32x4_t lane_step = vdupq_n_u32(8);
 
-        // Filter out square free m values branchlessly
+        // Filter out square free m values using ARM NEON
         // that satisfy: factor_table[m] > encoded_prime
         for (; m >= min_m + 8; m -= 8)
         {
@@ -225,7 +225,7 @@ T D_thread_arm_neon(T x,
           sum -= factor.mu(m_indexes32[i]) * phi_xpm;
         }
       }
-      else // 64-bit code path
+      else // Scalar 64-bit
       {
         constexpr std::size_t max_m_count = m_indexes64.size() - 4;
 
