@@ -69,13 +69,15 @@ ALWAYS_INLINE uint64_t bytes_per_count_instruction()
     // count_arm_sve() algorithm
     if (cpu_supports_sve)
       return get_svcntd() * sizeof(uint64_t);
-  #elif defined(ENABLE_ARM_NEON)
-    // count_default() algorithm using ARM NEON
-    return sizeof(uint64_t) * 2;
   #endif
 
-  // count_default() algorithm using popcnt64()
-  return sizeof(uint64_t);
+  #if defined(ENABLE_ARM_NEON)
+    // count_default() algorithm using ARM NEON
+    return sizeof(uint64_t) * 2;
+  #else
+    // count_default() algorithm using popcnt64()
+    return sizeof(uint64_t);
+  #endif
 }
 
 } // namespace
