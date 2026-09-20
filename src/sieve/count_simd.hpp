@@ -66,7 +66,7 @@
   NO_UNROLL_LOOP \
   for (; i + 2 <= stop_idx; i += 2) \
   { \
-    uint64x2_t vec = vld1q_u64(&sieve[i]); \
+    vec = vld1q_u64(&sieve[i]); \
     cnt8 = vcntq_u8(vreinterpretq_u8_u64(vec)); \
     cnt16 = vpaddlq_u8(cnt8); \
     cnt32 = vpaddlq_u16(cnt16); \
