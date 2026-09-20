@@ -12,6 +12,18 @@
 #ifndef AC_ARM_SVE_HPP
 #define AC_ARM_SVE_HPP
 
+#include "LoadBalancerAC.hpp"
+#include "SegmentedPiTable.hpp"
+
+#include <primecount-internal.hpp>
+#include <fast_div.hpp>
+#include <imath.hpp>
+#include <int128_t.hpp>
+#include <macros.hpp>
+#include <min.hpp>
+#include <PiTable.hpp>
+
+#include <stdint.h>
 #include <arm_sve.h>
 
 namespace {

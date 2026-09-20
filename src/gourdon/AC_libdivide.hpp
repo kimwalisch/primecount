@@ -19,8 +19,20 @@
 #define AC_LIBDIVIDE_HPP
 
 #include "AC_default.hpp"
+#include "LoadBalancerAC.hpp"
+#include "SegmentedPiTable.hpp"
 
+#include <primecount-internal.hpp>
+#include <fast_div.hpp>
+#include <imath.hpp>
+#include <int128_t.hpp>
 #include <libdivide.h>
+#include <macros.hpp>
+#include <min.hpp>
+#include <PiTable.hpp>
+#include <Vector.hpp>
+
+#include <stdint.h>
 
 namespace {
 

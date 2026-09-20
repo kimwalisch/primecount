@@ -24,7 +24,19 @@
 #ifndef D_ARM_SVE_HPP
 #define D_ARM_SVE_HPP
 
+#include <primecount-internal.hpp>
+#include <BaseFactorTable.hpp>
 #include <fast_div.hpp>
+#include <imath.hpp>
+#include <LoadBalancerS2.hpp>
+#include <macros.hpp>
+#include <min.hpp>
+#include <phi_vector.hpp>
+#include <PiTable.hpp>
+#include <sieve/Sieve.hpp>
+#include <Vector.hpp>
+
+#include <stdint.h>
 #include <arm_sve.h>
 
 namespace {

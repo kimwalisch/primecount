@@ -1,10 +1,11 @@
 ///
 /// @file  AC.cpp
-/// @brief Implementation of the A + C formulas (easy special leaves)
-///        in Xavier Gourdon's prime counting algorithm.
+/// @brief Setup and dispatch for the A + C formulas (easy special
+///        leaves) in Xavier Gourdon's prime counting algorithm.
 ///
-///        This file handles runtime dispatch to optimized SIMD
-///        implementations, thread scheduling, and load balancing.
+///        This file prepares the prime count lookup table and primes,
+///        dispatches to the scalar or SIMD implementation, and
+///        prints algorithm details and the result when requested.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -12,20 +13,14 @@
 /// file in the top level directory.
 ///
 
-#include "LoadBalancerAC.hpp"
-#include "SegmentedPiTable.hpp"
-
-#include <PiTable.hpp>
 #include <primecount-internal.hpp>
-#include <macros.hpp>
 #include <cpu_arch_macros.hpp>
-#include <fast_div.hpp>
 #include <gourdon.hpp>
+#include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
-#include <imath.hpp>
 #include <print.hpp>
-#include <Vector.hpp>
+#include <PiTable.hpp>
 
 #include <stdint.h>
 #include <utility>

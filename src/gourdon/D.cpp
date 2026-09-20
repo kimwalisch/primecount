@@ -16,19 +16,16 @@
 
 #include <primecount-internal.hpp>
 #include <cpu_arch_macros.hpp>
-#include <macros.hpp>
-#include <PiTable.hpp>
-#include <sieve/Sieve.hpp>
-#include <LoadBalancerS2.hpp>
-#include <fast_div.hpp>
-#include <phi_vector.hpp>
 #include <gourdon.hpp>
-#include <imath.hpp>
 #include <int128_t.hpp>
-#include <min.hpp>
+#include <LoadBalancerS2.hpp>
+#include <macros.hpp>
 #include <print.hpp>
+#include <PiTable.hpp>
 
 #include <stdint.h>
+#include <algorithm>
+#include <cmath>
 #include <utility>
 
 #if defined(ENABLE_ARM_SVE)
