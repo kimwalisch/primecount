@@ -71,13 +71,7 @@ ALWAYS_INLINE uint64_t bytes_per_count_instruction()
       return get_svcntd() * sizeof(uint64_t);
   #endif
 
-  #if defined(ENABLE_ARM_NEON)
-    // count_default() algorithm using ARM NEON
-    return sizeof(uint64_t) * 2;
-  #else
-    // count_default() algorithm using popcnt64()
-    return sizeof(uint64_t);
-  #endif
+  return DEFAULT_BYTES_PER_COUNT_INSTRUCTION;
 }
 
 } // namespace
@@ -112,7 +106,7 @@ uint64_t Sieve::count_default(uint64_t start, uint64_t stop) const
   if (start > stop)
     return 0;
 
-  SIEVE_COUNT_DEFAULT(start, stop);
+  DEFAULT_SIEVE_COUNT(start, stop);
   return cnt;
 }
 

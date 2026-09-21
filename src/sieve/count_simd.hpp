@@ -29,15 +29,47 @@
   #include <immintrin.h>
 #endif
 
-#if defined(ENABLE_ARM_NEON) && \
-    defined(ENABLE_COUNT_DEFAULT)
+// Portable fallback sieve count kernels
+#if defined(ENABLE_ARM_NEON)
+  #include <arm_neon.h>
+  #define DEFAULT_SIEVE_COUNT SIEVE_COUNT_ARM_NEON
+  #define DEFAULT_BYTES_PER_COUNT_INSTRUCTION (sizeof(uint64_t) * 2)
+#else
+  #define DEFAULT_SIEVE_COUNT SIEVE_COUNT_POPCNT64
+  #define DEFAULT_BYTES_PER_COUNT_INSTRUCTION sizeof(uint64_t)
+#endif
 
-#include <arm_neon.h>
+/// POPCNT64 /////////////////////////////////////////////////////////
+
+/// Count 1 bits inside [start, stop] using POPCNT64
+#define SIEVE_COUNT_POPCNT64(start, stop) \
+  ASSERT(start <= stop); \
+  ASSERT(stop - start < segment_size()); \
+  uint64_t start_idx = start / 240; \
+  uint64_t stop_idx = stop / 240; \
+  uint64_t m1 = unset_smaller[start % 240]; \
+  uint64_t m2 = unset_larger[stop % 240]; \
+  \
+  /* Branchfree bitmask calculation: */ \
+  /* if (start_idx == stop_idx) m1 = m1 & m2; */ \
+  /* if (start_idx == stop_idx) m2 = 0; */ \
+  CONDITIONAL_MOVE(start_idx == stop_idx, m1, m1 & m2); \
+  CONDITIONAL_MOVE(start_idx == stop_idx, m2, 0); \
+  \
+  const uint64_t* sieve = sieve_.data(); \
+  uint64_t start_bits = sieve[start_idx] & m1; \
+  uint64_t stop_bits = sieve[stop_idx] & m2; \
+  uint64_t cnt = popcnt64(start_bits); \
+  cnt += popcnt64(stop_bits); \
+  \
+  NO_UNROLL_LOOP \
+  for (uint64_t i = start_idx + 1; i < stop_idx; i++) \
+    cnt += popcnt64(sieve[i]);
 
 /// ARM NEON /////////////////////////////////////////////////////////
 
 /// Count 1 bits inside [start, stop] using ARM NEON
-#define SIEVE_COUNT_DEFAULT(start, stop) \
+#define SIEVE_COUNT_ARM_NEON(start, stop) \
   ASSERT(start <= stop); \
   ASSERT(stop - start < segment_size()); \
   uint64_t start_idx = start / 240; \
@@ -85,78 +117,6 @@
   vcnt = vaddq_u64(vcnt, vpaddlq_u32(cnt32)); \
   uint64_t cnt = vaddvq_u64(vcnt);
 
-#elif defined(ENABLE_COUNT_DEFAULT)
-
-/// POPCNT64 /////////////////////////////////////////////////////////
-
-/// Count 1 bits inside [start, stop] using POPCNT64
-#define SIEVE_COUNT_DEFAULT(start, stop) \
-  ASSERT(start <= stop); \
-  ASSERT(stop - start < segment_size()); \
-  uint64_t start_idx = start / 240; \
-  uint64_t stop_idx = stop / 240; \
-  uint64_t m1 = unset_smaller[start % 240]; \
-  uint64_t m2 = unset_larger[stop % 240]; \
-  \
-  /* Branchfree bitmask calculation: */ \
-  /* if (start_idx == stop_idx) m1 = m1 & m2; */ \
-  /* if (start_idx == stop_idx) m2 = 0; */ \
-  CONDITIONAL_MOVE(start_idx == stop_idx, m1, m1 & m2); \
-  CONDITIONAL_MOVE(start_idx == stop_idx, m2, 0); \
-  \
-  const uint64_t* sieve = sieve_.data(); \
-  uint64_t start_bits = sieve[start_idx] & m1; \
-  uint64_t stop_bits = sieve[stop_idx] & m2; \
-  uint64_t cnt = popcnt64(start_bits); \
-  cnt += popcnt64(stop_bits); \
-  \
-  NO_UNROLL_LOOP \
-  for (uint64_t i = start_idx + 1; i < stop_idx; i++) \
-    cnt += popcnt64(sieve[i]);
-
-#endif
-
-/// AVX512 ///////////////////////////////////////////////////////////
-
-/// Count 1 bits inside [start, stop] using AVX512
-#define SIEVE_COUNT_AVX512(start, stop) \
-  ASSERT(start <= stop); \
-  ASSERT(stop - start < segment_size()); \
-  uint64_t start_idx = start / 240; \
-  uint64_t stop_idx = stop / 240; \
-  uint64_t m1 = unset_smaller[start % 240]; \
-  uint64_t m2 = unset_larger[stop % 240]; \
-  \
-  /* Branchfree bitmask calculation: */ \
-  /* if (start_idx == stop_idx) m1 = m1 & m2; */ \
-  /* if (start_idx == stop_idx) m2 = 0; */ \
-  CONDITIONAL_MOVE(start_idx == stop_idx, m1, m1 & m2); \
-  CONDITIONAL_MOVE(start_idx == stop_idx, m2, 0); \
-  \
-  const uint64_t* sieve = sieve_.data(); \
-  uint64_t start_bits = sieve[start_idx] & m1; \
-  uint64_t stop_bits = sieve[stop_idx] & m2; \
-  uint64_t cnt = popcnt64_native(start_bits); \
-  cnt += popcnt64_native(stop_bits); \
-  __m512i vcnt = _mm512_setzero_si512(); \
-  uint64_t i = start_idx + 1; \
-  \
-  /* Compute this for loop using AVX512. */ \
-  /* for (i = start_idx + 1; i < stop_idx; i++) */ \
-  /*   cnt += popcnt64(sieve[i]); */ \
-  NO_UNROLL_LOOP \
-  for (; i + 8 < stop_idx; i += 8) \
-  { \
-    __m512i vec = _mm512_loadu_epi64(&sieve[i]); \
-    vec = _mm512_popcnt_epi64(vec); \
-    vcnt = _mm512_add_epi64(vcnt, vec); \
-  } \
-  __mmask8 mask = (__mmask8) (0xff >> (i + 8 - stop_idx)); \
-  __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve[i]); \
-  vec = _mm512_popcnt_epi64(vec); \
-  vcnt = _mm512_add_epi64(vcnt, vec); \
-  cnt += _mm512_reduce_add_epi64(vcnt);
-
 /// ARM SVE //////////////////////////////////////////////////////////
 
 /// Count 1 bits inside [start, stop] using ARM SVE
@@ -199,5 +159,46 @@
   vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec); \
   vcnt = svadd_u64_x(svptrue_b64(), vcnt, bounds); \
   uint64_t cnt = svaddv_u64(svptrue_b64(), vcnt);
+
+/// AVX512 ///////////////////////////////////////////////////////////
+
+/// Count 1 bits inside [start, stop] using AVX512
+#define SIEVE_COUNT_AVX512(start, stop) \
+  ASSERT(start <= stop); \
+  ASSERT(stop - start < segment_size()); \
+  uint64_t start_idx = start / 240; \
+  uint64_t stop_idx = stop / 240; \
+  uint64_t m1 = unset_smaller[start % 240]; \
+  uint64_t m2 = unset_larger[stop % 240]; \
+  \
+  /* Branchfree bitmask calculation: */ \
+  /* if (start_idx == stop_idx) m1 = m1 & m2; */ \
+  /* if (start_idx == stop_idx) m2 = 0; */ \
+  CONDITIONAL_MOVE(start_idx == stop_idx, m1, m1 & m2); \
+  CONDITIONAL_MOVE(start_idx == stop_idx, m2, 0); \
+  \
+  const uint64_t* sieve = sieve_.data(); \
+  uint64_t start_bits = sieve[start_idx] & m1; \
+  uint64_t stop_bits = sieve[stop_idx] & m2; \
+  uint64_t cnt = popcnt64_native(start_bits); \
+  cnt += popcnt64_native(stop_bits); \
+  __m512i vcnt = _mm512_setzero_si512(); \
+  uint64_t i = start_idx + 1; \
+  \
+  /* Compute this for loop using AVX512. */ \
+  /* for (i = start_idx + 1; i < stop_idx; i++) */ \
+  /*   cnt += popcnt64(sieve[i]); */ \
+  NO_UNROLL_LOOP \
+  for (; i + 8 < stop_idx; i += 8) \
+  { \
+    __m512i vec = _mm512_loadu_epi64(&sieve[i]); \
+    vec = _mm512_popcnt_epi64(vec); \
+    vcnt = _mm512_add_epi64(vcnt, vec); \
+  } \
+  __mmask8 mask = (__mmask8) (0xff >> (i + 8 - stop_idx)); \
+  __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve[i]); \
+  vec = _mm512_popcnt_epi64(vec); \
+  vcnt = _mm512_add_epi64(vcnt, vec); \
+  cnt += _mm512_reduce_add_epi64(vcnt);
 
 #endif
