@@ -328,11 +328,11 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
                                    uint128_t numer,
                                    svuint64_t divisor)
 {
-  svbool_t all_divisors_64bit = svcmpgt_n_u64(pg, divisor, UINT32_MAX);
+  svbool_t any_divisor_64bit = svcmpgt_n_u64(pg, divisor, UINT32_MAX);
 
   // Use simpler base-2^32 long division
   // if all divisors fit into 32 bits.
-  if (!svptest_any(pg, all_divisors_64bit))
+  if (!svptest_any(pg, any_divisor_64bit))
     return sve_div_128_by_32_to_64(pg, numer, divisor);
   else
     return sve_div_128_by_64_to_64(pg, numer, divisor);
