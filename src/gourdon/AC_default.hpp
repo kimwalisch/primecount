@@ -287,7 +287,6 @@ T C2(T xlow,
   return sum;
 }
 
-
 /// Compute A + C
 template <typename T,
           typename Primes>
