@@ -27,9 +27,8 @@
 #include <stdint.h>
 #include <type_traits>
 
-#if defined(HAVE_INT128_T) && \
-   (defined(ENABLE_ARM_SVE) || \
-    defined(ENABLE_MULTIARCH_ARM_SVE))
+#if defined(ENABLE_ARM_SVE) || \
+    defined(ENABLE_MULTIARCH_ARM_SVE)
   #include <arm_sve.h>
 #endif
 
@@ -182,9 +181,45 @@ fast_div64(X x, Y y)
   return (uint64_t) fast_div(x, y);
 }
 
-#if defined(HAVE_INT128_T) && \
-   (defined(ENABLE_ARM_SVE) || \
-    defined(ENABLE_MULTIARCH_ARM_SVE))
+#if defined(ENABLE_ARM_SVE) || \
+    defined(ENABLE_MULTIARCH_ARM_SVE)
+
+/// Used for (64-bit / 64-bit) = 64-bit
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
+                                   uint64_t numer,
+                                   svuint64_t divisor)
+{
+  return svdiv_u64_x(pg, svdup_n_u64(numer), divisor);
+}
+
+/// Used for (64-bit / 32-bit) = 64-bit
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
+                                   uint64_t numer,
+                                   const uint32_t* divisors)
+{
+  svuint64_t divisor = svld1uw_u64(pg, divisors);
+  return svdiv_u64_x(pg, svdup_n_u64(numer), divisor);
+}
+
+/// Used for (64-bit / 64-bit) = 64-bit
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
+                                   uint64_t numer,
+                                   const int64_t* divisors)
+{
+  svuint64_t divisor = svreinterpret_u64_s64(svld1_s64(pg, divisors));
+  return svdiv_u64_x(pg, svdup_n_u64(numer), divisor);
+}
+
+#if defined(HAVE_INT128_T)
 
 /// Used for (128-bit / 32-bit) = 64-bit.
 /// This is Knuth's short division by a single-precision integer,
@@ -285,19 +320,6 @@ ALWAYS_INLINE svuint64_t sve_div_128_by_64_to_64(svbool_t pg,
   return svorr_u64_x(pg, svlsl_n_u64_x(pg, q1, 32), q0);
 }
 
-// -------------------------------------------------------------------
-
-/// Used for (64-bit / 64-bit) = 64-bit
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
-#endif
-ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
-                                   uint64_t numer,
-                                   svuint64_t divisor)
-{
-  return svdiv_u64_x(pg, svdup_n_u64(numer), divisor);
-}
-
 /// Used for (128-bit / 64-bit) = 64-bit
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
@@ -314,32 +336,6 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
     return sve_div_128_by_32_to_64(pg, numer, divisor);
   else
     return sve_div_128_by_64_to_64(pg, numer, divisor);
-}
-
-// -------------------------------------------------------------------
-
-/// Used for (64-bit / 32-bit) = 64-bit
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
-#endif
-ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
-                                   uint64_t numer,
-                                   const uint32_t* divisors)
-{
-  svuint64_t divisor = svld1uw_u64(pg, divisors);
-  return svdiv_u64_x(pg, svdup_n_u64(numer), divisor);
-}
-
-/// Used for (64-bit / 64-bit) = 64-bit
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
-#endif
-ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
-                                   uint64_t numer,
-                                   const int64_t* divisors)
-{
-  svuint64_t divisor = svreinterpret_u64_s64(svld1_s64(pg, divisors));
-  return svdiv_u64_x(pg, svdup_n_u64(numer), divisor);
 }
 
 /// Used for (128-bit / 32-bit) = 64-bit
@@ -366,7 +362,7 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
   return sve_div64(pg, numer, divisor);
 }
 
-// -------------------------------------------------------------------
+#endif
 
 #endif
 
