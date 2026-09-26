@@ -1,11 +1,11 @@
-Changes in primecount-8.8, 2026-09-20
+Changes in primecount-8.8, 2026-09-26
 
 * D_arm_neon.hpp: ARM NEON filtering for Gourdon's D algorithm.
 * D.cpp: Refactor runtime SIMD dispatching.
 * AC.cpp: Refactor runtime SIMD dispatching.
 * Fix potential MinGW GCC 16 assertion warning in debug mode.
 * AC_libdivide.hpp: Factor out inner-loop arithmetic using sum_pi_libdivide().
-* AC.cpp: Factor out inner-loop arithmetic using sum_pi().
+* AC_default.hpp: Factor out inner-loop arithmetic using sum_pi().
 * Remove unnecessary integer literal suffixes.
 * sieve/count_simd.hpp: New ARM NEON sieve count kernel, for ARM CPUs without ARM SVE.
 * D_arm_sve.hpp: Use manual ARM SVE vectorization instead of relying on auto-vectorization.
