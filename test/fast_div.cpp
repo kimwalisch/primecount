@@ -186,14 +186,14 @@ bool test_sve_div64_arm_sve(std::mt19937& gen)
       uint64_t bits32 = wide
         ? 17 + ((i + j) % 16)
         :  1 + ((i + j) % 32);
-      uint64_t top_bit32 = uint64_t(1) << (bits32 - 1);
+      uint64_t top_bit32 = 1ull << (bits32 - 1);
       divisors32[j] = uint32_t(top_bit32 |
           (dist_u64(gen) & (top_bit32 - 1)));
 
       uint64_t bits64 = wide
         ? 17 + ((i + j) % 47)
         :  1 + ((i + j) % 63);
-      uint64_t top_bit64 = uint64_t(1) << (bits64 - 1);
+      uint64_t top_bit64 = 1ull << (bits64 - 1);
       divisors64[j] = int64_t(top_bit64 |
           (dist_u64(gen) & (top_bit64 - 1)));
     }
