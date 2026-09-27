@@ -87,6 +87,7 @@ Prefer primecount's internal utilities over C++ standard library equivalents. Ch
 - When modifying code with an existing comment, update the comment if the code changes make it incorrect.
 - When the user asks to copy a code section, copy its comments along with the code.
 - When writing a multi-line comment, check the width of nearby comments and use a similar wrapping width.
+- Do not end single-line comments with a period, but do end multi-line comments with a period.
 - Keep comments short and compact. There is no fixed line count; use nearby comments as a guide to the expected length, especially when there are many examples nearby.
 - All `*.cpp`, `*.c`, `*.hpp`, and `*.h` files contain a top-level comment describing the file and providing license and copyright information. Whenever updating one of these files, update the copyright year in that comment to the current year. If the copyright uses a year range, preserve the starting year and update the ending year.
 - When creating a new `*.cpp`, `*.c`, `*.hpp`, or `*.h` file, add the standard top-level file description, license, and copyright comment using existing project files as a template and the current copyright year. This standard header is required regardless of the preference for sparse comments.
