@@ -100,7 +100,7 @@ void check_batch_arm_sve(uint64_t base)
         check(results[i] == int64_t(xp / BaseFactorTable::to_number(indexes[i])));
     }
 
-    // Test the low subtraction added to batch_div_arm_sve().
+    // Test that batch_div_arm_sve() subtracts low from xp/m
     {
       uint64_t xp = UINT64_MAX;
       uint64_t low = 1;
