@@ -56,12 +56,24 @@ struct NeonCompactOffsets
 
 constexpr NeonCompactOffsets<uint32_t, 8> neon_compact_offsets;
 
+// Each match contributes a mask bit and 256 to the count
+alignas(16) const uint16_t neon_weights16[8] =
+{
+  256 + 0x80, 256 + 0x40, 256 + 0x20, 256 + 0x10,
+  256 + 0x08, 256 + 0x04, 256 + 0x02, 256 + 0x01
+};
+
+// Each match contributes a mask bit and 256 to the count
+alignas(16) const uint32_t neon_weights32[8] =
+{
+  256 + 0x80, 256 + 0x40, 256 + 0x20, 256 + 0x10,
+  256 + 0x08, 256 + 0x04, 256 + 0x02, 256 + 0x01
+};
+
 ALWAYS_INLINE uint32_t mask_count8_arm_neon(const uint16_t* factor_table,
                                             uint32_t encoded_prime)
 {
-  // Each match contributes a mask bit and 256 to the count
-  const uint16x8_t weights = { 256 + 0x80, 256 + 0x40, 256 + 0x20, 256 + 0x10,
-                               256 + 0x08, 256 + 0x04, 256 + 0x02, 256 + 0x01 };
+  const uint16x8_t weights = vld1q_u16(neon_weights16);
   ASSERT(encoded_prime <= UINT16_MAX);
   uint16x8_t factors = vld1q_u16(factor_table);
   uint16x8_t cmp = vcgtq_u16(factors, vdupq_n_u16(uint16_t(encoded_prime)));
@@ -71,9 +83,8 @@ ALWAYS_INLINE uint32_t mask_count8_arm_neon(const uint16_t* factor_table,
 ALWAYS_INLINE uint32_t mask_count8_arm_neon(const uint32_t* factor_table,
                                             uint32_t encoded_prime)
 {
-  // Each match contributes a mask bit and 256 to the count
-  const uint32x4_t low_weights  = { 256 + 0x80, 256 + 0x40, 256 + 0x20, 256 + 0x10 };
-  const uint32x4_t high_weights = { 256 + 0x08, 256 + 0x04, 256 + 0x02, 256 + 0x01 };
+  const uint32x4_t low_weights = vld1q_u32(neon_weights32);
+  const uint32x4_t high_weights = vld1q_u32(neon_weights32 + 4);
   uint32x4_t factor_low = vld1q_u32(factor_table);
   uint32x4_t factor_high = vld1q_u32(factor_table + 4);
   uint32x4_t cmp_low = vcgtq_u32(factor_low, vdupq_n_u32(encoded_prime));
