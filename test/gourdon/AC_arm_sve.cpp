@@ -34,7 +34,10 @@ using namespace primecount;
 
 namespace {
 
-MAYBE_UNUSED void check(bool ok)
+#if defined(ENABLE_ARM_SVE) || \
+    defined(ENABLE_MULTIARCH_ARM_SVE)
+
+void check(bool ok)
 {
   if (!ok)
   {
@@ -42,9 +45,6 @@ MAYBE_UNUSED void check(bool ok)
     std::exit(1);
   }
 }
-
-#if defined(ENABLE_ARM_SVE) || \
-    defined(ENABLE_MULTIARCH_ARM_SVE)
 
 template <typename PRIME, typename XP>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
