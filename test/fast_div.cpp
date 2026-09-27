@@ -168,7 +168,7 @@ bool test_sve_div64_arm_sve(std::mt19937& gen)
 
   // Test all four sve_div64() overload combinations using random divisors.
   // Every other iteration uses a true 128-bit numerator. In these
-  // iterations high < 2^15 and divisor >= 2^16, which guarantees
+  // iterations high <= 2^15 and divisor >= 2^16, which guarantees
   // that the quotient fits into uint64_t.
   std::uniform_int_distribution<uint64_t> dist_u64(
       0, pstd::numeric_limits<uint64_t>::max());
