@@ -22,7 +22,7 @@ These algorithms combine many formulas. Two of the most important contributions 
 
 For other core algorithm code, identify and read the related mathematical paper before editing, using references in the source files and project documentation.
 
-Read each relevant paper once per Codex session/chat, when work on the corresponding algorithm first begins and before the first code edit. For example, work on `src/gourdon/D.cpp` requires reading both `doc/Hard-Special-Leaves.pdf` and `doc/Hard-Special-Leaves-SIMD-Filtering.pdf`. Reuse that reading for subsequent edits in the same session; do not reread a paper for every edit or message. When work moves to another component, read any required papers that have not yet been read in the session. In a new session/chat, read the relevant papers again before editing.
+Read each relevant paper once per agent session/chat, when work on the corresponding algorithm first begins and before the first code edit. For example, work on `src/gourdon/D.cpp` requires reading both `doc/Hard-Special-Leaves.pdf` and `doc/Hard-Special-Leaves-SIMD-Filtering.pdf`. Reuse that reading for subsequent edits in the same session; do not reread a paper for every edit or message. When work moves to another component, read any required papers that have not yet been read in the session. In a new session/chat, read the relevant papers again before editing.
 
 Use the papers to understand the mathematics, but do not blindly copy their notation into variable names. Choose names that make the source code readable and fit existing naming conventions. Prefer shorter names when they remain clear.
 
