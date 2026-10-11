@@ -35,7 +35,7 @@ template <typename T,
           typename XP,
           typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE T sum_pi_arm_sve(XP xp,
                                uint64_t i,
@@ -104,7 +104,7 @@ template <typename T,
           typename XP,
           typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 T A_arm_sve(T xlow,
             T xhigh,
@@ -152,7 +152,7 @@ template <typename T,
           typename XP,
           typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 T C1_arm_sve(T xlow,
              T xhigh,
@@ -232,7 +232,7 @@ template <typename T,
           typename XP,
           typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 T C2_arm_sve(T xlow,
              T xhigh,
@@ -314,7 +314,7 @@ T C2_arm_sve(T xlow,
 template <typename T,
           typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ENTRY("+sve")
 #endif
 T AC_OpenMP_arm_sve(T x,
                     int64_t y,

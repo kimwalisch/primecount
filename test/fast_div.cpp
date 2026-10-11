@@ -39,7 +39,7 @@ constexpr uint64_t max_sve_lanes = 32;
 
 template <typename Divisor>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 bool check_sve_div64(svbool_t pg,
                      uint64_t numer,
@@ -59,7 +59,7 @@ bool check_sve_div64(svbool_t pg,
 
 template <typename Divisor>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 bool check_sve_div64(svbool_t pg,
                      uint128_t numer,
@@ -78,7 +78,7 @@ bool check_sve_div64(svbool_t pg,
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ENTRY("+sve")
 #endif
 bool test_sve_div64_arm_sve(std::mt19937& gen)
 {

@@ -8,8 +8,9 @@
 ///
 ///        For performance it is important that all AVX512 helper
 ///        functions are inlined by the compiler. We achieve this
-///        by annotating all AVX512 helper functions using the same
-///        AVX512 __attribute__ and the ALWAYS_INLINE macro.
+///        by annotating all AVX512 helper functions using the
+///        ALWAYS_INLINE macro and PRIMECOUNT_TARGET_ATTRIBUTE with
+///        the same CPU instruction sets as PRIMECOUNT_TARGET_ENTRY.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf
@@ -43,7 +44,7 @@ namespace {
 using namespace primecount;
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 #endif
 ALWAYS_INLINE __m512i load_factor_epi32_avx512(const uint16_t* factor_table,
                                                __m512i reverse32)
@@ -53,7 +54,7 @@ ALWAYS_INLINE __m512i load_factor_epi32_avx512(const uint16_t* factor_table,
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 #endif
 ALWAYS_INLINE __m512i load_factor_epi32_avx512(const uint32_t* factor_table,
                                                __m512i reverse32)
@@ -63,7 +64,7 @@ ALWAYS_INLINE __m512i load_factor_epi32_avx512(const uint32_t* factor_table,
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 #endif
 ALWAYS_INLINE __m512i load_factor_tail_epi32_avx512(const uint16_t* factor_table,
                                                     __mmask16 load_mask,
@@ -78,7 +79,7 @@ ALWAYS_INLINE __m512i load_factor_tail_epi32_avx512(const uint16_t* factor_table
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 #endif
 ALWAYS_INLINE __m512i load_factor_tail_epi32_avx512(const uint32_t* factor_table,
                                                     __mmask16 load_mask,
@@ -91,7 +92,7 @@ ALWAYS_INLINE __m512i load_factor_tail_epi32_avx512(const uint32_t* factor_table
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 #endif
 ALWAYS_INLINE __m512i load_factor_epi64_avx512(const uint16_t* factor_table,
                                                __m512i reverse64)
@@ -101,7 +102,7 @@ ALWAYS_INLINE __m512i load_factor_epi64_avx512(const uint16_t* factor_table,
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 #endif
 ALWAYS_INLINE __m512i load_factor_epi64_avx512(const uint32_t* factor_table,
                                                __m512i reverse64)
@@ -111,7 +112,7 @@ ALWAYS_INLINE __m512i load_factor_epi64_avx512(const uint32_t* factor_table,
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 #endif
 ALWAYS_INLINE __m512i load_factor_tail_epi64_avx512(const uint16_t* factor_table,
                                                     __mmask8 load_mask,
@@ -126,7 +127,7 @@ ALWAYS_INLINE __m512i load_factor_tail_epi64_avx512(const uint16_t* factor_table
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 #endif
 ALWAYS_INLINE __m512i load_factor_tail_epi64_avx512(const uint32_t* factor_table,
                                                     __mmask8 load_mask,
@@ -142,7 +143,7 @@ ALWAYS_INLINE __m512i load_factor_tail_epi64_avx512(const uint32_t* factor_table
 
 template <typename T, typename Primes, typename FactorTable>
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+  PRIMECOUNT_TARGET_ENTRY("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 #endif
 T D_thread_avx512(T x,
                   int64_t x_star,

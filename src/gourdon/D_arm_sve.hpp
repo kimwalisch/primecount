@@ -8,8 +8,9 @@
 ///
 ///        For performance it is important that small ARM SVE helper
 ///        functions are inlined by the compiler. We achieve this
-///        by annotating small ARM SVE helper functions using the same
-///        ARM SVE __attribute__ and the ALWAYS_INLINE macro.
+///        by annotating small ARM SVE helper functions using the
+///        ALWAYS_INLINE macro and PRIMECOUNT_TARGET_ATTRIBUTE with
+///        the same CPU instruction sets as PRIMECOUNT_TARGET_ENTRY.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf
@@ -44,7 +45,7 @@ namespace {
 using namespace primecount;
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
                                                  const uint16_t* factor_table)
@@ -53,7 +54,7 @@ ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
                                                  const uint32_t* factor_table)
@@ -62,7 +63,7 @@ ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
                                                  const uint16_t* factor_table)
@@ -71,7 +72,7 @@ ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
                                                  const uint32_t* factor_table)
@@ -81,7 +82,7 @@ ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
 
 template <typename XP, typename Index, std::size_t N, std::size_t M>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE void batch_div_arm_sve(XP xp,
                                      const Array<Index, N>& indexes,
@@ -105,7 +106,7 @@ ALWAYS_INLINE void batch_div_arm_sve(XP xp,
 
 template <typename T, typename Primes, typename FactorTable>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ENTRY("+sve")
 #endif
 T D_thread_arm_sve(T x,
                    int64_t x_star,

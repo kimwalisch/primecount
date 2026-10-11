@@ -1,7 +1,7 @@
-# We use GCC/Clang's function multi-versioning for ARM SVE
-# support. This code will automatically dispatch to the
-# ARM SVE algorithm if the CPU supports it and use the default
-# (portable) algorithm otherwise.
+# Runtime dispatch selects ARM SVE when supported by the CPU and OS,
+# and uses the default algorithm otherwise. The kernels use
+# target attributes with GCC/Clang (including clang-cl), and noinline
+# with native MSVC.
 
 include(CheckCXXSourceCompiles)
 include(CMakePushCheckState)
@@ -14,14 +14,15 @@ set(CMAKE_REQUIRED_INCLUDES
 check_cxx_source_compiles("
     #include <cpu_arch_macros.hpp>
 
-    // GCC/Clang function multiversioning for ARM SVE is not needed
-    // if the user compiles with -march=armv8-a+sve. GCC/Clang
-    // function multiversioning generally causes a minor overhead,
+    // Runtime dispatch for ARM SVE is not needed
+    // if the user compiles with -march=armv8-a+sve.
+    // Runtime dispatch generally causes a minor overhead,
     // hence we disable it if it is not needed.
     #if defined(ENABLE_ARM_SVE)
       Error: ARM SVE multiarch not needed!
     #endif
 
+    #include <macros.hpp>
     #include <src/arch/arm/sve.cpp>
     #include <arm_sve.h>
     #include <stdint.h>
@@ -29,9 +30,9 @@ check_cxx_source_compiles("
     class Sieve {
     public:
         uint64_t count_default(uint64_t* array, uint64_t stop_idx);
-        __attribute__ ((target (\"+sve\")))
+        PRIMECOUNT_TARGET_ENTRY(\"+sve\")
         uint64_t count_arm_sve(uint64_t* array, uint64_t stop_idx);
-        __attribute__ ((target (\"+sve\")))
+        PRIMECOUNT_TARGET_ENTRY(\"+sve\")
         uint64_t filter_arm_sve(uint64_t* array, uint64_t stop_idx);
     };
 
@@ -43,7 +44,7 @@ check_cxx_source_compiles("
         return res;
     }
 
-    __attribute__ ((target (\"+sve\")))
+    PRIMECOUNT_TARGET_ENTRY(\"+sve\")
     uint64_t Sieve::count_arm_sve(uint64_t* array, uint64_t stop_idx)
     {
         svuint64_t vec = svinsr_n_u64(svdup_u64(array[0]), array[1]);
@@ -64,7 +65,7 @@ check_cxx_source_compiles("
         return svaddv_u64(svptrue_b64(), vcnt);
     }
 
-    __attribute__ ((target (\"+sve\")))
+    PRIMECOUNT_TARGET_ENTRY(\"+sve\")
     uint64_t Sieve::filter_arm_sve(uint64_t* array, uint64_t stop_idx)
     {
         uint64_t filtered[32] = {};

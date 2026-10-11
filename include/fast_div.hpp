@@ -186,7 +186,7 @@ fast_div64(X x, Y y)
 
 /// Used for (64-bit / 64-bit) = 64-bit
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
                                    uint64_t numer,
@@ -197,7 +197,7 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
 
 /// Used for (64-bit / 32-bit) = 64-bit
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
                                    uint64_t numer,
@@ -209,7 +209,7 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
 
 /// Used for (64-bit / 64-bit) = 64-bit
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
                                    uint64_t numer,
@@ -229,7 +229,7 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
 /// Exercise 16.
 ///
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint64_t sve_div_128_by_32_to_64(svbool_t pg,
                                                  uint128_t numer,
@@ -255,7 +255,7 @@ ALWAYS_INLINE svuint64_t sve_div_128_by_32_to_64(svbool_t pg,
 /// https://github.com/ridiculousfish/libdivide/blob/master/doc/divlu.c
 ///
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint64_t sve_div_128_by_64_to_64(svbool_t pg,
                                                  uint128_t numer,
@@ -322,7 +322,7 @@ ALWAYS_INLINE svuint64_t sve_div_128_by_64_to_64(svbool_t pg,
 
 /// Used for (128-bit / 64-bit) = 64-bit
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
                                    uint128_t numer,
@@ -340,7 +340,7 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
 
 /// Used for (128-bit / 32-bit) = 64-bit
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
                                    uint128_t numer,
@@ -352,7 +352,7 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
 
 /// Used for (128-bit / 64-bit) = 64-bit
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
                                    uint128_t numer,
