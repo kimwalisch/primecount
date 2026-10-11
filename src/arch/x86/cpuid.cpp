@@ -98,7 +98,7 @@ bool has_popcnt()
 }
 
 /// Check if CPU supports: 
-/// AVX512F, AVX512BW, AVX512VL, AVX512VPOPCNTDQ
+/// AVX512F, AVX512BW, AVX512VL, AVX512VPOPCNTDQ, POPCNT
 ///
 bool has_avx512_vpopcnt()
 {
@@ -107,6 +107,10 @@ bool has_avx512_vpopcnt()
     int abcd[4];
     run_cpuid(1, 0, abcd);
     int osxsave_mask = (1 << 27);
+
+    // AVX512 sieve counting and filtering require POPCNT
+    if ((abcd[2] & bit_POPCNT) != bit_POPCNT)
+      return false;
 
     // Ensure OS supports extended processor state management
     if ((abcd[2] & osxsave_mask) != osxsave_mask)

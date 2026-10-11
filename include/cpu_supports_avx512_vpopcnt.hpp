@@ -1,7 +1,7 @@
 ///
 /// @file  cpu_supports_avx512_vpopcnt.hpp
-/// @brief Detect if the x86 CPU supports AVX512F, AVX512BW, AVX512VL
-///        and AVX512VPOPCNTDQ.
+/// @brief Detect if the x86 CPU supports AVX512F, AVX512BW, AVX512VL,
+///        AVX512VPOPCNTDQ and POPCNT.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///

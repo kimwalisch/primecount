@@ -180,8 +180,8 @@
   const uint64_t* sieve = sieve_.data(); \
   uint64_t start_bits = sieve[start_idx] & m1; \
   uint64_t stop_bits = sieve[stop_idx] & m2; \
-  uint64_t cnt = popcnt64_native(start_bits); \
-  cnt += popcnt64_native(stop_bits); \
+  uint64_t cnt = _mm_popcnt_u64(start_bits); \
+  cnt += _mm_popcnt_u64(stop_bits); \
   __m512i vcnt = _mm512_setzero_si512(); \
   uint64_t i = start_idx + 1; \
   \
