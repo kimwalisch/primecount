@@ -157,6 +157,7 @@
 /// tends to deteriorate performance due to increased branch
 /// mispredictions. Using the NO_UNROLL_LOOP macro we can disable
 /// loop unrolling for such loops.
+///
 #if defined(__clang__)
   #define NO_UNROLL_LOOP _Pragma("nounroll")
 #elif defined(__GNUC__) && __GNUC__ >= 8
@@ -167,6 +168,7 @@
 
 /// Disable automatic vectorization. Used for loops
 /// that execute very few iterations on average.
+///
 #if defined(__clang__)
   #define NO_VECTORIZE_LOOP _Pragma("clang loop vectorize(disable)")
 #elif defined(__GNUC__) && __GNUC__ >= 14
@@ -177,11 +179,12 @@
   #define NO_VECTORIZE_LOOP
 #endif
 
-// Branchfree conditional move instruction:
-// if (cond == true) dest = src;
-// GCC, Clang and MSVC emit a CMOV instruction on x64
-// CPUs when compiled with: -O1, -O2, -O3, -Os, ...
-// On ARM64 the branchfree CSEL instruction is emitted.
+/// Branchfree conditional move instruction:
+/// if (cond == true) dest = src;
+/// GCC, Clang and MSVC emit a CMOV instruction on x64
+/// CPUs when compiled with: -O1, -O2, -O3, -Os, ...
+/// On ARM64 the branchfree CSEL instruction is emitted.
+///
 #define CONDITIONAL_MOVE(cond, dest, src) \
   dest = (-(cond) & (src)) | (-!(cond) & dest)
 
