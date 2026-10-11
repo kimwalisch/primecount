@@ -28,19 +28,15 @@
 #include <cmath>
 #include <utility>
 
-#if defined(ENABLE_ARM_SVE)
-  #include "D_arm_sve.hpp"
-#elif defined(ENABLE_AVX512_VPOPCNT)
-  #include "D_avx512.hpp"
-#elif defined(ENABLE_MULTIARCH_ARM_SVE)
-  #include "D_arm_sve.hpp"
-  #include <cpu_supports_arm_sve.hpp>
-#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #include "D_avx512.hpp"
-  #include <cpu_supports_avx512_vpopcnt.hpp>
-#endif
-
-#if defined(ENABLE_ARM_NEON)
+#if defined(ENABLE_AVX512_VPOPCNT)
+  #define D_DEFAULT_HEADER "D_avx512.hpp"
+  #define D_DEFAULT_ALGO_NAME "Algorithm: AVX512"
+  #define D_THREAD_DEFAULT D_thread_avx512
+#elif defined(ENABLE_ARM_SVE)
+  #define D_DEFAULT_HEADER "D_arm_sve.hpp"
+  #define D_DEFAULT_ALGO_NAME "Algorithm: ARM SVE"
+  #define D_THREAD_DEFAULT D_thread_arm_sve
+#elif defined(ENABLE_ARM_NEON)
   #define D_DEFAULT_HEADER "D_arm_neon.hpp"
   #define D_DEFAULT_ALGO_NAME "Algorithm: ARM NEON"
   #define D_THREAD_DEFAULT D_thread_arm_neon
@@ -50,11 +46,18 @@
   #define D_THREAD_DEFAULT D_thread_default
 #endif
 
-// Portable fallback D algorithm
-#if !defined(ENABLE_ARM_SVE) && \
-    !defined(ENABLE_AVX512_VPOPCNT)
-  #include D_DEFAULT_HEADER
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  #include <cpu_supports_avx512_vpopcnt.hpp>
+  #include "D_avx512.hpp"
 #endif
+
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  #include <cpu_supports_arm_sve.hpp>
+  #include "D_arm_sve.hpp"
+#endif
+
+// Fastest algorithm supported by the compiler flags
+#include D_DEFAULT_HEADER
 
 namespace {
 
@@ -70,40 +73,32 @@ T D_thread(Args&&... args)
   // faster than signed integer division.
   using UT = typename pstd::make_unsigned<T>::type;
 
-  #if defined(ENABLE_AVX512_VPOPCNT)
-    return D_thread_avx512<UT>(std::forward<Args>(args)...);
-  #elif defined(ENABLE_ARM_SVE)
-    return D_thread_arm_sve<UT>(std::forward<Args>(args)...);
-  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    return cpu_supports_avx512_vpopcnt
-      ? D_thread_avx512<UT>(std::forward<Args>(args)...)
-      : D_THREAD_DEFAULT<UT>(std::forward<Args>(args)...);
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    return cpu_supports_sve
-      ? D_thread_arm_sve<UT>(std::forward<Args>(args)...)
-      : D_THREAD_DEFAULT<UT>(std::forward<Args>(args)...);
-  #else
-    return D_THREAD_DEFAULT<UT>(std::forward<Args>(args)...);
+  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+    if (cpu_supports_avx512_vpopcnt)
+      return D_thread_avx512<UT>(std::forward<Args>(args)...);
   #endif
+
+  #if defined(ENABLE_MULTIARCH_ARM_SVE)
+    if (cpu_supports_sve)
+      return D_thread_arm_sve<UT>(std::forward<Args>(args)...);
+  #endif
+
+  return D_THREAD_DEFAULT<UT>(std::forward<Args>(args)...);
 }
 
 string_view_t D_algo_name()
 {
-  #if defined(ENABLE_AVX512_VPOPCNT)
-    return "Algorithm: AVX512";
-  #elif defined(ENABLE_ARM_SVE)
-    return "Algorithm: ARM SVE";
-  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    return cpu_supports_avx512_vpopcnt
-      ? "Algorithm: AVX512"
-      : D_DEFAULT_ALGO_NAME;
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    return cpu_supports_sve
-      ? "Algorithm: ARM SVE"
-      : D_DEFAULT_ALGO_NAME;
-  #else
-    return D_DEFAULT_ALGO_NAME;
+  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+    if (cpu_supports_avx512_vpopcnt)
+      return "Algorithm: AVX512";
   #endif
+
+  #if defined(ENABLE_MULTIARCH_ARM_SVE)
+    if (cpu_supports_sve)
+      return "Algorithm: ARM SVE";
+  #endif
+
+  return D_DEFAULT_ALGO_NAME;
 }
 
 /// Calculate the contribution of the hard special leaves.

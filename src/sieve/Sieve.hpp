@@ -37,6 +37,8 @@
 #ifndef SIEVE_HPP
 #define SIEVE_HPP
 
+#include "count_simd.hpp"
+
 #include <cpu_arch_macros.hpp>
 #include <Vector.hpp>
 
@@ -70,44 +72,30 @@ public:
       cross_off(primes[i], i);
   }
 
-#if defined(ENABLE_COUNT_DEFAULT)
   /// Count 1 bits inside [0, stop]
-  uint64_t count_default(uint64_t stop);
+  uint64_t SIEVE_COUNT_DEFAULT(uint64_t stop);
 
   /// Count 1 bits inside [start, stop]
-  uint64_t count_default(uint64_t start, uint64_t stop) const;
-#endif
+  uint64_t SIEVE_COUNT_DEFAULT(uint64_t start, uint64_t stop) const;
 
-#if defined(ENABLE_AVX512_VPOPCNT) || \
-    defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
   /// Count 1 bits inside [0, stop]
-  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
-  #endif
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
   uint64_t count_avx512(uint64_t stop);
 
   /// Count 1 bits inside [start, stop]
-  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
-  #endif
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
   uint64_t count_avx512(uint64_t start, uint64_t stop) const;
+#endif
 
-#elif defined(ENABLE_ARM_SVE) || \
-      defined(ENABLE_MULTIARCH_ARM_SVE)
-
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
   /// Count 1 bits inside [0, stop]
-  #if defined(ENABLE_MULTIARCH_ARM_SVE)
-    __attribute__ ((target ("+sve")))
-  #endif
+  __attribute__ ((target ("+sve")))
   uint64_t count_arm_sve(uint64_t stop);
 
   /// Count 1 bits inside [start, stop]
-  #if defined(ENABLE_MULTIARCH_ARM_SVE)
-    __attribute__ ((target ("+sve")))
-  #endif
+  __attribute__ ((target ("+sve")))
   uint64_t count_arm_sve(uint64_t start, uint64_t stop) const;
-
 #endif
 
 private:

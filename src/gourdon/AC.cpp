@@ -26,13 +26,10 @@
 #include <utility>
 
 #if defined(ENABLE_ARM_SVE)
-  #include "AC_arm_sve.hpp"
-#elif defined(ENABLE_MULTIARCH_ARM_SVE)
-  #include "AC_arm_sve.hpp"
-  #include <cpu_supports_arm_sve.hpp>
-#endif
-
-#if defined(ENABLE_LIBDIVIDE)
+  #define AC_DEFAULT_HEADER "AC_arm_sve.hpp"
+  #define AC_DEFAULT_ALGO_NAME "Algorithm: ARM SVE"
+  #define AC_OPENMP_DEFAULT AC_OpenMP_arm_sve
+#elif defined(ENABLE_LIBDIVIDE)
   #define AC_DEFAULT_HEADER "AC_libdivide.hpp"
   #define AC_DEFAULT_ALGO_NAME "Algorithm: libdivide"
   #define AC_OPENMP_DEFAULT AC_OpenMP_libdivide
@@ -42,10 +39,13 @@
   #define AC_OPENMP_DEFAULT AC_OpenMP_default
 #endif
 
-// Portable fallback AC algorithm
-#if !defined(ENABLE_ARM_SVE)
-  #include AC_DEFAULT_HEADER
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  #include <cpu_supports_arm_sve.hpp>
+  #include "AC_arm_sve.hpp"
 #endif
+
+// Fastest algorithm supported by the compiler flags
+#include AC_DEFAULT_HEADER
 
 namespace {
 
@@ -55,28 +55,22 @@ namespace {
 template <typename T, typename... Args>
 T AC_OpenMP(T x, Args&&... args)
 {
-  #if defined(ENABLE_ARM_SVE)
-    return AC_OpenMP_arm_sve(x, std::forward<Args>(args)...);
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    return cpu_supports_sve
-      ? AC_OpenMP_arm_sve(x, std::forward<Args>(args)...)
-      : AC_OPENMP_DEFAULT(x, std::forward<Args>(args)...);
-  #else
-    return AC_OPENMP_DEFAULT(x, std::forward<Args>(args)...);
+  #if defined(ENABLE_MULTIARCH_ARM_SVE)
+    if (cpu_supports_sve)
+      return AC_OpenMP_arm_sve(x, std::forward<Args>(args)...);
   #endif
+
+  return AC_OPENMP_DEFAULT(x, std::forward<Args>(args)...);
 }
 
 string_view_t AC_algo_name()
 {
-  #if defined(ENABLE_ARM_SVE)
-    return "Algorithm: ARM SVE";
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    return cpu_supports_sve
-      ? "Algorithm: ARM SVE"
-      : AC_DEFAULT_ALGO_NAME;
-  #else
-    return AC_DEFAULT_ALGO_NAME;
+  #if defined(ENABLE_MULTIARCH_ARM_SVE)
+    if (cpu_supports_sve)
+      return "Algorithm: ARM SVE";
   #endif
+
+  return AC_DEFAULT_ALGO_NAME;
 }
 
 } // namespace

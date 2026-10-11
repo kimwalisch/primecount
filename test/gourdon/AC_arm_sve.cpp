@@ -23,10 +23,12 @@
 #include <cstdlib>
 #include <iostream>
 
-#if defined(ENABLE_ARM_SVE)
+#if defined(ENABLE_ARM_SVE) || \
+    defined(ENABLE_MULTIARCH_ARM_SVE)
   #include "AC_arm_sve.hpp"
-#elif defined(ENABLE_MULTIARCH_ARM_SVE)
-  #include "AC_arm_sve.hpp"
+#endif
+
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
   #include <cpu_supports_arm_sve.hpp>
 #endif
 
@@ -90,7 +92,13 @@ void check_pi_arm_sve(XP xp)
 
 int main()
 {
-  #if defined(ENABLE_ARM_SVE)
+  #if defined(ENABLE_MULTIARCH_ARM_SVE)
+    if (!cpu_supports_sve)
+      return 0;
+  #endif
+
+  #if defined(ENABLE_ARM_SVE) || \
+      defined(ENABLE_MULTIARCH_ARM_SVE)
     check_pi_arm_sve<uint32_t>(uint64_t(1) << 20);
     check_pi_arm_sve<int64_t>(uint64_t(1) << 40);
     check_pi_arm_sve<int64_t>(UINT64_MAX);
@@ -100,20 +108,6 @@ int main()
     #endif
 
     std::cout << "ARM SVE division and masked pi lookups passed." << std::endl;
-
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    if (cpu_supports_sve)
-    {
-      check_pi_arm_sve<uint32_t>(uint64_t(1) << 20);
-      check_pi_arm_sve<int64_t>(uint64_t(1) << 40);
-      check_pi_arm_sve<int64_t>(UINT64_MAX);
-
-      #if defined(HAVE_INT128_T)
-        check_pi_arm_sve<int64_t>(uint128_t(1) << 68);
-      #endif
-
-      std::cout << "ARM SVE division and masked pi lookups passed." << std::endl;
-    }
   #else
     std::cout << "SIMD execution skipped: no supported AC SIMD backend on this CPU/build." << std::endl;
   #endif

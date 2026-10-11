@@ -7,19 +7,19 @@ include(CheckCXXSourceCompiles)
 include(CMakePushCheckState)
 
 cmake_push_check_state()
-set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}")
+set(CMAKE_REQUIRED_INCLUDES
+    "${PROJECT_SOURCE_DIR}"
+    "${PROJECT_SOURCE_DIR}/include")
 
 check_cxx_source_compiles("
+    #include <cpu_arch_macros.hpp>
+
     // GCC/Clang function multiversioning for AVX512 is not needed if
     // the user compiles with -mavx512f -mavx512bw -mavx512vl
     // -mavx512vpopcntdq -mpopcnt.
     // GCC/Clang function multiversioning generally causes a minor
     // overhead, hence we disable it if it is not needed.
-    #if defined(__AVX512F__) && \
-        defined(__AVX512BW__) && \
-        defined(__AVX512VL__) && \
-        defined(__AVX512VPOPCNTDQ__) && \
-        defined(__POPCNT__)
+    #if defined(ENABLE_AVX512_VPOPCNT)
       Error: AVX512 multiarch not needed!
     #endif
 

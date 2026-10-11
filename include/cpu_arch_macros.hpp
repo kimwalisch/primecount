@@ -1,5 +1,8 @@
 ///
 /// @file  cpu_arch_macros.hpp
+/// @brief Enable the fastest SIMD instruction set supported by the
+///        compiler flags. Runtime dispatching (ENABLE_MULTIARCH_*)
+///        is only kept for instruction sets that are even faster.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -10,35 +13,30 @@
 #ifndef CPU_ARCH_MACROS_HPP
 #define CPU_ARCH_MACROS_HPP
 
-// Needed for __has_include
 #include <macros.hpp>
 
-#if defined(__ARM_FEATURE_SVE) && \
-    __has_include(<arm_sve.h>)
-  #define ENABLE_ARM_SVE
-#elif defined(__AVX512F__) && \
-      defined(__AVX512BW__) && \
-      defined(__AVX512VL__) && \
-      defined(__AVX512VPOPCNTDQ__) && \
-      defined(__POPCNT__) && \
-      !defined(__i386__)
-      __has_include(<immintrin.h>)
-  #define ENABLE_AVX512_VPOPCNT
-#elif defined(ENABLE_MULTIARCH_ARM_SVE)
-  #define ENABLE_COUNT_DEFAULT
-#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #define ENABLE_COUNT_DEFAULT
-#else
-  #define ENABLE_COUNT_DEFAULT
-#endif
-
-// Our ARM NEON code uses vaddvq() and vpaddq() intrinsics
-// which are supported on 64-bit but not on 32-bit ARM CPUs.
-#if defined(ENABLE_COUNT_DEFAULT) && \
-    (defined(__aarch64__) || \
+// ARM NEON is supported by all 64-bit ARM CPUs. 32-bit ARM
+// uses the portable default algorithms, as NEON is optional
+// on 32-bit ARM and we use AArch64-only NEON intrinsics.
+#if (defined(__aarch64__) || \
      defined(_M_ARM64)) && \
     __has_include(<arm_neon.h>)
   #define ENABLE_ARM_NEON
+#endif
+
+#if defined(__AVX512F__) && \
+    defined(__AVX512BW__) && \
+    defined(__AVX512VL__) && \
+    defined(__AVX512VPOPCNTDQ__) && \
+    defined(__POPCNT__) && \
+    !defined(__i386__) && \
+    __has_include(<immintrin.h>)
+  #define ENABLE_AVX512_VPOPCNT
+  #undef ENABLE_MULTIARCH_AVX512_VPOPCNT
+#elif defined(__ARM_FEATURE_SVE) && \
+      __has_include(<arm_sve.h>)
+  #define ENABLE_ARM_SVE
+  #undef ENABLE_MULTIARCH_ARM_SVE
 #endif
 
 #endif

@@ -34,10 +34,12 @@
 
 #include <stdint.h>
 
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  #include <cpu_supports_avx512_vpopcnt.hpp>
+#endif
+
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   #include <cpu_supports_arm_sve.hpp>
-#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #include <cpu_supports_avx512_vpopcnt.hpp>
 #endif
 
 namespace {
@@ -55,17 +57,13 @@ uint64_t get_svcntd()
 
 ALWAYS_INLINE uint64_t bytes_per_count_instruction()
 {
-  #if defined(ENABLE_AVX512_VPOPCNT)
-    // count_avx512() algorithm
-    return sizeof(__m512i);
-  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     // count_avx512() algorithm
     if (cpu_supports_avx512_vpopcnt)
       return sizeof(__m512i);
-  #elif defined(ENABLE_ARM_SVE)
-    // count_arm_sve() algorithm
-    return svcntd() * sizeof(uint64_t);
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+  #endif
+
+  #if defined(ENABLE_MULTIARCH_ARM_SVE)
     // count_arm_sve() algorithm
     if (cpu_supports_sve)
       return get_svcntd() * sizeof(uint64_t);
@@ -81,48 +79,41 @@ namespace primecount {
 /// Count 1 bits inside [start, stop]
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
-  #if defined(ENABLE_ARM_SVE)
-    return count_arm_sve(start, stop);
-  #elif defined(ENABLE_AVX512_VPOPCNT)
-    return count_avx512(start, stop);
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    return cpu_supports_sve ? count_arm_sve(start, stop) : count_default(start, stop);
-  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    return cpu_supports_avx512_vpopcnt ? count_avx512(start, stop) : count_default(start, stop);
-  #else
-    return count_default(start, stop);
+  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+    if (cpu_supports_avx512_vpopcnt)
+      return count_avx512(start, stop);
   #endif
-}
 
-#if defined(ENABLE_COUNT_DEFAULT)
+  #if defined(ENABLE_MULTIARCH_ARM_SVE)
+    if (cpu_supports_sve)
+      return count_arm_sve(start, stop);
+  #endif
+
+  return SIEVE_COUNT_DEFAULT(start, stop);
+}
 
 /// Count 1 bits inside [start, stop].
 /// The distance [start, stop] is small here < sqrt(segment_size),
 /// hence we simply count the number of unsieved elements
 /// by linearly iterating over the sieve array.
 ///
-uint64_t Sieve::count_default(uint64_t start, uint64_t stop) const
+uint64_t Sieve::SIEVE_COUNT_DEFAULT(uint64_t start, uint64_t stop) const
 {
   if (start > stop)
     return 0;
 
-  DEFAULT_SIEVE_COUNT(start, stop);
+  SIEVE_COUNT_KERNEL_DEFAULT(start, stop);
   return cnt;
 }
 
-#endif
-
-#if defined(ENABLE_AVX512_VPOPCNT) || \
-    defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
 
 /// Count 1 bits inside [start, stop].
 /// The distance [start, stop] is small here < sqrt(segment_size),
 /// hence we simply count the number of unsieved elements
 /// by linearly iterating over the sieve array.
 ///
-#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
-#endif
+__attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 uint64_t Sieve::count_avx512(uint64_t start, uint64_t stop) const
 {
   if (start > stop)
@@ -132,17 +123,16 @@ uint64_t Sieve::count_avx512(uint64_t start, uint64_t stop) const
   return cnt;
 }
 
-#elif defined(ENABLE_ARM_SVE) || \
-      defined(ENABLE_MULTIARCH_ARM_SVE)
+#endif
+
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
 
 /// Count 1 bits inside [start, stop].
 /// The distance [start, stop] is small here < sqrt(segment_size),
 /// hence we simply count the number of unsieved elements
 /// by linearly iterating over the sieve array.
 ///
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
-#endif
+__attribute__ ((target ("+sve")))
 uint64_t Sieve::count_arm_sve(uint64_t start, uint64_t stop) const
 {
   if (start > stop)
