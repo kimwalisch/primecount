@@ -29,8 +29,14 @@
   #include <immintrin.h>
 #endif
 
-// Portable fallback sieve count kernels
-#if defined(ENABLE_ARM_NEON)
+// Fastest count kernel supported by the compiler flags
+#if defined(ENABLE_AVX512_VPOPCNT)
+  #define DEFAULT_SIEVE_COUNT SIEVE_COUNT_AVX512
+  #define DEFAULT_BYTES_PER_COUNT_INSTRUCTION sizeof(__m512i)
+#elif defined(ENABLE_ARM_SVE)
+  #define DEFAULT_SIEVE_COUNT SIEVE_COUNT_ARM_SVE
+  #define DEFAULT_BYTES_PER_COUNT_INSTRUCTION (sizeof(uint64_t) * svcntd())
+#elif defined(ENABLE_ARM_NEON)
   #include <arm_neon.h>
   #define DEFAULT_SIEVE_COUNT SIEVE_COUNT_ARM_NEON
   #define DEFAULT_BYTES_PER_COUNT_INSTRUCTION (sizeof(uint64_t) * 2)

@@ -33,26 +33,16 @@
 namespace primecount {
 
 /// Count 1 bits inside [0, stop].
-/// This method is safe to run on any CPU without runtime
-/// CPUID checks. In most cases (e.g. when compiled
-/// without -march=native) this will call the portable
-/// count_default() method.
+/// Use the fastest algorithm supported by the compiler
+/// flags without runtime CPUID checks.
 ///
 ALWAYS_INLINE uint64_t Sieve::count(uint64_t stop)
 {
-  #if defined(ENABLE_AVX512_VPOPCNT)
-    return count_avx512(stop);
-  #elif defined(ENABLE_ARM_SVE)
-    return count_arm_sve(stop);
-  #else
-    return count_default(stop);
-  #endif
+  return SIEVE_COUNT_DEFAULT(stop);
 }
 
-#if defined(ENABLE_COUNT_DEFAULT)
-
 /// Count 1 bits inside [0, stop]
-ALWAYS_INLINE uint64_t Sieve::count_default(uint64_t stop)
+ALWAYS_INLINE uint64_t Sieve::SIEVE_COUNT_DEFAULT(uint64_t stop)
 {
   ASSERT(stop >= prev_stop_);
   uint64_t start = prev_stop_ + 1;
@@ -88,15 +78,10 @@ ALWAYS_INLINE uint64_t Sieve::count_default(uint64_t stop)
   return count_;
 }
 
-#endif
-
-#if defined(ENABLE_AVX512_VPOPCNT) || \
-    defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
 
 /// Count 1 bits inside [0, stop]
-#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
-#endif
+__attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 ALWAYS_INLINE uint64_t Sieve::count_avx512(uint64_t stop)
 {
   ASSERT(stop >= prev_stop_);
@@ -133,13 +118,12 @@ ALWAYS_INLINE uint64_t Sieve::count_avx512(uint64_t stop)
   return count_;
 }
 
-#elif defined(ENABLE_ARM_SVE) || \
-      defined(ENABLE_MULTIARCH_ARM_SVE)
+#endif
+
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
 
 /// Count 1 bits inside [0, stop]
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
-#endif
+__attribute__ ((target ("+sve")))
 ALWAYS_INLINE uint64_t Sieve::count_arm_sve(uint64_t stop)
 {
   ASSERT(stop >= prev_stop_);
