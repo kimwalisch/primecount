@@ -121,7 +121,7 @@ uint64_t Sieve::count_default(uint64_t start, uint64_t stop) const
 /// by linearly iterating over the sieve array.
 ///
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 #endif
 uint64_t Sieve::count_avx512(uint64_t start, uint64_t stop) const
 {

@@ -20,6 +20,8 @@
       defined(__AVX512BW__) && \
       defined(__AVX512VL__) && \
       defined(__AVX512VPOPCNTDQ__) && \
+      defined(__POPCNT__) && \
+      !defined(__i386__)
       __has_include(<immintrin.h>)
   #define ENABLE_AVX512_VPOPCNT
 #elif defined(ENABLE_MULTIARCH_ARM_SVE)

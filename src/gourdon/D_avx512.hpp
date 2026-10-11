@@ -31,7 +31,6 @@
 #include <macros.hpp>
 #include <min.hpp>
 #include <phi_vector.hpp>
-#include <popcnt.hpp>
 #include <PiTable.hpp>
 #include <sieve/Sieve.hpp>
 #include <Vector.hpp>
@@ -44,7 +43,7 @@ namespace {
 using namespace primecount;
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 #endif
 ALWAYS_INLINE __m512i load_factor_epi32_avx512(const uint16_t* factor_table,
                                                __m512i reverse32)
@@ -54,7 +53,7 @@ ALWAYS_INLINE __m512i load_factor_epi32_avx512(const uint16_t* factor_table,
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 #endif
 ALWAYS_INLINE __m512i load_factor_epi32_avx512(const uint32_t* factor_table,
                                                __m512i reverse32)
@@ -64,7 +63,7 @@ ALWAYS_INLINE __m512i load_factor_epi32_avx512(const uint32_t* factor_table,
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 #endif
 ALWAYS_INLINE __m512i load_factor_tail_epi32_avx512(const uint16_t* factor_table,
                                                     __mmask16 load_mask,
@@ -79,7 +78,7 @@ ALWAYS_INLINE __m512i load_factor_tail_epi32_avx512(const uint16_t* factor_table
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 #endif
 ALWAYS_INLINE __m512i load_factor_tail_epi32_avx512(const uint32_t* factor_table,
                                                     __mmask16 load_mask,
@@ -92,7 +91,7 @@ ALWAYS_INLINE __m512i load_factor_tail_epi32_avx512(const uint32_t* factor_table
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 #endif
 ALWAYS_INLINE __m512i load_factor_epi64_avx512(const uint16_t* factor_table,
                                                __m512i reverse64)
@@ -102,7 +101,7 @@ ALWAYS_INLINE __m512i load_factor_epi64_avx512(const uint16_t* factor_table,
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 #endif
 ALWAYS_INLINE __m512i load_factor_epi64_avx512(const uint32_t* factor_table,
                                                __m512i reverse64)
@@ -112,7 +111,7 @@ ALWAYS_INLINE __m512i load_factor_epi64_avx512(const uint32_t* factor_table,
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 #endif
 ALWAYS_INLINE __m512i load_factor_tail_epi64_avx512(const uint16_t* factor_table,
                                                     __mmask8 load_mask,
@@ -127,7 +126,7 @@ ALWAYS_INLINE __m512i load_factor_tail_epi64_avx512(const uint16_t* factor_table
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 #endif
 ALWAYS_INLINE __m512i load_factor_tail_epi64_avx512(const uint32_t* factor_table,
                                                     __mmask8 load_mask,
@@ -143,7 +142,7 @@ ALWAYS_INLINE __m512i load_factor_tail_epi64_avx512(const uint32_t* factor_table
 
 template <typename T, typename Primes, typename FactorTable>
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 #endif
 T D_thread_avx512(T x,
                   int64_t x_star,
@@ -235,7 +234,7 @@ T D_thread_avx512(T x,
           __m512i factor_vec = load_factor_epi32_avx512(&factor_table[m - 15], reverse32);
           __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, encoded_prime_vec);
           _mm512_mask_compressstoreu_epi32(&m_indexes32[m_count], mask, m_vec);
-          m_count += popcnt64_native(mask);
+          m_count += _mm_popcnt_u64(mask);
 
           if (m_count > max_m_count)
           {
@@ -270,7 +269,7 @@ T D_thread_avx512(T x,
           __m512i factor_vec = load_factor_tail_epi32_avx512(&factor_table[min_m + 1], load_mask, count, m_offsets32);
           __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, encoded_prime_vec);
           _mm512_mask_compressstoreu_epi32(&m_indexes32[m_count], mask, m_vec);
-          m_count += popcnt64_native(mask);
+          m_count += _mm_popcnt_u64(mask);
         }
 
         // Batch calculate (xp/m - low) to improve CPU pipelining
@@ -302,7 +301,7 @@ T D_thread_avx512(T x,
           __m512i factor_vec = load_factor_epi64_avx512(&factor_table[m - 7], reverse64);
           __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, encoded_prime_vec);
           _mm512_mask_compressstoreu_epi64(&m_indexes64[m_count], mask, m_vec);
-          m_count += popcnt64_native(mask);
+          m_count += _mm_popcnt_u64(mask);
 
           if (m_count > max_m_count)
           {
@@ -337,7 +336,7 @@ T D_thread_avx512(T x,
           __m512i factor_vec = load_factor_tail_epi64_avx512(&factor_table[min_m + 1], load_mask, count, m_offsets64);
           __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, encoded_prime_vec);
           _mm512_mask_compressstoreu_epi64(&m_indexes64[m_count], mask, m_vec);
-          m_count += popcnt64_native(mask);
+          m_count += _mm_popcnt_u64(mask);
         }
 
         // Batch calculate (xp/m - low) to improve CPU pipelining

@@ -11,13 +11,15 @@ set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}")
 
 check_cxx_source_compiles("
     // GCC/Clang function multiversioning for AVX512 is not needed if
-    // the user compiles with -mavx512f -mavx512bw -mavx512vl -mavx512vpopcntdq.
+    // the user compiles with -mavx512f -mavx512bw -mavx512vl
+    // -mavx512vpopcntdq -mpopcnt.
     // GCC/Clang function multiversioning generally causes a minor
     // overhead, hence we disable it if it is not needed.
     #if defined(__AVX512F__) && \
         defined(__AVX512BW__) && \
         defined(__AVX512VL__) && \
-        defined(__AVX512VPOPCNTDQ__)
+        defined(__AVX512VPOPCNTDQ__) && \
+        defined(__POPCNT__)
       Error: AVX512 multiarch not needed!
     #endif
 
@@ -28,7 +30,7 @@ check_cxx_source_compiles("
     class Sieve {
     public:
         uint64_t count_default(uint64_t* array, uint64_t stop_idx);
-        __attribute__ ((target (\"avx512f,avx512bw,avx512vl,avx512vpopcntdq\")))
+        __attribute__ ((target (\"avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt\")))
         uint64_t count_avx512(uint64_t* array, uint64_t stop_idx);
     };
 
@@ -40,7 +42,7 @@ check_cxx_source_compiles("
         return res;
     }
 
-    __attribute__ ((target (\"avx512f,avx512bw,avx512vl,avx512vpopcntdq\")))
+    __attribute__ ((target (\"avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt\")))
     uint64_t Sieve::count_avx512(uint64_t* array, uint64_t stop_idx)
     {
         uint64_t i = 0;
@@ -57,7 +59,7 @@ check_cxx_source_compiles("
         __m512i vec = _mm512_maskz_loadu_epi64(mask , &array[i]);
         vec = _mm512_popcnt_epi64(vec);
         vcnt = _mm512_add_epi64(vcnt, vec);
-        return _mm512_reduce_add_epi64(vcnt);
+        return _mm512_reduce_add_epi64(vcnt) + _mm_popcnt_u64(array[0]);
     }
 
     int main()

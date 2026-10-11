@@ -95,7 +95,7 @@ ALWAYS_INLINE uint64_t Sieve::count_default(uint64_t stop)
 
 /// Count 1 bits inside [0, stop]
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
 #endif
 ALWAYS_INLINE uint64_t Sieve::count_avx512(uint64_t stop)
 {
