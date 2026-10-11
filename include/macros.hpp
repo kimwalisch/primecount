@@ -44,6 +44,24 @@
   #define NOINLINE
 #endif
 
+/// Annotate SIMD functions used for runtime dispatching. GCC/Clang
+/// (including clang-cl) use target attributes. Native MSVC must
+/// not inline SIMD code into scalar code, as SIMD instructions may
+/// leak into the scalar code path. Hence, functions called from
+/// scalar code use PRIMECOUNT_TARGET_ENTRY, which is NOINLINE with
+/// native MSVC. SIMD helpers only called from other SIMD functions
+/// use PRIMECOUNT_TARGET_ATTRIBUTE and may be ALWAYS_INLINE. To be
+/// inlined, a helper must use the same CPU instruction sets as its
+/// PRIMECOUNT_TARGET_ENTRY caller.
+///
+#if __has_attribute(target)
+  #define PRIMECOUNT_TARGET_ATTRIBUTE(isa) __attribute__((target(isa)))
+  #define PRIMECOUNT_TARGET_ENTRY(isa) __attribute__((target(isa)))
+#elif defined(_MSC_VER)
+  #define PRIMECOUNT_TARGET_ATTRIBUTE(isa)
+  #define PRIMECOUNT_TARGET_ENTRY(isa) NOINLINE
+#endif
+
 #if __cplusplus >= 202002L && \
     __has_cpp_attribute(likely)
   #define if_likely(x) if (x) [[likely]]

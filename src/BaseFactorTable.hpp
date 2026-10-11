@@ -58,7 +58,7 @@ public:
     defined(ENABLE_MULTIARCH_ARM_SVE)
 
   #if defined(ENABLE_MULTIARCH_ARM_SVE)
-    __attribute__ ((target ("+sve")))
+    PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
   #endif
   ALWAYS_INLINE static svuint64_t to_number_arm_sve(svbool_t pg,
                                                     const uint32_t* indexes)
@@ -72,7 +72,7 @@ public:
   }
 
   #if defined(ENABLE_MULTIARCH_ARM_SVE)
-    __attribute__ ((target ("+sve")))
+    PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
   #endif
   ALWAYS_INLINE static svuint64_t to_number_arm_sve(svbool_t pg,
                                                     const int64_t* indexes)

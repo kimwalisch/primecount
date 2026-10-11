@@ -49,7 +49,7 @@ void check(bool ok)
 
 template <typename Index>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 void check_conversion_arm_sve(uint64_t base)
 {
@@ -75,7 +75,7 @@ void check_conversion_arm_sve(uint64_t base)
 
 template <typename Index>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
 void check_batch_arm_sve(uint64_t base)
 {
@@ -132,7 +132,7 @@ void check_batch_arm_sve(uint64_t base)
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ENTRY("+sve")
 #endif
 void test_arm_sve()
 {

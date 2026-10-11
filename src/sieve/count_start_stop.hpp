@@ -47,7 +47,7 @@ namespace {
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
 
 /// svcntd() requires ARM SVE compiler flag
-__attribute__ ((target ("+sve")))
+PRIMECOUNT_TARGET_ENTRY("+sve")
 uint64_t get_svcntd()
 {
   return svcntd();
@@ -113,7 +113,7 @@ uint64_t Sieve::SIEVE_COUNT_DEFAULT(uint64_t start, uint64_t stop) const
 /// hence we simply count the number of unsieved elements
 /// by linearly iterating over the sieve array.
 ///
-__attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+PRIMECOUNT_TARGET_ENTRY("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 uint64_t Sieve::count_avx512(uint64_t start, uint64_t stop) const
 {
   if (start > stop)
@@ -132,7 +132,7 @@ uint64_t Sieve::count_avx512(uint64_t start, uint64_t stop) const
 /// hence we simply count the number of unsieved elements
 /// by linearly iterating over the sieve array.
 ///
-__attribute__ ((target ("+sve")))
+PRIMECOUNT_TARGET_ENTRY("+sve")
 uint64_t Sieve::count_arm_sve(uint64_t start, uint64_t stop) const
 {
   if (start > stop)

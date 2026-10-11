@@ -1,7 +1,7 @@
-# We use GCC/Clang's function multi-versioning for AVX512
-# support. This code will automatically dispatch to the
-# AVX512 VPOPCNT algorithm if the CPU supports it and use
-# the default (portable) algorithm otherwise.
+# Runtime dispatch selects AVX512 VPOPCNT when supported by the CPU
+# and OS, and uses the default algorithm otherwise. The kernels use
+# target attributes with GCC/Clang (including clang-cl), and noinline
+# with native MSVC.
 
 include(CheckCXXSourceCompiles)
 include(CMakePushCheckState)
@@ -14,15 +14,16 @@ set(CMAKE_REQUIRED_INCLUDES
 check_cxx_source_compiles("
     #include <cpu_arch_macros.hpp>
 
-    // GCC/Clang function multiversioning for AVX512 is not needed if
+    // Runtime dispatch for AVX512 is not needed if
     // the user compiles with -mavx512f -mavx512bw -mavx512vl
     // -mavx512vpopcntdq -mpopcnt.
-    // GCC/Clang function multiversioning generally causes a minor
+    // Runtime dispatch generally causes a minor
     // overhead, hence we disable it if it is not needed.
     #if defined(ENABLE_AVX512_VPOPCNT)
       Error: AVX512 multiarch not needed!
     #endif
 
+    #include <macros.hpp>
     #include <src/arch/x86/cpuid.cpp>
     #include <immintrin.h>
     #include <stdint.h>
@@ -30,7 +31,7 @@ check_cxx_source_compiles("
     class Sieve {
     public:
         uint64_t count_default(uint64_t* array, uint64_t stop_idx);
-        __attribute__ ((target (\"avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt\")))
+        PRIMECOUNT_TARGET_ENTRY(\"avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt\")
         uint64_t count_avx512(uint64_t* array, uint64_t stop_idx);
     };
 
@@ -42,7 +43,7 @@ check_cxx_source_compiles("
         return res;
     }
 
-    __attribute__ ((target (\"avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt\")))
+    PRIMECOUNT_TARGET_ENTRY(\"avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt\")
     uint64_t Sieve::count_avx512(uint64_t* array, uint64_t stop_idx)
     {
         uint64_t i = 0;

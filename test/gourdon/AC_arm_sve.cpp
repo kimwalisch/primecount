@@ -50,7 +50,7 @@ void check(bool ok)
 
 template <typename PRIME, typename XP>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ENTRY("+sve")
 #endif
 void check_pi_arm_sve(XP xp)
 {

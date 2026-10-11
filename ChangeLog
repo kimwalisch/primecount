@@ -1,5 +1,7 @@
 Changes in primecount-8.9, 2026-10-11
 
+* Implement SIMD runtime dispatching for MSVC compiler.
+* ci.yml: Check that AVX512 and ARM SVE runtime dispatching are enabled.
 * Simplify SIMD runtime dispatch preprocessor logic.
 * popcnt.hpp: Add ARM NEON popcnt64() for MSVC compiler.
 * Use _mm_popcnt_u64() instead of popcnt64_native() in AVX512 code.

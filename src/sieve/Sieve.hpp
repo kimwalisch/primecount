@@ -40,6 +40,7 @@
 #include "count_simd.hpp"
 
 #include <cpu_arch_macros.hpp>
+#include <macros.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
@@ -80,21 +81,21 @@ public:
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
   /// Count 1 bits inside [0, stop]
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
   uint64_t count_avx512(uint64_t stop);
 
   /// Count 1 bits inside [start, stop]
-  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+  PRIMECOUNT_TARGET_ENTRY("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
   uint64_t count_avx512(uint64_t start, uint64_t stop) const;
 #endif
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   /// Count 1 bits inside [0, stop]
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
   uint64_t count_arm_sve(uint64_t stop);
 
   /// Count 1 bits inside [start, stop]
-  __attribute__ ((target ("+sve")))
+  PRIMECOUNT_TARGET_ENTRY("+sve")
   uint64_t count_arm_sve(uint64_t start, uint64_t stop) const;
 #endif
 

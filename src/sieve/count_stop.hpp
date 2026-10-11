@@ -81,7 +81,7 @@ ALWAYS_INLINE uint64_t Sieve::SIEVE_COUNT_DEFAULT(uint64_t stop)
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
 
 /// Count 1 bits inside [0, stop]
-__attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")))
+PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 ALWAYS_INLINE uint64_t Sieve::count_avx512(uint64_t stop)
 {
   ASSERT(stop >= prev_stop_);
@@ -123,7 +123,7 @@ ALWAYS_INLINE uint64_t Sieve::count_avx512(uint64_t stop)
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
 
 /// Count 1 bits inside [0, stop]
-__attribute__ ((target ("+sve")))
+PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 ALWAYS_INLINE uint64_t Sieve::count_arm_sve(uint64_t stop)
 {
   ASSERT(stop >= prev_stop_);
