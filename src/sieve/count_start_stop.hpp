@@ -102,7 +102,7 @@ uint64_t Sieve::SIEVE_COUNT_DEFAULT(uint64_t start, uint64_t stop) const
   if (start > stop)
     return 0;
 
-  DEFAULT_SIEVE_COUNT(start, stop);
+  SIEVE_COUNT_KERNEL_DEFAULT(start, stop);
   return cnt;
 }
 

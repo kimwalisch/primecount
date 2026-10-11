@@ -37,18 +37,12 @@
 #ifndef SIEVE_HPP
 #define SIEVE_HPP
 
+#include "count_simd.hpp"
+
 #include <cpu_arch_macros.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
-
-#if defined(ENABLE_AVX512_VPOPCNT)
-  #define SIEVE_COUNT_DEFAULT count_avx512
-#elif defined(ENABLE_ARM_SVE)
-  #define SIEVE_COUNT_DEFAULT count_arm_sve
-#else
-  #define SIEVE_COUNT_DEFAULT count_default
-#endif
 
 namespace primecount {
 

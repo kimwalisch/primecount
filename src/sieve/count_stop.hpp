@@ -72,7 +72,7 @@ ALWAYS_INLINE uint64_t Sieve::SIEVE_COUNT_DEFAULT(uint64_t stop)
   // (stop - start) < counter_.dist, hence we simply
   // count the remaining number of unsieved elements by
   // linearly iterating over the sieve array.
-  DEFAULT_SIEVE_COUNT(start, stop);
+  SIEVE_COUNT_KERNEL_DEFAULT(start, stop);
   count_ += cnt;
 
   return count_;
