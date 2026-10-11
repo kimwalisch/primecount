@@ -50,6 +50,16 @@
   #define NOINLINE
 #endif
 
+/// Keep ISA-specific kernels behind the runtime
+/// dispatch boundary. GCC/Clang use target attributes;
+/// native MSVC must prevent inlining.
+///
+#if __has_attribute(target)
+  #define PRIMESIEVE_TARGET_ATTRIBUTE(isa) __attribute__((target(isa)))
+#elif defined(_MSC_VER)
+  #define PRIMESIEVE_TARGET_ATTRIBUTE(isa) NOINLINE
+#endif
+
 #if __cplusplus >= 202002L && \
     __has_cpp_attribute(likely)
   #define if_likely(x) if (x) [[likely]]
@@ -157,6 +167,32 @@
   #define INDETERMINATE [[indeterminate]]
 #else
   #define INDETERMINATE
+#endif
+
+/// Unrolling loops that execute very few iterations on average
+/// tends to deteriorate performance due to increased branch
+/// mispredictions. Using the NO_UNROLL_LOOP macro we can disable
+/// loop unrolling for such loops.
+///
+#if defined(__clang__)
+  #define NO_UNROLL_LOOP _Pragma("nounroll")
+#elif defined(__GNUC__) && __GNUC__ >= 8
+  #define NO_UNROLL_LOOP _Pragma("GCC unroll 0")
+#else
+  #define NO_UNROLL_LOOP
+#endif
+
+/// Disable automatic vectorization. Used for loops
+/// that execute very few iterations on average.
+///
+#if defined(__clang__)
+  #define NO_VECTORIZE_LOOP _Pragma("clang loop vectorize(disable)")
+#elif defined(__GNUC__) && __GNUC__ >= 14
+  #define NO_VECTORIZE_LOOP _Pragma("GCC novector")
+#elif defined(_MSC_VER)
+  #define NO_VECTORIZE_LOOP __pragma(loop(no_vector))
+#else
+  #define NO_VECTORIZE_LOOP
 #endif
 
 #endif

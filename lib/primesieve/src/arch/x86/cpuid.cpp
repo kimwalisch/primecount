@@ -19,6 +19,8 @@
 // https://en.wikipedia.org/wiki/CPUID
 
 // %ebx bit flags
+#define bit_AVX2     (1 << 5)
+#define bit_BMI2     (1 << 8)
 #define bit_AVX512F  (1 << 16)
 #define bit_AVX512BW (1 << 30)
 
@@ -97,6 +99,39 @@ bool has_popcnt()
   return cached;
 }
 
+bool has_avx2()
+{
+  static const bool cached = []() -> bool
+  {
+    int abcd[4];
+    run_cpuid(1, 0, abcd);
+    int osxsave_mask = (1 << 27);
+
+    // fillNextPrimes_x86_avx2() requires POPCNT
+    if ((abcd[2] & bit_POPCNT) != bit_POPCNT)
+      return false;
+
+    // Ensure OS supports extended processor state management
+    if ((abcd[2] & osxsave_mask) != osxsave_mask)
+      return false;
+
+    uint64_t ymm_mask = XSTATE_SSE | XSTATE_YMM;
+    uint64_t xcr0 = get_xcr0();
+
+    // Check AVX OS support
+    if ((xcr0 & ymm_mask) != ymm_mask)
+      return false;
+
+    run_cpuid(7, 0, abcd);
+
+    // fillNextPrimes_x86_avx2() requires AVX2 & BMI2
+    return ((abcd[1] & bit_AVX2) == bit_AVX2 &&
+            (abcd[1] & bit_BMI2) == bit_BMI2);
+  }();
+
+  return cached;
+}
+
 bool has_avx512_bw()
 {
   static const bool cached = []() -> bool
@@ -138,6 +173,10 @@ bool has_avx512_vbmi2()
     int abcd[4];
     run_cpuid(1, 0, abcd);
     int osxsave_mask = (1 << 27);
+
+    // fillNextPrimes_x86_avx512() requires POPCNT
+    if ((abcd[2] & bit_POPCNT) != bit_POPCNT)
+      return false;
 
     // Ensure OS supports extended processor state management
     if ((abcd[2] & osxsave_mask) != osxsave_mask)

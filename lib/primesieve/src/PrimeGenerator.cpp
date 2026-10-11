@@ -7,9 +7,9 @@
 ///         the vector PrimeGenerator generates new primes.
 ///
 ///         primesieve::iterator's next_prime() performance depends
-///         on PrimeGenerator::fillNextPrimes(). Therefore
-///         fillNextPrimes() is highly optimized using hardware
-///         acceleration (e.g. CTZ, AVX512) whenever possible.
+///         on PrimeGenerator::fillNextPrimes(). Therefore fillNextPrimes()
+///         is highly optimized using hardware acceleration (e.g. CTZ,
+///         AVX512) whenever possible.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 /// Copyright (C) 2022 @zielaj, https://github.com/zielaj
@@ -26,7 +26,6 @@
 #include <primesieve/macros.hpp>
 #include <primesieve/primesieve_error.hpp>
 #include <primesieve/pmath.hpp>
-#include <primesieve/popcnt.hpp>
 #include <primesieve/util.hpp>
 #include <primesieve/Vector.hpp>
 
@@ -225,9 +224,8 @@ void PrimeGenerator::initNextPrimes(Vector<uint64_t>& primes,
       resize(primes, *size);
     else
     {
-      // +64 is needed because our fillNextPrimes()
-      // algorithm aborts as soon as there is not
-      // enough space to store 64 more primes.
+      // Ensure room for one complete sieve word,
+      // which contains at most 64 primes.
       std::size_t minSize = *size + 64;
       std::size_t pix = primeCountUpper(start_, stop_) + 64;
       pix = inBetween(minSize, pix, maxSize);
@@ -242,9 +240,8 @@ void PrimeGenerator::initNextPrimes(Vector<uint64_t>& primes,
   }
   else
   {
-    // +64 is needed because our fillNextPrimes()
-    // algorithm aborts as soon as there is not
-    // enough space to store 64 more primes.
+    // Ensure room for one complete sieve word,
+    // which contains at most 64 primes.
     std::size_t minSize = 64;
     std::size_t pix = primeCountUpper(start_, stop_) + 64;
     pix = inBetween(minSize, pix, maxSize);
@@ -333,11 +330,13 @@ bool PrimeGenerator::sieveNextPrimes(Vector<uint64_t>& primes,
 
 } // namespace
 
-#if defined(ENABLE_PRIMEGENERATOR_DEFAULT)
-  #include "PrimeGenerator_default.hpp"
-#endif
-
-#if defined(ENABLE_AVX512_VBMI2) || \
-    defined(ENABLE_MULTIARCH_AVX512_VBMI2)
+#if defined(ENABLE_MULTIARCH_AVX512_VBMI2)
   #include "PrimeGenerator_x86_avx512.hpp"
 #endif
+
+#if defined(ENABLE_MULTIARCH_AVX2_BMI2)
+  #include "PrimeGenerator_x86_avx2.hpp"
+#endif
+
+// Fastest algorithm supported by the compiler flags
+#include PRIMEGENERATOR_DEFAULT_HEADER

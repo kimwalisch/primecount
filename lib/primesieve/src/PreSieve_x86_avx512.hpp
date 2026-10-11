@@ -11,6 +11,8 @@
 #ifndef PRESIEVE_X86_AVX512_HPP
 #define PRESIEVE_X86_AVX512_HPP
 
+#include <primesieve/cpu_arch_macros.hpp>
+
 #include <immintrin.h>
 #include <stdint.h>
 #include <cstddef>
@@ -18,7 +20,7 @@
 namespace {
 
 #if defined(ENABLE_MULTIARCH_AVX512_BW)
-  __attribute__ ((target ("avx512f,avx512bw")))
+  PRIMESIEVE_TARGET_ATTRIBUTE("avx512f,avx512bw")
 #endif
 void presieve1_x86_avx512(const uint8_t* __restrict preSieved0,
                           const uint8_t* __restrict preSieved1,
@@ -29,6 +31,10 @@ void presieve1_x86_avx512(const uint8_t* __restrict preSieved0,
 {
   std::size_t i = 0;
 
+  // This loop executes only about 16 iterations on average.
+  // Hence, unrolling this loop will most likely hurt
+  // performance since it will cause more branch misses.
+  NO_UNROLL_LOOP
   for (; i + 64 <= bytes; i += sizeof(__m512i))
   {
     _mm512_storeu_epi8((__m512i*) &sieve[i],
@@ -49,7 +55,7 @@ void presieve1_x86_avx512(const uint8_t* __restrict preSieved0,
 }
 
 #if defined(ENABLE_MULTIARCH_AVX512_BW)
-  __attribute__ ((target ("avx512f,avx512bw")))
+  PRIMESIEVE_TARGET_ATTRIBUTE("avx512f,avx512bw")
 #endif
 void presieve2_x86_avx512(const uint8_t* __restrict preSieved0,
                           const uint8_t* __restrict preSieved1,
@@ -60,6 +66,10 @@ void presieve2_x86_avx512(const uint8_t* __restrict preSieved0,
 {
   std::size_t i = 0;
 
+  // This loop executes only about 16 iterations on average.
+  // Hence, unrolling this loop will most likely hurt
+  // performance since it will cause more branch misses.
+  NO_UNROLL_LOOP
   for (; i + 64 <= bytes; i += sizeof(__m512i))
   {
     _mm512_storeu_epi8((__m512i*) &sieve[i],

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9...4.2)
 
 project(primesieve
-        VERSION 12.16
+        VERSION 12.17
         LANGUAGES CXX)
 
 # Build options ######################################################
@@ -109,14 +109,15 @@ set(LIB_SRC src/api-c.cpp
 
 if(WITH_MULTIARCH)
     include("${PROJECT_SOURCE_DIR}/cmake/multiarch_x86_popcnt.cmake")
+    include("${PROJECT_SOURCE_DIR}/cmake/multiarch_avx2.cmake")
     include("${PROJECT_SOURCE_DIR}/cmake/multiarch_avx512_bw.cmake")
     include("${PROJECT_SOURCE_DIR}/cmake/multiarch_avx512_vbmi2.cmake")
 
-    if(multiarch_x86_popcnt OR multiarch_avx512_bw OR multiarch_avx512_vbmi2)
+    if(multiarch_x86_popcnt OR multiarch_avx2 OR multiarch_avx512_bw OR multiarch_avx512_vbmi2)
         set(LIB_SRC ${LIB_SRC} src/arch/x86/cpuid.cpp)
     else()
-        include("${PROJECT_SOURCE_DIR}/cmake/multiarch_sve_arm.cmake")
-        if(multiarch_sve_arm)
+        include("${PROJECT_SOURCE_DIR}/cmake/multiarch_arm_sve.cmake")
+        if(multiarch_arm_sve)
             set(LIB_SRC ${LIB_SRC} src/arch/arm/sve.cpp)
         endif()
     endif()
@@ -152,9 +153,7 @@ if(BUILD_SHARED_LIBS)
     PUBLIC
         cxx_alias_templates
     PRIVATE
-        cxx_constexpr
-        cxx_uniform_initialization
-        cxx_lambdas)
+        cxx_generic_lambdas)
 
     target_include_directories(libprimesieve
     PUBLIC
@@ -187,9 +186,7 @@ if(BUILD_STATIC_LIBS)
     PUBLIC
         cxx_alias_templates
     PRIVATE
-        cxx_constexpr
-        cxx_uniform_initialization
-        cxx_lambdas)
+        cxx_generic_lambdas)
 
     target_include_directories(libprimesieve-static
     PUBLIC
