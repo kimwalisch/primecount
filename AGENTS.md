@@ -32,6 +32,7 @@ Exclude these vendored libraries from changes to the primecount codebase, includ
 
 - primesieve: `lib/primesieve`
 - libdivide: `include/libdivide.h`
+- calculator: `include/calculator.hpp`
 
 Fixes to these libraries belong in their upstream repositories. For primesieve, update the vendored copy afterwards using `scripts/update_libprimesieve.sh`. The user usually performs this update manually; leave it to them unless they ask you to perform it.
 
