@@ -20,28 +20,28 @@
 
 namespace {
 
-const primecount::Array<uint8_t, 1> phi_table0 = { 0 };
-const primecount::Array<uint8_t, 2> phi_table1 = { 0, 1 };
-const primecount::Array<uint8_t, 6> phi_table2 = { 0, 1, 1, 1, 1, 2 };
+const primecount::Array<uint8_t, 1> phi_dense0 = { 0 };
+const primecount::Array<uint8_t, 2> phi_dense1 = { 0, 1 };
+const primecount::Array<uint8_t, 6> phi_dense2 = { 0, 1, 1, 1, 1, 2 };
 
-const primecount::Array<uint8_t, 30> phi_table3 =
+const primecount::Array<uint8_t, 30> phi_dense3 =
 {
   0, 1, 1, 1, 1, 1, 1, 2, 2, 2,
   2, 3, 3, 4, 4, 4, 4, 5, 5, 6,
   6, 6, 6, 7, 7, 7, 7, 7, 7, 8
 };
 
-/// phi_tables[a][x] = phi(x, a) for x < 2 * 3 * ... * prime[a]
-constexpr primecount::Array<const uint8_t*, 4> phi_tables =
+/// phi_dense[a][x] = phi(x, a) for x < 2 * 3 * ... * prime[a]
+constexpr primecount::Array<const uint8_t*, 4> phi_dense =
 {
-  phi_table0.data(), phi_table1.data(),
-  phi_table2.data(), phi_table3.data()
+  phi_dense0.data(), phi_dense1.data(),
+  phi_dense2.data(), phi_dense3.data()
 };
 
-/// Packing sieve_t increases the cache's capacity by 33%
+/// Packing phi_compressed_t increases the cache's capacity by 33%
 /// which improves performance by up to 10%.
 #pragma pack(push, 1)
-struct sieve_t
+struct phi_compressed_t
 {
   uint32_t count;
   uint64_t bits;
@@ -60,19 +60,19 @@ struct sieve_t
 /// @bits: 64-bit word whose 1-bits correspond to numbers that
 ///        are not divisible by any of the first a primes.
 ///
-const primecount::Array<sieve_t, 1> sieve_table4 =
+const primecount::Array<phi_compressed_t, 1> phi_compressed4 =
 {{
   {     0, 0xFFBFFBF77EEFDFFD }
 }};
 
-const primecount::Array<sieve_t, 10> sieve_table5 =
+const primecount::Array<phi_compressed_t, 10> phi_compressed5 =
 {{
   {     0, 0xFD3DFBB67EEFDFF9 }, {    50, 0x9EFDAFFBF35EEFD7 }, {    99, 0xEFDBDDBFF3F77CEF }, {   150, 0x7EE7DF7DBFBAF76E },
   {   199, 0x757EAEDFEDBFFBD7 }, {   248, 0xFBE77EEBDFFDB7FB }, {   300, 0xBBDBF776EF5DFDBE }, {   349, 0xF5BF79F73EEFCFFD },
   {   399, 0xDFBCBFEBF77ACFDF }, {   449, 0xFFFFFF9FFBF77E6D }
 }};
 
-const primecount::Array<sieve_t, 126> sieve_table6 =
+const primecount::Array<phi_compressed_t, 126> phi_compressed6 =
 {{
   {     0, 0xF93DDBB67EEFDFF1 }, {    47, 0x9EFDA7EBF35E6FD5 }, {    92, 0xEF5BDDBBF3D73CEE }, {   138, 0x5EA7DE7DBFB2E76E },
   {   182, 0x756EAEDF6DBDFBD7 }, {   228, 0xF9E37ECB9FFCB7FB }, {   275, 0xBADBF776EF5DFD3E }, {   322, 0xF5BF79F53AEFCFBD },
@@ -108,7 +108,7 @@ const primecount::Array<sieve_t, 126> sieve_table6 =
   {  5708, 0xFBF77E6DDBBC9FAB }, {  5755, 0xFFFFFFFFFFFFFF8F }
 }};
 
-const primecount::Array<sieve_t, 2128> sieve_table7 =
+const primecount::Array<phi_compressed_t, 2128> phi_compressed7 =
 {{
   {     0, 0xF93DDBB67EEFDFE1 }, {    46, 0x9EFDA6EBF31E4FD5 }, {    88, 0xED5BDD3BF3D72CE6 }, {   130, 0x5EA6DE7DBF92E76A },
   {   171, 0x756E2EDF6DADF3D7 }, {   214, 0xF8E37E8B9FFCB3F9 }, {   257, 0xBA5BF776EF55FD3E }, {   302, 0xF5BF39D53AEBCDBD },
@@ -644,28 +644,28 @@ const primecount::Array<sieve_t, 2128> sieve_table7 =
   { 92026, 0x34EBCFDCBBDAB756 }, { 92067, 0xF278CFD765BF7967 }, { 92109, 0xFBF77E6DDBBC9FAB }, { 92156, 0xFFFFFFFFFFFFFF87 }
 }};
 
-constexpr primecount::Array<const sieve_t*, 8> sieve_tables =
+constexpr primecount::Array<const phi_compressed_t*, 8> phi_compressed =
 {
-  // For a <= 3 phi_tables is used
+  // For a <= 3 phi_dense is used
   nullptr, nullptr, nullptr, nullptr,
-  sieve_table4.data(), sieve_table5.data(),
-  sieve_table6.data(), sieve_table7.data()
+  phi_compressed4.data(), phi_compressed5.data(),
+  phi_compressed6.data(), phi_compressed7.data()
 };
 
 #if defined(ENABLE_ASSERT)
 
 /// Array sizes for bounds checks in debug mode
-constexpr primecount::Array<std::size_t, 4> phi_table_sizes =
+constexpr primecount::Array<std::size_t, 4> phi_dense_sizes =
 {
-  phi_table0.size(), phi_table1.size(),
-  phi_table2.size(), phi_table3.size()
+  phi_dense0.size(), phi_dense1.size(),
+  phi_dense2.size(), phi_dense3.size()
 };
 
-constexpr primecount::Array<std::size_t, 8> sieve_table_sizes =
+constexpr primecount::Array<std::size_t, 8> phi_compressed_sizes =
 {
   0, 0, 0, 0,
-  sieve_table4.size(), sieve_table5.size(),
-  sieve_table6.size(), sieve_table7.size()
+  phi_compressed4.size(), phi_compressed5.size(),
+  phi_compressed6.size(), phi_compressed7.size()
 };
 
 #endif

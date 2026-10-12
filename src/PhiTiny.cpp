@@ -53,7 +53,7 @@ using PhiTiny::totients;
 
 static_assert(prime_products.size() == primes.size(), "Invalid prime_products size!");
 static_assert(totients.size() == primes.size(), "Invalid totients size!");
-static_assert(sieve_tables.size() == primes.size(), "Invalid sieve_tables size!");
+static_assert(phi_compressed.size() == primes.size(), "Invalid phi_compressed size!");
 
 class PhiTinyImpl : public BitSieve240
 {
@@ -82,28 +82,28 @@ private:
   ALWAYS_INLINE static T phi(T x, uint64_t a)
   {
     auto pp = prime_products[a];
-    auto remainder = (uint64_t)(x % pp);
+    auto remainder = uint64_t(x % pp);
     T xpp = x / pp;
     T sum = xpp * totients[a];
 
     // For prime[a] <= 5 our phi(x % pp, a) lookup table
     // is a simple two dimensional array.
-    if (a < phi_tables.size())
+    if (a < phi_dense.size())
     {
-      ASSERT(remainder < phi_table_sizes[a]);
-      sum += phi_tables[a][remainder];
+      ASSERT(remainder < phi_dense_sizes[a]);
+      sum += phi_dense[a][remainder];
     }
     else
     {
       // For prime[a] > 5 we use a compressed phi(x % pp, a)
-      // lookup table. Each bit of the sieve array corresponds
+      // lookup table. Each bit of the bitmap corresponds
       // to an integer that is not divisible by 2, 3 and 5.
       // Hence the 8 bits of each byte correspond to the offsets
       // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
-      ASSERT(remainder / 240 < sieve_table_sizes[a]);
-      const sieve_t& sieve = sieve_tables[a][remainder / 240];
-      uint64_t count = sieve.count;
-      uint64_t bits = sieve.bits;
+      ASSERT(remainder / 240 < phi_compressed_sizes[a]);
+      const auto& entry = phi_compressed[a][remainder / 240];
+      uint64_t count = entry.count;
+      uint64_t bits = entry.bits;
       uint64_t bitmask = unset_larger_[remainder % 240];
       sum += count + popcnt64(bits & bitmask);
     }
@@ -122,20 +122,20 @@ private:
     constexpr uint32_t a = 7;
     constexpr uint32_t pp = 510510;
     constexpr uint32_t totient = 92160;
-    auto remainder = (uint64_t)(x % pp);
+    auto remainder = uint64_t(x % pp);
     T xpp = x / pp;
     T sum = xpp * totient;
 
     // For prime[a] > 5 we use a compressed phi(x % pp, a)
-    // lookup table. Each bit of the sieve array corresponds
+    // lookup table. Each bit of the bitmap corresponds
     // to an integer that is not divisible by 2, 3 and 5.
     // Hence the 8 bits of each byte correspond to the offsets
     // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
-    ASSERT(sieve_tables.size() - 1 == a);
-    ASSERT(remainder / 240 < sieve_table_sizes[a]);
-    const sieve_t& sieve = sieve_tables[a][remainder / 240];
-    uint64_t count = sieve.count;
-    uint64_t bits = sieve.bits;
+    ASSERT(phi_compressed.size() - 1 == a);
+    ASSERT(remainder / 240 < phi_compressed_sizes[a]);
+    const auto& entry = phi_compressed[a][remainder / 240];
+    uint64_t count = entry.count;
+    uint64_t bits = entry.bits;
     uint64_t bitmask = unset_larger_[remainder % 240];
     sum += count + popcnt64(bits & bitmask);
 
