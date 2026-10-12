@@ -16,21 +16,15 @@
 #include <Vector.hpp>
 
 #include <stdint.h>
-#include <initializer_list>
+#include <cstddef>
 
 namespace {
 
-/// Each lookup table is a separate std::initializer_list
-/// variable because MSVC miscompiles constexpr arrays of nested
-/// std::initializer_lists (their element pointers are invalid).
-/// With const instead of constexpr, MSVC would initialize
-/// phi_tables and sieve_tables at program startup.
+const primecount::Array<uint8_t, 1> phi_table0 = { 0 };
+const primecount::Array<uint8_t, 2> phi_table1 = { 0, 1 };
+const primecount::Array<uint8_t, 6> phi_table2 = { 0, 1, 1, 1, 1, 2 };
 
-constexpr std::initializer_list<uint8_t> phi_table0 = { 0 };
-constexpr std::initializer_list<uint8_t> phi_table1 = { 0, 1 };
-constexpr std::initializer_list<uint8_t> phi_table2 = { 0, 1, 1, 1, 1, 2 };
-
-constexpr std::initializer_list<uint8_t> phi_table3 =
+const primecount::Array<uint8_t, 30> phi_table3 =
 {
   0, 1, 1, 1, 1, 1, 1, 2, 2, 2,
   2, 3, 3, 4, 4, 4, 4, 5, 5, 6,
@@ -38,10 +32,11 @@ constexpr std::initializer_list<uint8_t> phi_table3 =
 };
 
 /// phi_tables[a][x] = phi(x, a) for x < 2 * 3 * ... * prime[a]
-constexpr primecount::Array<std::initializer_list<uint8_t>, 4> phi_tables =
-{{
-  phi_table0, phi_table1, phi_table2, phi_table3
-}};
+constexpr primecount::Array<const uint8_t*, 4> phi_tables =
+{
+  phi_table0.data(), phi_table1.data(),
+  phi_table2.data(), phi_table3.data()
+};
 
 /// Packing sieve_t increases the cache's capacity by 33%
 /// which improves performance by up to 10%.
@@ -65,20 +60,20 @@ struct sieve_t
 /// @bits: 64-bit word whose 1-bits correspond to numbers that
 ///        are not divisible by any of the first a primes.
 ///
-constexpr std::initializer_list<sieve_t> sieve_table4 =
-{
+const primecount::Array<sieve_t, 1> sieve_table4 =
+{{
   {     0, 0xFFBFFBF77EEFDFFD }
-};
+}};
 
-constexpr std::initializer_list<sieve_t> sieve_table5 =
-{
+const primecount::Array<sieve_t, 10> sieve_table5 =
+{{
   {     0, 0xFD3DFBB67EEFDFF9 }, {    50, 0x9EFDAFFBF35EEFD7 }, {    99, 0xEFDBDDBFF3F77CEF }, {   150, 0x7EE7DF7DBFBAF76E },
   {   199, 0x757EAEDFEDBFFBD7 }, {   248, 0xFBE77EEBDFFDB7FB }, {   300, 0xBBDBF776EF5DFDBE }, {   349, 0xF5BF79F73EEFCFFD },
   {   399, 0xDFBCBFEBF77ACFDF }, {   449, 0xFFFFFF9FFBF77E6D }
-};
+}};
 
-constexpr std::initializer_list<sieve_t> sieve_table6 =
-{
+const primecount::Array<sieve_t, 126> sieve_table6 =
+{{
   {     0, 0xF93DDBB67EEFDFF1 }, {    47, 0x9EFDA7EBF35E6FD5 }, {    92, 0xEF5BDDBBF3D73CEE }, {   138, 0x5EA7DE7DBFB2E76E },
   {   182, 0x756EAEDF6DBDFBD7 }, {   228, 0xF9E37ECB9FFCB7FB }, {   275, 0xBADBF776EF5DFD3E }, {   322, 0xF5BF79F53AEFCFBD },
   {   369, 0xDF9CBFEAF77AC7CF }, {   415, 0xEFD7E99FFB777C69 }, {   461, 0x5EEDD3FD1DBBB67E }, {   505, 0xB77CEF9EF5AFFBF3 },
@@ -111,10 +106,10 @@ constexpr std::initializer_list<sieve_t> sieve_table6 =
   {  5341, 0xE35EEF57FD39FB96 }, {  5385, 0xF3F75CAF9EFDAFF3 }, {  5432, 0xBFBAF76EEFDB5DBD }, {  5480, 0xED3FF9D37EC79F7C },
   {  5525, 0xDFBDB6FB7576AEDF }, {  5572, 0xE74DFDBE7BE57AEB }, {  5617, 0x3CEBCFDDBBDAF776 }, {  5662, 0xF67ACFD7E5BF7977 },
   {  5708, 0xFBF77E6DDBBC9FAB }, {  5755, 0xFFFFFFFFFFFFFF8F }
-};
+}};
 
-constexpr std::initializer_list<sieve_t> sieve_table7 =
-{
+const primecount::Array<sieve_t, 2128> sieve_table7 =
+{{
   {     0, 0xF93DDBB67EEFDFE1 }, {    46, 0x9EFDA6EBF31E4FD5 }, {    88, 0xED5BDD3BF3D72CE6 }, {   130, 0x5EA6DE7DBF92E76A },
   {   171, 0x756E2EDF6DADF3D7 }, {   214, 0xF8E37E8B9FFCB3F9 }, {   257, 0xBA5BF776EF55FD3E }, {   302, 0xF5BF39D53AEBCDBD },
   {   345, 0x5F9CBFEAF77AC7CE }, {   389, 0xEF97C99FFB757C69 }, {   432, 0x5EEDC3F51DBBB67E }, {   474, 0xB75CEF9AF5AFFB73 },
@@ -647,14 +642,33 @@ constexpr std::initializer_list<sieve_t> sieve_table7 =
   { 91681, 0x6DDDB8AFC3B77ACE }, { 91722, 0x3EAEDFF993E9F77E }, { 91767, 0xE35EEF57FD39FA96 }, { 91810, 0xB3D75CAB9CFDAF73 },
   { 91852, 0xBFAAF76EEFDA5DBD }, { 91898, 0xCD3FF9D17EC71F7C }, { 91940, 0xCFB5B6FB7476AE9F }, { 91983, 0xE749FDBE7B657AEB },
   { 92026, 0x34EBCFDCBBDAB756 }, { 92067, 0xF278CFD765BF7967 }, { 92109, 0xFBF77E6DDBBC9FAB }, { 92156, 0xFFFFFFFFFFFFFF87 }
+}};
+
+constexpr primecount::Array<const sieve_t*, 8> sieve_tables =
+{
+  // For a <= 3 phi_tables is used
+  nullptr, nullptr, nullptr, nullptr,
+  sieve_table4.data(), sieve_table5.data(),
+  sieve_table6.data(), sieve_table7.data()
 };
 
-constexpr primecount::Array<std::initializer_list<sieve_t>, 8> sieve_tables =
-{{
-  // For a <= 3 phi_tables is used
-  {}, {}, {}, {},
-  sieve_table4, sieve_table5, sieve_table6, sieve_table7
-}};
+#if defined(ENABLE_ASSERT)
+
+/// Array sizes for bounds checks in debug mode
+constexpr primecount::Array<std::size_t, 4> phi_table_sizes =
+{
+  phi_table0.size(), phi_table1.size(),
+  phi_table2.size(), phi_table3.size()
+};
+
+constexpr primecount::Array<std::size_t, 8> sieve_table_sizes =
+{
+  0, 0, 0, 0,
+  sieve_table4.size(), sieve_table5.size(),
+  sieve_table6.size(), sieve_table7.size()
+};
+
+#endif
 
 } // namespace
 

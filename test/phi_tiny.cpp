@@ -46,7 +46,7 @@ int main()
 
     // Check all entries of PhiTiny's lookup tables
     uint64_t cnt = 0;
-    bool OK = (phi_tiny(0, a) == 0);
+    bool OK = (phi_tiny(uint64_t(0), a) == 0);
 
     for (uint64_t i = 1; i <= max_x; i++)
     {

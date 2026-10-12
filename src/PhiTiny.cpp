@@ -90,8 +90,8 @@ private:
     // is a simple two dimensional array.
     if (a < phi_tables.size())
     {
-      ASSERT(remainder < phi_tables[a].size());
-      sum += *(phi_tables[a].begin() + remainder);
+      ASSERT(remainder < phi_table_sizes[a]);
+      sum += phi_tables[a][remainder];
     }
     else
     {
@@ -100,8 +100,8 @@ private:
       // to an integer that is not divisible by 2, 3 and 5.
       // Hence the 8 bits of each byte correspond to the offsets
       // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
-      ASSERT(remainder / 240 < sieve_tables[a].size());
-      const sieve_t& sieve = *(sieve_tables[a].begin() + remainder / 240);
+      ASSERT(remainder / 240 < sieve_table_sizes[a]);
+      const sieve_t& sieve = sieve_tables[a][remainder / 240];
       uint64_t count = sieve.count;
       uint64_t bits = sieve.bits;
       uint64_t bitmask = unset_larger_[remainder % 240];
@@ -132,8 +132,8 @@ private:
     // Hence the 8 bits of each byte correspond to the offsets
     // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
     ASSERT(sieve_tables.size() - 1 == a);
-    ASSERT(remainder / 240 < sieve_tables[a].size());
-    const sieve_t& sieve = *(sieve_tables[a].begin() + remainder / 240);
+    ASSERT(remainder / 240 < sieve_table_sizes[a]);
+    const sieve_t& sieve = sieve_tables[a][remainder / 240];
     uint64_t count = sieve.count;
     uint64_t bits = sieve.bits;
     uint64_t bitmask = unset_larger_[remainder % 240];
