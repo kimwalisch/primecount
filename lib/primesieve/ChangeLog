@@ -1,6 +1,14 @@
-Changes in version 12.17, 11/10/2026
+Changes in version 12.17, 12/10/2026
 ====================================
 
+* PreSieveTables.hpp: Simplify the lookup table generator program.
+* CMake: Require C++14 for the executable and tests.
+* Vector.hpp: Make Array member functions constexpr.
+* PreSieveTables.hpp: Fix MSVC initializing preSieveTables at startup.
+* scripts: Remove unused build_mingw64_x64.sh and build_mingw64_arm64.sh.
+* Add AGENTS.md file for AI agents.
+* ci.yml: Migrate Windows GCC CI from MINGW64 to UCRT64.
+* ci.yml: Check that SIMD runtime dispatch probes succeed.
 * CMake: Reuse cpu_arch_macros.hpp in SIMD runtime dispatch probes.
 * Implement SIMD runtime dispatching for MSVC compiler.
 * main.cpp: Add -march=native support to --cpu-info option.
