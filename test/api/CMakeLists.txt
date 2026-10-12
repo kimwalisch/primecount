@@ -4,6 +4,11 @@ file(GLOB files "*.cpp" "*.c")
 foreach(file ${files})
     get_filename_component(binary_name ${file} NAME_WE)
     add_executable(${binary_name} ${file})
+
+    if(file MATCHES "\\.cpp$")
+        target_compile_features(${binary_name} PRIVATE cxx_std_14)
+    endif()
+
     target_compile_definitions(${binary_name} PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_link_libraries(${binary_name} primecount::primecount primesieve::primesieve ${PRIMECOUNT_LINK_LIBRARIES})
 

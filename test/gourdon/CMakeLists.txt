@@ -13,6 +13,7 @@ endif()
 foreach(file ${files})
     get_filename_component(binary_name ${file} NAME_WE)
     add_executable(${binary_name} ${file})
+    target_compile_features(${binary_name} PRIVATE cxx_std_14)
     target_compile_definitions(${binary_name} PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_link_libraries(${binary_name} primecount::primecount primesieve::primesieve ${PRIMECOUNT_LINK_LIBRARIES})
 
