@@ -1,5 +1,7 @@
 Changes in primecount-8.9, 2026-10-12
 
+* PhiTiny.cpp: Use hardcoded lookup tables, no initialization at startup.
+* AGENTS.md: Document include header order.
 * AGENTS.md: Use UCRT64 for Windows development builds.
 * ci.yml: Migrate Windows GCC CI from MINGW64 to UCRT64.
 * build_windows_binaries.yml: Build Windows x64 binary using UCRT64.
