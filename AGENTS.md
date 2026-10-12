@@ -116,12 +116,12 @@ Use MSYS2 MinGW-w64 GCC in the UCRT64 environment as the primary Windows compile
 
 Prepend that directory to `PATH` in every new shell used to configure, build, or run tests. This makes both the build tools and their runtime DLLs available. Set the compiler and make program explicitly as shown below to avoid tool discovery delays.
 
-The following PowerShell commands were verified on this PC using the `Unix Makefiles` generator from `doc/Build.md`, CMake 4.4.3, and GCC 16.2.0. Run them from the repository root. `build-agents-ucrt64` is an ignored build directory; reuse it when its compiler and generator match, or choose a fresh build directory when they differ.
+The following PowerShell commands were verified on this PC using the `Unix Makefiles` generator from `doc/Build.md`, CMake 4.4.3, and GCC 16.2.0. Run them from the repository root. `build-agents-msys2-gcc` is an ignored build directory; reuse it when its compiler and generator match, or choose a fresh build directory when they differ.
 
 ```powershell
 $env:Path = 'C:\msys64\ucrt64\bin;' + $env:Path
-New-Item -ItemType Directory -Force -Path build-agents-ucrt64 | Out-Null
-Set-Location build-agents-ucrt64
+New-Item -ItemType Directory -Force -Path build-agents-msys2-gcc | Out-Null
+Set-Location build-agents-msys2-gcc
 cmake .. -G 'Unix Makefiles' -DCMAKE_MAKE_PROGRAM=C:/msys64/ucrt64/bin/mingw32-make.exe -DCMAKE_CXX_COMPILER=C:/msys64/ucrt64/bin/g++.exe -DCMAKE_C_COMPILER=C:/msys64/ucrt64/bin/gcc.exe '-DCMAKE_CXX_FLAGS=-Wall -Wextra -pedantic -Werror' '-DCMAKE_C_FLAGS=-Wall -Wextra -pedantic -Werror' -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
 if ($LASTEXITCODE -ne 0) { throw 'CMake configuration failed' }
 cmake --build . --parallel 14
