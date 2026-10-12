@@ -260,7 +260,7 @@ if(BUILD_SHARED_LIBS)
 
     target_compile_features(libprimecount
     PRIVATE
-        cxx_generic_lambdas)
+        cxx_std_14)
 
     target_include_directories(libprimecount
     PUBLIC
@@ -292,7 +292,7 @@ if(BUILD_STATIC_LIBS)
 
     target_compile_features(libprimecount-static
     PRIVATE
-        cxx_generic_lambdas)
+        cxx_std_14)
 
     target_include_directories(libprimecount-static
     PUBLIC
@@ -336,7 +336,7 @@ if(BUILD_PRIMECOUNT)
     target_link_libraries(primecount PRIVATE primecount::primecount primesieve::primesieve)
     target_include_directories(primecount PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_compile_definitions(primecount PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
-    target_compile_features(primecount PRIVATE cxx_auto_type)
+    target_compile_features(primecount PRIVATE cxx_std_14)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     # Workaround for LLVM OpenMP performance issue
