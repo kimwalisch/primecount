@@ -37,7 +37,7 @@ handle_error() {
 
 mkdir build-release
 cd build-release
-cmake .. -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-ffunction-sections -fdata-sections -mpopcnt -flto -static -static-libgcc -static-libstdc++ -Wall -Wextra -pedantic -D_WIN32_WINNT=0x601" -DCMAKE_EXE_LINKER_FLAGS="-Wl,--gc-sections" -DWITH_FLOAT128=ON
+cmake .. -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-ffunction-sections -fdata-sections -mpopcnt -flto -static -static-libgcc -static-libstdc++ -Wall -Wextra -pedantic -D_WIN32_WINNT=0x0A00" -DCMAKE_EXE_LINKER_FLAGS="-Wl,--gc-sections" -DWITH_FLOAT128=ON
 make -j8
 rm primecount.exe
 
