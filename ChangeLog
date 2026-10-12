@@ -1,5 +1,6 @@
 Changes in primecount-8.9, 2026-10-12
 
+* AGENTS.md: Use UCRT64 for Windows development builds.
 * ci.yml: Migrate Windows GCC CI from MINGW64 to UCRT64.
 * build_windows_binaries.yml: Build Windows x64 binary using UCRT64.
 * Implement SIMD runtime dispatching for MSVC compiler.

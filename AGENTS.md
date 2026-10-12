@@ -112,17 +112,17 @@ The user may revise or remove ChangeLog entries, including entries they consider
 
 ## Building on Windows
 
-Use MSYS2 MinGW-w64 as the primary Windows compiler. On this PC the tools are installed in `C:\msys64\mingw64\bin`.
+Use MSYS2 MinGW-w64 GCC in the UCRT64 environment as the primary Windows compiler, matching `.github/workflows/ci.yml` and the x64 job in `.github/workflows/build_windows_binaries.yml`. The commands below use MSYS2's default location, `C:\msys64\ucrt64\bin`. If MSYS2 is installed elsewhere, replace that path in all commands. The environment must provide `gcc`, `g++`, `cmake`, `ctest` and `mingw32-make`. Do not mix MSYS2 environments or reuse a MINGW64 build directory for UCRT64. Do not install or update packages; report missing packages to the user.
 
 Prepend that directory to `PATH` in every new shell used to configure, build, or run tests. This makes both the build tools and their runtime DLLs available. Set the compiler and make program explicitly as shown below to avoid tool discovery delays.
 
-The following PowerShell commands were verified on this PC using the `Unix Makefiles` generator from `doc/Build.md`, CMake 4.4.0, and GCC 16.1.0. Run them from the repository root. `build-agents` is an ignored build directory; reuse it when its compiler and generator match, or choose a fresh build directory when they differ.
+The following PowerShell commands were verified on this PC using the `Unix Makefiles` generator from `doc/Build.md`, CMake 4.4.3, and GCC 16.2.0. Run them from the repository root. `build-agents-ucrt64` is an ignored build directory; reuse it when its compiler and generator match, or choose a fresh build directory when they differ.
 
 ```powershell
-$env:Path = 'C:\msys64\mingw64\bin;' + $env:Path
-New-Item -ItemType Directory -Force -Path build-agents | Out-Null
-Set-Location build-agents
-cmake .. -G 'Unix Makefiles' -DCMAKE_MAKE_PROGRAM=C:/msys64/mingw64/bin/mingw32-make.exe -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/g++.exe -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/gcc.exe '-DCMAKE_CXX_FLAGS=-Wall -Wextra -pedantic -Werror' '-DCMAKE_C_FLAGS=-Wall -Wextra -pedantic -Werror' -DBUILD_TESTS=ON
+$env:Path = 'C:\msys64\ucrt64\bin;' + $env:Path
+New-Item -ItemType Directory -Force -Path build-agents-ucrt64 | Out-Null
+Set-Location build-agents-ucrt64
+cmake .. -G 'Unix Makefiles' -DCMAKE_MAKE_PROGRAM=C:/msys64/ucrt64/bin/mingw32-make.exe -DCMAKE_CXX_COMPILER=C:/msys64/ucrt64/bin/g++.exe -DCMAKE_C_COMPILER=C:/msys64/ucrt64/bin/gcc.exe '-DCMAKE_CXX_FLAGS=-Wall -Wextra -pedantic -Werror' '-DCMAKE_C_FLAGS=-Wall -Wextra -pedantic -Werror' -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
 if ($LASTEXITCODE -ne 0) { throw 'CMake configuration failed' }
 cmake --build . --parallel 14
 if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
@@ -134,9 +134,9 @@ if ($LASTEXITCODE -ne 0) { throw 'Prime-counting implementation tests failed' }
 if ($LASTEXITCODE -ne 0) { throw 'Large computation failed' }
 ```
 
-The build defaults to `Release`. The parallel build above uses this PC's 14 logical processors; adjust the job count on other machines.
+The recipe explicitly selects `Release`, which is also the default for a new build directory. The parallel build above uses this PC's 14 logical processors; adjust the job count on other machines.
 
-This configuration uses GNU's linker, with `CMAKE_LINKER` resolving to `C:/msys64/mingw64/bin/ld.exe`. Microsoft Visual Studio's `link.exe` is not required. Do not add a Visual Studio linker path or force `link.exe` for this MinGW build.
+This configuration uses GNU's linker, with `CMAKE_LINKER` resolving to `C:/msys64/ucrt64/bin/ld.exe`. Microsoft Visual Studio's `link.exe` is not required. Do not add a Visual Studio linker path or force `link.exe` for this MinGW build.
 
 ## Required verification
 
