@@ -29,8 +29,6 @@
 namespace primecount {
 namespace PhiTiny {
 
-const Array<uint64_t, 8> primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
-
 // prime_products[n] = \prod_{i=1}^{n} primes[i]
 const Array<uint64_t, 8> prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
 
@@ -47,13 +45,12 @@ namespace {
 
 using namespace primecount;
 
-using PhiTiny::primes;
 using PhiTiny::prime_products;
 using PhiTiny::totients;
 
-static_assert(prime_products.size() == primes.size(), "Invalid prime_products size!");
-static_assert(totients.size() == primes.size(), "Invalid totients size!");
-static_assert(phi_compressed.size() == primes.size(), "Invalid phi_compressed size!");
+static_assert(prime_products.size() == PhiTiny::max_a(), "Invalid prime_products size!");
+static_assert(totients.size() == PhiTiny::max_a(), "Invalid totients size!");
+static_assert(phi_compressed.size() == PhiTiny::max_a(), "Invalid phi_compressed size!");
 
 class PhiTinyImpl : public BitSieve240
 {
