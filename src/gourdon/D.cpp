@@ -12,6 +12,8 @@
 /// file in the top level directory.
 ///
 
+#include "DCentral.hpp"
+
 #include <primecount-internal.hpp>
 #include <cpu_arch_macros.hpp>
 #include <FactorTable.hpp>
@@ -21,6 +23,7 @@
 #include <LoadBalancerS2.hpp>
 #include <macros.hpp>
 #include <min.hpp>
+#include <phi_vector.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
 
@@ -72,6 +75,20 @@
 namespace {
 
 using namespace primecount;
+
+/// Recover a signed representative without an out-of-range cast.
+/// The complemented upper-half residue fits in T before negation.
+///
+template <typename T>
+T signed_from_unsigned(typename pstd::make_unsigned<T>::type value)
+{
+  static_assert(pstd::is_signed<T>::value, "Expected a signed result type");
+  using UT = typename pstd::make_unsigned<T>::type;
+  if (value <= UT(pstd::numeric_limits<T>::max()))
+    return T(value);
+  UT complement = ~value;
+  return -T(complement) - 1;
+}
 
 /// Runtime dispatch to highly optimized SIMD algorithm if the CPU
 /// supports the required instruction set.
@@ -150,9 +167,20 @@ T D_OpenMP(T x,
            int threads,
            bool is_print)
 {
+  using UT = typename pstd::make_unsigned<T>::type;
+
   // Hard special leaves satisfy m > p and
   // p^3 * m <= x, hence p^4 < x.
   int64_t x14 = iroot<4>(x);
+  Vector<int64_t> mertens_y;
+  if (z == y)
+  {
+    int64_t max_b = pi[min(iroot<3>(x / y), x_star)];
+    // Only rows with prime^2 <= y < prime^3 use this prefix
+    mertens_y = phi_vector(y, max_b, primes, pi);
+    for (int64_t b = 1; b <= max_b; b++)
+      mertens_y[b] -= central_correction(y, primes[b], b, pi);
+  }
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -161,7 +189,7 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
-  T sum = 0;
+  UT sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
@@ -170,13 +198,14 @@ T D_OpenMP(T x,
     while (loadBalancer.get_work(thread))
     {
       thread.start_time = get_time();
-      thread.sum = D_thread<T>(x, y, xy, k, x14, primes, pi, factor, thread);
+      UT partial = D_thread<UT>(x, y, xy, k, x14, primes, pi, factor, mertens_y, thread);
+      thread.sum = signed_from_unsigned<T>(partial);
       thread.stop_time = get_time();
-      sum += thread.sum;
+      sum += partial;
     }
   }
 
-  return sum;
+  return signed_from_unsigned<T>(sum);
 }
 
 } // namespace

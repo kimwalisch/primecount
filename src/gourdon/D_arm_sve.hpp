@@ -25,6 +25,8 @@
 #ifndef D_ARM_SVE_HPP
 #define D_ARM_SVE_HPP
 
+#include "DCentral.hpp"
+
 #include <primecount-internal.hpp>
 #include <BaseFactorTable.hpp>
 #include <fast_div.hpp>
@@ -43,6 +45,20 @@
 namespace {
 
 using namespace primecount;
+
+// Not a lambda, operator() requires the ARM SVE target attribute
+struct DCountArmSve
+{
+  Sieve& sieve;
+
+  #if defined(ENABLE_MULTIARCH_ARM_SVE)
+    PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
+  #endif
+  inline uint64_t operator()(uint64_t stop) const
+  {
+    return sieve.count_arm_sve(stop);
+  }
+};
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
@@ -116,6 +132,7 @@ T D_thread_arm_sve(T x,
                    const Primes& primes,
                    const PiTable& pi,
                    const FactorTable& factor,
+                   const Vector<int64_t>& mertens_y,
                    ThreadData& thread)
 {
   T sum = 0;
@@ -135,6 +152,9 @@ T D_thread_arm_sve(T x,
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
+  Vector<CentralEvent> events;
+  SemiprimeEventBitmap sorter;
+  DCountArmSve count_sieve{sieve};
   thread.init_time = get_time();
 
   INDETERMINATE Array<uint32_t, 128> m_indexes32;
@@ -167,9 +187,24 @@ T D_thread_arm_sve(T x,
       int64_t xp_high = min(fast_div(xp, high), y);
       int64_t min_m = max(xp_high, y / prime);
       int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
+      int64_t original_max_m = max_m;
 
       if (prime >= max_m)
         goto next_segment;
+
+      if (central_row(xp, prime, b, y, z, low, high, phi[b], primes, pi,
+                      mertens_y, count_sieve, events, sorter, sum, max_m))
+      {
+        phi[b] += sieve.get_total_count();
+        sieve.cross_off_count(prime, b);
+        continue;
+      }
+
+      // A composite m with all prime factors > prime exceeds prime^2.
+      // Test the uncapped bound: later rows may still have central
+      // leaves even when the capped max_m is at most prime^2.
+      if (original_max_m <= prime * prime)
+        break;
 
       min_m = FactorTable::to_index(min_m);
       max_m = FactorTable::to_index(max_m);
@@ -334,7 +369,7 @@ T D_thread_arm_sve(T x,
       sieve.cross_off_count(prime, b);
     }
 
-    // For pi_sqrty < b <= pi_x14
+    // For the remaining b <= pi_x14
     // Find all special leaves in the current segment
     // that are composed of 2 primes:
     // low <= x / (primes[b] * primes[l]) < high
@@ -344,7 +379,7 @@ T D_thread_arm_sve(T x,
       T xp = x / prime;
       int64_t xp_low = min(fast_div(xp, low1), y);
       int64_t xp_high = min(fast_div(xp, high), y);
-      int64_t min_m = max(xp_high, prime);
+      int64_t min_m = max3(xp_high, z / prime, prime);
       int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
       int64_t l = pi[max_m];
 

@@ -10,6 +10,9 @@
 
 #include <primecount.hpp>
 #include <gourdon.hpp>
+#include <generate_primes.hpp>
+#include <imath.hpp>
+#include <Vector.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -112,6 +115,32 @@ void check(bool OK)
     std::exit(1);
 }
 
+int64_t D_reference(int64_t x, int64_t y, int64_t z, int64_t k)
+{
+  auto primes = generate_primes<uint32_t>(z);
+  auto lpf = generate_lpf(z, primes);
+  auto mpf = generate_mpf(z, primes);
+  auto mu = generate_moebius(z, primes);
+  int64_t max_prime = iroot<4>(x);
+  int64_t sum = 0;
+
+  for (std::size_t b = k + 1; b < primes.size(); b++)
+  {
+    int64_t prime = primes[b];
+    if (prime > max_prime) break;
+
+    for (int64_t m = prime + 1; m <= z; m++)
+      if (mu[m] != 0 &&
+          lpf[m] > prime &&
+          mpf[m] <= y &&
+          prime * m > z &&
+          x / (prime * m) >= prime * prime)
+        sum -= mu[m] * phi(x / (prime * m), b - 1);
+  }
+
+  return sum;
+}
+
 int main()
 {
   int threads = get_num_threads();
@@ -126,6 +155,112 @@ int main()
       int128_t res2 = D((int128_t) params.x, params.y, params.k, threads);
       std::cout << "D_128bit(" << params.x << ", " << params.y << ", " << params.k << ") = " << res2;
       check(res2 == params.res);
+    #endif
+  }
+
+  // Check the transition from square-free to prime leaves, including
+  // the first square-free composite m beyond each prime squared.
+  const Array<int64_t, 5> primes = { 23, 29, 31, 37, 41 };
+
+  for (std::size_t i = 0; i + 2 < primes.size(); i++)
+  {
+    int64_t p = primes[i];
+    int64_t q = primes[i + 1];
+    int64_t r = primes[i + 2];
+
+    for (int64_t center : { ipow<5>(p), p * p * p * q * r })
+      for (int64_t delta : { -1, 0, 1 })
+        for (int64_t z : { p * p - 1, p * p, p * p + 1,
+                           q * r - 1, q * r, q * r + 1 })
+        {
+          int64_t x = center + delta;
+          int64_t y = iroot<3>(x) + 1;
+          int64_t expected = D_reference(x, y, z, 8);
+          int64_t res = D(x, y, z, 8, threads);
+          std::cout << "D boundary(" << x << ", " << y << ", " << z << ") = " << res;
+          check(res == expected);
+
+          #ifdef HAVE_INT128_T
+            int128_t res2 = D((int128_t) x, y, z, 8, threads);
+            check(res2 == expected);
+          #endif
+        }
+  }
+
+  struct CentralParams
+  {
+    int64_t xp;
+    int64_t y;
+    int64_t z;
+    int64_t prime;
+    int region;
+  };
+
+  // Regions: 0 = fallback, 1 = natural upper bound, 2 = upper bound y.
+  // Include A = p^2, A = H, prime/semiprime endpoints, and boundaries
+  // immediately below, at, and above multiples of the sieve alignment.
+  const Array<CentralParams, 33> central_cases = {{
+    { 279840, 530, 530, 23, 0 },
+    { 279841, 530, 530, 23, 0 },
+    { 280370, 530, 530, 23, 1 },
+    { 280898, 530, 530, 23, 1 },
+    { 280899, 530, 530, 23, 2 },
+    { 280900, 530, 530, 23, 0 },
+    { 280901, 530, 530, 23, 0 },
+    { 559681, 1058, 1058, 23, 1 },
+    { 559682, 1058, 1058, 23, 1 },
+    { 560739, 1058, 1058, 23, 2 },
+    { 560740, 1058, 1058, 23, 2 },
+    { 280370, 600, 700, 23, 1 },
+    { 665499, 1058, 2116, 23, 0 },
+    { 7653060, 12167, 12167, 23, 0 },
+    { 292140, 541, 541, 23, 2 },
+    { 807302, 899, 899, 23, 2 },
+    { 864017, 1200, 1200, 23, 2 },
+    { 396017, 720, 720, 23, 2 },
+    { 444888, 767, 767, 23, 2 },
+    { 444889, 767, 767, 23, 2 },
+    { 444890, 767, 767, 23, 2 },
+    { 707280, 941, 941, 23, 2 },
+    { 707281, 941, 941, 23, 2 },
+    { 707282, 941, 941, 23, 2 },
+    { 808200, 999, 999, 23, 2 },
+    { 808201, 999, 999, 23, 2 },
+    { 808202, 999, 999, 23, 2 },
+    { 921599, 1200, 1200, 23, 2 },
+    { 921600, 1200, 1200, 23, 2 },
+    { 921601, 1200, 1200, 23, 2 },
+    { 1414562, 1682, 1682, 29, 1 },
+    { 1416243, 1682, 1682, 29, 2 },
+    { 1582779, 1682, 3364, 29, 0 }
+  }};
+
+  for (const CentralParams& params : central_cases)
+  {
+    int64_t p = params.prime;
+    int64_t x = params.xp * p;
+    int64_t upper = params.xp / (p * p);
+    int64_t lower = params.xp / params.y;
+    int64_t middle = isqrt(params.xp);
+    int region = 0;
+
+    if (p * p <= upper && middle < upper && upper <= params.y)
+      region = 1;
+    else if (params.z == params.y &&
+             p * p <= lower && lower <= middle &&
+             middle < params.y && params.y < p * p * p)
+      region = 2;
+
+    std::cout << "D central region " << params.region << " ("
+              << x << ", " << params.y << ", " << params.z << ")";
+    check(region == params.region &&
+          iroot<3>(x) < params.y &&
+          params.y <= params.z && params.z < isqrt(x));
+    int64_t expected = D_reference(x, params.y, params.z, 8);
+    check(D(x, params.y, params.z, 8, threads) == expected);
+
+    #ifdef HAVE_INT128_T
+      check(D((int128_t) x, params.y, params.z, 8, threads) == expected);
     #endif
   }
 
