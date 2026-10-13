@@ -4,7 +4,7 @@ include(CMakePushCheckState)
 cmake_push_check_state()
 
 # Our <int128_t.hpp> requires C++11 or later
-if(NOT compiler_supports_cpp11)
+if(NOT PRIMECOUNT_COMPILER_SUPPORTS_CPP11)
     if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
         set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
     elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
@@ -42,9 +42,9 @@ check_cxx_source_compiles("
             return 1;
 
         return 0;
-    }" int128)
+    }" PRIMECOUNT_INT128_T)
 
-if(NOT int128)
+if(NOT PRIMECOUNT_INT128_T)
     set(DISABLE_INT128 "DISABLE_INT128")
     list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "${DISABLE_INT128}")
 endif()

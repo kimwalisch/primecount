@@ -2,8 +2,8 @@
 
 if(WIN32)
     include(CheckCXXSymbolExists)
-    check_cxx_symbol_exists(_putenv_s "stdlib.h" WIN_putenv_s)
-    if(WIN_putenv_s)
+    check_cxx_symbol_exists(_putenv_s "stdlib.h" PRIMECOUNT_WIN_PUTENV_S)
+    if(PRIMECOUNT_WIN_PUTENV_S)
         include(CheckCXXSourceCompiles)
         check_cxx_source_compiles("
             #include <stdlib.h>
@@ -12,16 +12,16 @@ if(WIN32)
             {
                 size_t required = 0;
                 return getenv_s(&required, nullptr, 0, \"GETENV_TEST\");
-            }" WIN_getenv_s)
+            }" PRIMECOUNT_WIN_GETENV_S)
     endif()
 endif()
 
-if(NOT WIN_getenv_s AND NOT WIN_putenv_s)
+if(NOT PRIMECOUNT_WIN_GETENV_S AND NOT PRIMECOUNT_WIN_PUTENV_S)
     check_cxx_source_compiles("
         #include <stdlib.h>
 
         int main()
         {
             return setenv(\"SETENV_TEST\", \"1\", 0);
-        }" POSIX_setenv)
+        }" PRIMECOUNT_POSIX_SETENV)
 endif()

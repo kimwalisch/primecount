@@ -76,9 +76,9 @@ check_cxx_source_compiles("
 
         return (cnt > 0) ? 0 : 1;
     }
-" multiarch_avx512_vpopcnt)
+" PRIMECOUNT_MULTIARCH_AVX512_VPOPCNT)
 
-if(multiarch_avx512_vpopcnt)
+if(PRIMECOUNT_MULTIARCH_AVX512_VPOPCNT)
     list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_MULTIARCH_AVX512_VPOPCNT")
 endif()
 

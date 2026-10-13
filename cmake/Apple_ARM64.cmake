@@ -10,4 +10,4 @@ check_cxx_source_compiles("
     #else
         Error: not Apple ARM64
     #endif
-    " Apple_ARM64)
+    " PRIMECOUNT_APPLE_ARM64)
