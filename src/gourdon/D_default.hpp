@@ -29,6 +29,8 @@
 #ifndef D_DEFAULT_HPP
 #define D_DEFAULT_HPP
 
+#include "DCentral.hpp"
+
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
@@ -60,6 +62,7 @@ T D_thread_default(T x,
                    const Primes& primes,
                    const PiTable& pi,
                    const FactorTable& factor,
+                   const Vector<int64_t>& mertens_y,
                    ThreadData& thread)
 {
   T sum = 0;
@@ -79,6 +82,9 @@ T D_thread_default(T x,
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
+  Vector<CentralEvent> events;
+  SemiprimeEventBitmap sorter;
+  auto count_sieve = [&sieve](uint64_t stop) { return sieve.count(stop); };
   thread.init_time = get_time();
 
   INDETERMINATE Array<uint32_t, 128> m_indexes32;
@@ -111,9 +117,24 @@ T D_thread_default(T x,
       int64_t xp_high = min(fast_div(xp, high), z);
       int64_t min_m = max(xp_high, z / prime);
       int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
+      int64_t original_max_m = max_m;
 
       if (prime >= max_m)
         goto next_segment;
+
+      if (central_row(xp, prime, b, y, z, low, high, phi[b], primes, pi,
+                      mertens_y, count_sieve, events, sorter, sum, max_m))
+      {
+        phi[b] += sieve.get_total_count();
+        sieve.cross_off_count(prime, b);
+        continue;
+      }
+
+      // A composite m with all prime factors > prime exceeds prime^2.
+      // Test the uncapped bound: later rows may still have central
+      // leaves even when the capped max_m is at most prime^2.
+      if (original_max_m <= prime * prime)
+        break;
 
       min_m = FactorTable::to_index(min_m);
       max_m = FactorTable::to_index(max_m);
@@ -256,7 +277,7 @@ T D_thread_default(T x,
       sieve.cross_off_count(prime, b);
     }
 
-    // For pi_sqrtz < b <= pi_x_star
+    // For the remaining b <= pi_x_star
     // Find all special leaves in the current segment
     // that are composed of 2 primes:
     // low <= x / (primes[b] * primes[l]) < high
@@ -266,7 +287,7 @@ T D_thread_default(T x,
       T xp = x / prime;
       int64_t xp_low = min(fast_div(xp, low1), y);
       int64_t xp_high = min(fast_div(xp, high), y);
-      int64_t min_m = max(xp_high, prime);
+      int64_t min_m = max3(xp_high, z / prime, prime);
       int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
       int64_t l = pi[max_m];
 
