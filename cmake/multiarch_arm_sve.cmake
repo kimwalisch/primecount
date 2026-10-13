@@ -91,9 +91,9 @@ check_cxx_source_compiles("
 
         return (cnt > 0) ? 0 : 1;
     }
-" multiarch_arm_sve)
+" PRIMECOUNT_MULTIARCH_ARM_SVE)
 
-if(multiarch_arm_sve)
+if(PRIMECOUNT_MULTIARCH_ARM_SVE)
     list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_MULTIARCH_ARM_SVE")
 endif()
 

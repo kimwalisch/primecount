@@ -59,6 +59,7 @@ Keep changes limited to the requested task. Avoid unrelated refactoring, renamin
 - Annotate multiarch SIMD functions with the macros from `include/macros.hpp`: `PRIMECOUNT_TARGET_ENTRY(isa)` for functions called from scalar code, and `PRIMECOUNT_TARGET_ATTRIBUTE(isa)` for helpers called only from other SIMD functions (helpers may also use `ALWAYS_INLINE`). Give helpers the same `isa` string as the entry function that calls them; otherwise GCC/Clang cannot inline them. Never call a helper from scalar code, and never pass SIMD vector types into or out of an entry function: with native MSVC, SIMD code inlined into scalar code can crash with an illegal instruction. Use the same annotation on a function's declaration and definition.
 - Split overly complicated expressions, especially nested `min()`/`max()` calls combined with table lookups, into simpler intermediate calculations.
 - Do not use `UINT64_C(...)` or similar integer-constant macros.
+- The CMake cache is shared with the vendored primesieve and with parent projects that use `add_subdirectory()`, hence compiler check and library search results use the `PRIMECOUNT_` prefix, e.g. `PRIMECOUNT_MULTIARCH_ARM_SVE`, whereas public `BUILD_*` and `WITH_*` options keep their names.
 
 ## Integer types and casts
 

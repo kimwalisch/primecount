@@ -8,4 +8,4 @@ check_cxx_source_compiles("
         static_assert(std::numeric_limits<unsigned int>::min() == 0, \"\");
         static_assert(std::is_integral<int>::value, \"\");
         return 0;
-    }" compiler_supports_cpp11)
+    }" PRIMECOUNT_COMPILER_SUPPORTS_CPP11)

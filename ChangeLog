@@ -1,5 +1,7 @@
-Changes in primecount-8.9, 2026-10-12
+Changes in primecount-8.9, 2026-10-13
 
+* CMake: Prefix internal cache variables with PRIMECOUNT_ to avoid name collisions.
+* primecountConfig.cmake.in: Avoid overwriting the LOWER_COMPONENTS variable of consumers.
 * CMake: Require C++14 for the executable and tests, fixes Emscripten build.
 * Vector.hpp: Make Array member functions constexpr.
 * PhiTiny.cpp: Use hardcoded lookup tables, no initialization at startup.

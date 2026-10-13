@@ -13,8 +13,8 @@ include(CMakePushCheckState)
 find_package(OpenMP QUIET)
 
 if(NOT (TARGET OpenMP::OpenMP_CXX))
-    message(STATUS "Performing Test OpenMP")
-    message(STATUS "Performing Test OpenMP - Failed")
+    message(STATUS "Performing Test PRIMECOUNT_OPENMP")
+    message(STATUS "Performing Test PRIMECOUNT_OPENMP - Failed")
 endif()
 
 # CMake has found OpenMP, now we need to check
@@ -41,7 +41,7 @@ if(TARGET OpenMP::OpenMP_CXX)
         }")
 
     # Our <int128_t.hpp> requires C++11 or later
-    if(NOT compiler_supports_cpp11)
+    if(NOT PRIMECOUNT_COMPILER_SUPPORTS_CPP11)
         if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
             set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION}")
         elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
@@ -56,28 +56,28 @@ if(TARGET OpenMP::OpenMP_CXX)
     set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 
     # Check if OpenMP supports 128-bit integers
-    check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" OpenMP)
+    check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" PRIMECOUNT_OPENMP)
 
-    if(NOT OpenMP)
+    if(NOT PRIMECOUNT_OPENMP)
         # Try if OpenMP works if we link against libatomic.
         # This is sometimes required for LLVM/Clang.
         # First try -latomic as the compiler may find libraries
         # in directories which CMake does not search.
         set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX" "-latomic")
-        check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" OpenMP_with_latomic)
+        check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" PRIMECOUNT_OPENMP_WITH_LATOMIC)
 
-        if(OpenMP_with_latomic)
+        if(PRIMECOUNT_OPENMP_WITH_LATOMIC)
             list(APPEND PRIMECOUNT_LINK_LIBRARIES "-latomic")
             string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-latomic ")
         else()
-            find_library(LIB_ATOMIC NAMES atomic atomic.so.1 libatomic.so.1)
+            find_library(PRIMECOUNT_LIB_ATOMIC NAMES atomic atomic.so.1 libatomic.so.1)
 
-            if(LIB_ATOMIC)
-                set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX" "${LIB_ATOMIC}")
-                check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" OpenMP_with_libatomic_path)
+            if(PRIMECOUNT_LIB_ATOMIC)
+                set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX" "${PRIMECOUNT_LIB_ATOMIC}")
+                check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" PRIMECOUNT_OPENMP_WITH_LIBATOMIC_PATH)
 
-                if(OpenMP_with_libatomic_path)
-                    list(APPEND PRIMECOUNT_LINK_LIBRARIES "${LIB_ATOMIC}")
+                if(PRIMECOUNT_OPENMP_WITH_LIBATOMIC_PATH)
+                    list(APPEND PRIMECOUNT_LINK_LIBRARIES "${PRIMECOUNT_LIB_ATOMIC}")
                 endif()
             endif()
         endif()
@@ -86,9 +86,9 @@ if(TARGET OpenMP::OpenMP_CXX)
     cmake_pop_check_state()
 
     # OpenMP has been tested successfully, enable it
-    if(OpenMP OR
-       OpenMP_with_latomic OR
-       OpenMP_with_libatomic_path)
+    if(PRIMECOUNT_OPENMP OR
+       PRIMECOUNT_OPENMP_WITH_LATOMIC OR
+       PRIMECOUNT_OPENMP_WITH_LIBATOMIC_PATH)
         set(PRIMECOUNT_WITH_OPENMP ON)
         list(APPEND PRIMECOUNT_LINK_LIBRARIES "OpenMP::OpenMP_CXX")
 
@@ -109,10 +109,10 @@ if(PRIMECOUNT_WITH_OPENMP)
         int main() {
             kmp_set_blocktime(1);
             return 0;
-        }" LLVM_OpenMP)
+        }" PRIMECOUNT_LLVM_OPENMP)
     cmake_pop_check_state()
 
-    if(LLVM_OpenMP)
+    if(PRIMECOUNT_LLVM_OPENMP)
         include("${PROJECT_SOURCE_DIR}/cmake/setenv.cmake")
     endif()
 endif()
