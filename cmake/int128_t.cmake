@@ -42,9 +42,9 @@ check_cxx_source_compiles("
             return 1;
 
         return 0;
-    }" PRIMECOUNT_INT128)
+    }" PRIMECOUNT_INT128_T)
 
-if(NOT PRIMECOUNT_INT128)
+if(NOT PRIMECOUNT_INT128_T)
     set(DISABLE_INT128 "DISABLE_INT128")
     list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "${DISABLE_INT128}")
 endif()
