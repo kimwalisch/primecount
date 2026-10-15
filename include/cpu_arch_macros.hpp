@@ -33,10 +33,27 @@
     __has_include(<immintrin.h>)
   #define ENABLE_AVX512_VPOPCNT
   #undef ENABLE_MULTIARCH_AVX512_VPOPCNT
+  #undef ENABLE_MULTIARCH_AVX2
 #elif defined(__ARM_FEATURE_SVE) && \
       __has_include(<arm_sve.h>)
   #define ENABLE_ARM_SVE
   #undef ENABLE_MULTIARCH_ARM_SVE
+#endif
+
+#if defined(__AVX2__) && \
+    defined(__POPCNT__) && \
+    !defined(__i386__) && \
+    __has_include(<immintrin.h>)
+  #define ENABLE_AVX2
+  #undef ENABLE_MULTIARCH_AVX2
+// MSVC does not define __POPCNT__, but
+// /arch:AVX2 also enables POPCNT.
+#elif defined(_MSC_VER) && \
+      defined(__AVX2__) && \
+      !defined(_M_IX86) && \
+      __has_include(<immintrin.h>)
+  #define ENABLE_AVX2
+  #undef ENABLE_MULTIARCH_AVX2
 #endif
 
 #endif
