@@ -36,6 +36,10 @@
   #define D_DEFAULT_HEADER "D_arm_sve.hpp"
   #define D_DEFAULT_ALGO_NAME "Algorithm: ARM SVE"
   #define D_THREAD_DEFAULT D_thread_arm_sve
+#elif defined(ENABLE_AVX2)
+  #define D_DEFAULT_HEADER "D_avx2.hpp"
+  #define D_DEFAULT_ALGO_NAME "Algorithm: AVX2"
+  #define D_THREAD_DEFAULT D_thread_avx2
 #elif defined(ENABLE_ARM_NEON)
   #define D_DEFAULT_HEADER "D_arm_neon.hpp"
   #define D_DEFAULT_ALGO_NAME "Algorithm: ARM NEON"
@@ -49,6 +53,11 @@
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
   #include <cpu_supports_avx512_vpopcnt.hpp>
   #include "D_avx512.hpp"
+#endif
+
+#if defined(ENABLE_MULTIARCH_AVX2)
+  #include <cpu_supports_avx2.hpp>
+  #include "D_avx2.hpp"
 #endif
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
@@ -78,6 +87,11 @@ T D_thread(Args&&... args)
       return D_thread_avx512<UT>(std::forward<Args>(args)...);
   #endif
 
+  #if defined(ENABLE_MULTIARCH_AVX2)
+    if (cpu_supports_avx2)
+      return D_thread_avx2<UT>(std::forward<Args>(args)...);
+  #endif
+
   #if defined(ENABLE_MULTIARCH_ARM_SVE)
     if (cpu_supports_sve)
       return D_thread_arm_sve<UT>(std::forward<Args>(args)...);
@@ -91,6 +105,11 @@ string_view_t D_algo_name()
   #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     if (cpu_supports_avx512_vpopcnt)
       return "Algorithm: AVX512";
+  #endif
+
+  #if defined(ENABLE_MULTIARCH_AVX2)
+    if (cpu_supports_avx2)
+      return "Algorithm: AVX2";
   #endif
 
   #if defined(ENABLE_MULTIARCH_ARM_SVE)

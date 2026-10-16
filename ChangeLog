@@ -1,5 +1,8 @@
 Changes in primecount-8.9, 2026-10-13
 
+* D_avx2.hpp: AVX2 filtering for Gourdon's D algorithm.
+* D.cpp: Add AVX2 runtime dispatch.
+* test/gourdon/D_avx2.cpp: Test AVX2 filtering against scalar filtering.
 * CMake: Prefix internal cache variables with PRIMECOUNT_ to avoid name collisions.
 * primecountConfig.cmake.in: Avoid overwriting the LOWER_COMPONENTS variable of consumers.
 * CMake: Require C++14 for the executable and tests, fixes Emscripten build.
