@@ -108,11 +108,12 @@ T S2_hard_thread(T x,
 
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
+      int64_t encoded_prime = factor.encode(b);
 
       for (int64_t m = max_m; m > min_m; m--)
       {
         // mu(m) != 0 && lpf(m) > prime
-        if (factor.mu_lpf(m) > prime)
+        if (factor[m] > encoded_prime)
         {
           int64_t xpm = fast_div64(xp, factor.to_number(m));
           int64_t count = sieve.count(xpm - low);
@@ -274,8 +275,17 @@ int128_t S2_hard(int128_t x,
     FactorTable<uint16_t> factor(y, threads);
     int64_t max_prime = min(y, z / isqrt(y));
     PiTable pi(max_prime, threads);
-    auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-    sum = S2_hard_OpenMP(x, y, z, c, pi, primes, factor, threads, is_print);
+
+    if (max_prime <= UINT32_MAX)
+    {
+      auto primes = pi.get_primes<uint32_t>(max_prime, threads);
+      sum = S2_hard_OpenMP(x, y, z, c, pi, primes, factor, threads, is_print);
+    }
+    else
+    {
+      auto primes = pi.get_primes<int64_t>(max_prime, threads);
+      sum = S2_hard_OpenMP(x, y, z, c, pi, primes, factor, threads, is_print);
+    }
   }
   else
   {

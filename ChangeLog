@@ -1,5 +1,6 @@
-Changes in primecount-8.9, 2026-10-13
+Changes in primecount-8.9, 2026-10-19
 
+* FactorTable.hpp: Reduce Deleglise-Rivat S2_hard memory using 16-bit prime factor ordinals.
 * D_avx2.hpp: AVX2 filtering for Gourdon's D algorithm.
 * D.cpp: Add AVX2 runtime dispatch.
 * test/gourdon/D_avx2.cpp: Test AVX2 filtering against scalar filtering.
