@@ -27,9 +27,9 @@ struct Sigma_formula_params
 
 /// Known correct results generated using: scripts/gen_tests_gourdon2.sh
 /// For each input x=10^n we test using:
-/// 1) The default alpha_y & alpha_z
-/// 2) The maximum alpha_y
-/// 3) The maximum alpha_z
+/// 1) The default alpha
+/// 2) The maximum alpha
+/// 3) The minimum alpha=1
 std::array<Sigma_formula_params, 41> test_cases =
 {{
   { 10, 2, 1 },
@@ -65,14 +65,14 @@ std::array<Sigma_formula_params, 41> test_cases =
   { 100000000000, 13825, 222935833 },
   { 100000000000, 315588, -1927148 },
   { 100000000000, 4642, 372245278 },
-  { 1000000000000, 50000, 1541740088 },
+  { 1000000000000, 76500, 1233812043 },
   { 1000000000000, 999999, -48075857 },
   { 1000000000000, 10001, 3080175375 },
-  { 10000000000000, 107720, 13832177419 },
+  { 10000000000000, 241615, 9230551193 },
   { 10000000000000, 3145424, -749805339 },
   { 10000000000000, 21545, 25908547161 },
-  { 100000000000000, 282435, 115597332512 },
-  { 1000000000000000, 737200, 982718153395 }
+  { 100000000000000, 660067, 76786209217 },
+  { 1000000000000000, 1724700, 667944358024 }
 }};
 
 void check(bool OK)

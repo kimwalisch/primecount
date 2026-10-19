@@ -130,13 +130,10 @@ maxint_t AC(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  auto alpha = get_alpha_gourdon(x);
-  double alpha_y = alpha.first;
-  double alpha_z = alpha.second;
-
+  double alpha = get_alpha_gourdon(x);
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
-  int64_t y = (int64_t)(x13 * alpha_y);
+  int64_t y = (int64_t)(x13 * alpha);
 
   // x^(1/3) < y < x^(1/2)
   y = std::max(y, x13 + 1);
@@ -152,12 +149,7 @@ maxint_t AC(maxint_t x, int threads)
 #endif
 
   int64_t k = PhiTiny::get_k(x);
-  int64_t z = (int64_t)(y * alpha_z);
-
-  // y <= z < x^(1/2)
-  z = std::max(z, y);
-  z = std::min(z, sqrtx - 1);
-  z = std::max(z, (int64_t) 1);
+  int64_t z = y;
 
   if (is_print())
     set_print_variables(true);
@@ -173,12 +165,10 @@ maxint_t B(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  auto alpha = get_alpha_gourdon(x);
-  double alpha_y = alpha.first;
-
+  double alpha = get_alpha_gourdon(x);
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
-  int64_t y = (int64_t)(x13 * alpha_y);
+  int64_t y = (int64_t)(x13 * alpha);
 
   // x^(1/3) < y < x^(1/2)
   y = std::max(y, x13 + 1);
@@ -207,13 +197,10 @@ maxint_t D(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  auto alpha = get_alpha_gourdon(x);
-  double alpha_y = alpha.first;
-  double alpha_z = alpha.second;
-
+  double alpha = get_alpha_gourdon(x);
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
-  int64_t y = (int64_t)(x13 * alpha_y);
+  int64_t y = (int64_t)(x13 * alpha);
 
   // x^(1/3) < y < x^(1/2)
   y = std::max(y, x13 + 1);
@@ -229,12 +216,7 @@ maxint_t D(maxint_t x, int threads)
 #endif
 
   int64_t k = PhiTiny::get_k(x);
-  int64_t z = (int64_t)(y * alpha_z);
-
-  // y <= z < x^(1/2)
-  z = std::max(z, y);
-  z = std::min(z, sqrtx - 1);
-  z = std::max(z, (int64_t) 1);
+  int64_t z = y;
 
   if (is_print())
     set_print_variables(true);
@@ -250,13 +232,10 @@ maxint_t Phi0(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  auto alpha = get_alpha_gourdon(x);
-  double alpha_y = alpha.first;
-  double alpha_z = alpha.second;
-
+  double alpha = get_alpha_gourdon(x);
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
-  int64_t y = (int64_t)(x13 * alpha_y);
+  int64_t y = (int64_t)(x13 * alpha);
 
   // x^(1/3) < y < x^(1/2)
   y = std::max(y, x13 + 1);
@@ -272,12 +251,7 @@ maxint_t Phi0(maxint_t x, int threads)
 #endif
 
   int64_t k = PhiTiny::get_k(x);
-  int64_t z = (int64_t)(y * alpha_z);
-
-  // y <= z < x^(1/2)
-  z = std::max(z, y);
-  z = std::min(z, sqrtx - 1);
-  z = std::max(z, (int64_t) 1);
+  int64_t z = y;
 
   if (is_print())
     set_print_variables(true);
@@ -293,12 +267,10 @@ maxint_t Sigma(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  auto alpha = get_alpha_gourdon(x);
-  double alpha_y = alpha.first;
-
+  double alpha = get_alpha_gourdon(x);
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
-  int64_t y = (int64_t)(x13 * alpha_y);
+  int64_t y = (int64_t)(x13 * alpha);
 
   // x^(1/3) < y < x^(1/2)
   y = std::max(y, x13 + 1);

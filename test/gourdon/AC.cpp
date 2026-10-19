@@ -29,9 +29,9 @@ struct AC_formula_params
 
 /// Known correct results generated using: scripts/gen_tests_gourdon1.sh
 /// For each input x=10^n we test using:
-/// 1) The default alpha_y & alpha_z
-/// 2) The minimum alpha_y=1 & alpha_z=1
-/// 3) The maximum alpha_y
+/// 1) The default alpha
+/// 2) The minimum alpha=1
+/// 3) The maximum alpha
 std::array<AC_formula_params, 43> test_cases =
 {{
   { 10, 2, 2, 0, 0 },

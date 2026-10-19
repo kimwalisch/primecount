@@ -1,8 +1,8 @@
 ///
-/// @file   alpha_z.cpp
-/// @brief  Test the alpha_z tuning factor in Gourdon's algorithm.
-///         z = y * alpha_z
-///         By computing pi(x) using different alpha_z tuning
+/// @file   alpha_gourdon.cpp
+/// @brief  Test the alpha tuning factor with Gourdon's algorithm.
+///         y = alpha * x^(1/3)
+///         By computing pi(x) using different alpha tuning
 ///         factors we can make sure that all array sizes
 ///         (and other bounds) are accurate.
 ///
@@ -47,16 +47,16 @@ int main()
       int64_t x = dist(gen);
       int64_t res1 = pi_cache(x);
 
-      for (double alpha_z = 1; alpha_z <= iroot<6>(x); alpha_z++)
+      for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
       {
-        set_alpha_z(alpha_z);
+        set_alpha(alpha);
         int64_t res2 = pi_gourdon_64(x, threads);
-        std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_64(" << x << ") = " << res2;
+        std::cout << "alpha = " << alpha << ", pi_gourdon_64(" << x << ") = " << res2;
         check(res2 == res1);
 
         #ifdef HAVE_INT128_T
           int128_t res3 = pi_gourdon_128(x, threads);
-          std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_128(" << x << ") = " << res3;
+          std::cout << "alpha = " << alpha << ", pi_gourdon_128(" << x << ") = " << res3;
           check(res3 == res1);
         #endif
       }
@@ -77,16 +77,16 @@ int main()
       int64_t x = dist(gen);
       int64_t res1 = pi_meissel(x, threads);
 
-      for (double alpha_z = 1; alpha_z <= iroot<6>(x); alpha_z++)
+      for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
       {
-        set_alpha_z(alpha_z);
+        set_alpha(alpha);
         int64_t res2 = pi_gourdon_64(x, threads);
-        std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_64(" << x << ") = " << res2;
+        std::cout << "alpha = " << alpha << ", pi_gourdon_64(" << x << ") = " << res2;
         check(res2 == res1);
 
         #ifdef HAVE_INT128_T
           int128_t res3 = pi_gourdon_128(x, threads);
-          std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_128(" << x << ") = " << res3;
+          std::cout << "alpha = " << alpha << ", pi_gourdon_128(" << x << ") = " << res3;
           check(res3 == res1);
         #endif
       }
@@ -99,16 +99,16 @@ int main()
     int64_t res1 = 4118054810;
     std::vector<double> alphas = { 1, 1+1/3.0, 2, 10, (double) iroot<6>(x) };
 
-    for (double alpha_z : alphas)
+    for (double alpha : alphas)
     {
-      set_alpha_z(alpha_z);
+      set_alpha(alpha);
       int64_t res2 = pi_gourdon_64(x, threads);
-      std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_64(" << x << ") = " << res2;
+      std::cout << "alpha = " << alpha << ", pi_gourdon_64(" << x << ") = " << res2;
       check(res2 == res1);
 
       #ifdef HAVE_INT128_T
         int128_t res3 = pi_gourdon_128(x, threads);
-        std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_128(" << x << ") = " << res3;
+        std::cout << "alpha = " << alpha << ", pi_gourdon_128(" << x << ") = " << res3;
         check(res3 == res1);
       #endif
     }

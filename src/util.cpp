@@ -23,21 +23,14 @@
 #include <sstream>
 #include <string>
 #include <stdint.h>
-#include <utility>
 
 namespace {
 
 int status_precision_ = -1;
 
-/// Tuning factor used in the Lagarias-Miller-Odlyzko
-/// and Deleglise-Rivat algorithms.
+/// Tuning factor used in the Lagarias-Miller-Odlyzko,
+/// Deleglise-Rivat and Gourdon algorithms.
 double alpha_ = -1;
-
-/// Tuning factor used in Xavier Gourdon's algorithm
-double alpha_y_ = -1;
-
-/// Tuning factor used in Xavier Gourdon's algorithm
-double alpha_z_ = -1;
 
 /// Recompute pi(x) with alternative alpha tuning factor(s) to
 /// verify the first result. This redundancy helps guard
@@ -113,28 +106,8 @@ void set_alpha(double alpha)
     alpha_ = truncate3(alpha);
 }
 
-void set_alpha_y(double alpha_y)
-{
-  // If alpha_y < 1 then we compute a good
-  // alpha tuning factor at runtime.
-  if (alpha_y < 1.0)
-    alpha_y_ = -1;
-  else
-    alpha_y_ = truncate3(alpha_y);
-}
-
-void set_alpha_z(double alpha_z)
-{
-  // If alpha_z < 1 then we compute a good
-  // alpha tuning factor at runtime.
-  if (alpha_z < 1.0)
-    alpha_z_ = -1;
-  else
-    alpha_z_ = truncate3(alpha_z);
-}
-
-/// Tuning factor used in the Lagarias-Miller-Odlyzko
-/// and Deleglise-Rivat algorithms.
+/// Tuning factor used in the Lagarias-Miller-Odlyzko,
+/// Deleglise-Rivat and Gourdon algorithms.
 ///
 double get_alpha(maxint_t x, int64_t y)
 {
@@ -149,37 +122,6 @@ double get_alpha(maxint_t x, int64_t y)
     alpha = std::nextafter(alpha, max_alpha);
 
   return alpha;
-}
-
-/// Tuning factor used in Xavier Gourdon's algorithm.
-double get_alpha_y(maxint_t x, int64_t y)
-{
-  // y = x13 * alpha_y, thus alpha = y / x13
-  double x13 = (double) iroot<3>(x);
-  double alpha_y = (double) y / x13;
-  double max_alpha_y = (double) y;
-  int64_t verify_y = (int64_t)(x13 * alpha_y);
-
-  // Prevent x^(1/3) * alpha_y = 23.99999...
-  if (verify_y < y)
-    alpha_y = std::nextafter(alpha_y, max_alpha_y);
-
-  return alpha_y;
-}
-
-/// Tuning factor used in Xavier Gourdon's algorithm.
-double get_alpha_z(int64_t y, int64_t z)
-{
-  // z = y * alpha_z, thus alpha_z = z / y
-  double alpha_z = (double) z / y;
-  double max_alpha_z = (double) z;
-  int64_t verify_z = (int64_t)(y * alpha_z);
-
-  // Prevent y * alpha_z = 23.99999...
-  if (verify_z < z)
-    alpha_z = std::nextafter(alpha_z, max_alpha_z);
-
-  return alpha_z;
 }
 
 /// Get the Lagarias-Miller-Odlyzko alpha tuning factor.
@@ -263,90 +205,52 @@ double get_alpha_deleglise_rivat(maxint_t x)
   return in_between(1, alpha, x16);
 }
 
-/// In Xavier Gourdon's algorithm there are 2 alpha tuning
-/// factors. The alpha_y tuning factor should grow like
-/// O(log(x)^3) and the alpha_z tuning factor is a small
-/// constant. Both alpha_y and alpha_z should be determined
-/// experimentally by running benchmarks.
+/// Get the Xavier Gourdon alpha tuning factor.
+/// alpha = a log(x)^3 + b log(x)^2 + c log(x) + d
+/// a, b, c and d have been determined empirically.
 /// @see doc/alpha-factor-gourdon.pdf
 ///
-/// y = x^(1/3) * alpha_y, with alpha_y >= 1.
-/// z = y * alpha_z, with alpha_z >= 1.
-/// alpha_y * alpha_z <= x^(1/6)
-///
-std::pair<double, double> get_alpha_gourdon(maxint_t x)
+double get_alpha_gourdon(maxint_t x)
 {
-  double alpha_y = alpha_y_;
-  double alpha_z = alpha_z_;
+  double alpha = alpha_;
   double x16 = (double) iroot<6>(x);
-  double logx = std::log((double) x);
-  double alpha_yz;
 
-  // For x <= 10^11 our default formula does not
-  // generate good alpha values. Hence we use
-  // another formula optimized for small values.
-  if (x <= 1e11)
+  // Use default alpha
+  if (alpha < 1)
   {
-    double a = 0.078173;
-    double b = 1;
-    alpha_yz = a * logx + b;
-  }
-  else
-  {
-    double a = 0.007888745747017503;
-    double b = -0.7610431057184933;
-    double c = 25.74106177417062;
-    double d = -288.9823576050215;
-    double logx2 = logx * logx;
-    double logx3 = logx * logx * logx;
-    alpha_yz = a * logx3 + b * logx2 + c * logx + d;
-  }
-
-  // Use default alpha_z
-  if (alpha_z < 1)
-  {
-    // y = x^(1/3) * alpha_y
-    // z = y * alpha_z
-    //
-    // alpha_y should grow like O(log(x)^3) just like in the
-    // Deleglise-Rivat algorithm whereas alpha_z is a small tuning
-    // factor usually within [1, 4]. alpha_z corresponds to the c
-    // constant in Gourdon's paper. The alpha_y and alpha_z tuning
-    // factors are used to balance the work between the A, B, C and
-    // D formulas. The algorithm is theoretically most efficient
-    // (i.e. uses the fewest instructions) if y == z, hence if
-    // alpha_z = 1. When using the default alpha_y, increasing
-    // alpha_z automatically decreases alpha_y. This speeds up the
-    // A, C and D formulas at the expense of a longer running B
-    // formula.
-    alpha_z = 1.0;
-
-    // alpha_z should be significantly smaller than alpha_y
-    alpha_z = in_between(1, alpha_yz / 5, alpha_z);
+    // For x <= 10^11 our default formula does not
+    // generate good alpha values. Hence we use
+    // another formula optimized for small values.
+    if (x <= 1e11)
+    {
+      double a = 0.078173;
+      double b = 1;
+      double logx = std::log((double) x);
+      alpha = a * logx + b;
+    }
+    else
+    {
+      double a = 0.007888745747017503;
+      double b = -0.7610431057184933;
+      double c = 25.74106177417062;
+      double d = -288.9823576050215;
+      double logx = std::log((double) x);
+      double logx2 = logx * logx;
+      double logx3 = logx * logx * logx;
+      alpha = a * logx3 + b * logx2 + c * logx + d;
+    }
   }
 
-  // --double-check option for second pi(x) computation
+  // Recompute pi(x) with alternative alpha tuning
+  // factor(s) to verify the first result.
   if (double_check_)
-  {
-    alpha_z = max(1.0, alpha_z * 1.02);
-    alpha_yz = max(1.0, alpha_yz * 0.97);
-  }
-
-  // Use default alpha_y
-  if (alpha_y < 1)
-    alpha_y = alpha_yz / alpha_z;
+    alpha *= 0.97;
 
   // Preserve 3 digits after decimal point
-  alpha_y = in_between(1, alpha_y, x16);
-  alpha_y = truncate3(alpha_y);
-  alpha_z = truncate3(alpha_z);
+  alpha = in_between(1, alpha, x16);
+  alpha = truncate3(alpha);
 
-  // Ensure alpha_y * alpha_z <= x^(1/6)
-  alpha_y = in_between(1, alpha_y, x16);
-  double max_alpha_z = max(1.0, x16 / alpha_y);
-  alpha_z = in_between(1, alpha_z, max_alpha_z);
-
-  return std::make_pair(alpha_y, alpha_z);
+  return in_between(1, alpha, x16);
 }
 
 /// x_star = max(x^(1/4), x / y^2)

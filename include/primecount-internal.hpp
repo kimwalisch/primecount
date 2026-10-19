@@ -75,15 +75,11 @@ int64_t RiemannR_psi_inverse(int64_t x);
 int get_status_precision(maxint_t x);
 void set_status_precision(int precision);
 void set_alpha(double alpha);
-void set_alpha_y(double alpha_y);
-void set_alpha_z(double alpha_z);
 double get_time();
 double get_alpha(maxint_t x, int64_t y);
-double get_alpha_y(maxint_t x, int64_t y);
-double get_alpha_z(int64_t y, int64_t z);
 double get_alpha_lmo(maxint_t x);
 double get_alpha_deleglise_rivat(maxint_t x);
-std::pair<double, double> get_alpha_gourdon(maxint_t x);
+double get_alpha_gourdon(maxint_t x);
 int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 void verify_pix(string_view_t pix_function, maxint_t x, maxint_t pix);
 

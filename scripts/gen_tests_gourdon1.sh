@@ -32,14 +32,14 @@ do
 
         echo "{ ${x}, ${y}, ${z}, ${k}, ${res} },"
 
-        res=$(./primecount 1e$i --$formula --alpha-y=1)
-        x=$(./primecount 1e$i --$formula --alpha-y=1 -s | grep '^x =' | cut -f3 -d' ')
-        y=$(./primecount 1e$i --$formula --alpha-y=1 -s | grep '^y =' | cut -f3 -d' ')
-        z=$(./primecount 1e$i --$formula --alpha-y=1 -s | grep '^z =' | cut -f3 -d' ')
-        k=$(./primecount 1e$i --$formula --alpha-y=1 -s | grep '^k =' | cut -f3 -d' ')
+        res=$(./primecount 1e$i --$formula --alpha=1)
+        x=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^x =' | cut -f3 -d' ')
+        y=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^y =' | cut -f3 -d' ')
+        z=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^z =' | cut -f3 -d' ')
+        k=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^k =' | cut -f3 -d' ')
 
-        verify=$(./primecount 1e$i --alpha-y=1 -g -s | grep "$formula_label = $res\$")
-        if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -g --alpha-y=1)" != "$(./primecount 1e$i -m)" ]]
+        verify=$(./primecount 1e$i --alpha=1 -g -s | grep "$formula_label = $res\$")
+        if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -g --alpha=1)" != "$(./primecount 1e$i -m)" ]]
         then
             echo ""
             echo "Error!"
@@ -48,14 +48,14 @@ do
 
         echo "{ ${x}, ${y}, ${z}, ${k}, ${res} },"
 
-        res=$(./primecount 1e$i --$formula --alpha-y=10000000)
-        x=$(./primecount 1e$i --$formula --alpha-y=10000000 -s | grep '^x =' | cut -f3 -d' ')
-        y=$(./primecount 1e$i --$formula --alpha-y=10000000 -s | grep '^y =' | cut -f3 -d' ')
-        z=$(./primecount 1e$i --$formula --alpha-y=10000000 -s | grep '^z =' | cut -f3 -d' ')
-        k=$(./primecount 1e$i --$formula --alpha-y=10000000 -s | grep '^k =' | cut -f3 -d' ')
+        res=$(./primecount 1e$i --$formula --alpha=10000000)
+        x=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^x =' | cut -f3 -d' ')
+        y=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^y =' | cut -f3 -d' ')
+        z=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^z =' | cut -f3 -d' ')
+        k=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^k =' | cut -f3 -d' ')
 
-        verify=$(./primecount 1e$i --alpha-y=10000000 -g -s | grep "$formula_label = $res\$")
-        if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -g --alpha-y=10000000)" != "$(./primecount 1e$i -m)" ]]
+        verify=$(./primecount 1e$i --alpha=10000000 -g -s | grep "$formula_label = $res\$")
+        if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -g --alpha=10000000)" != "$(./primecount 1e$i -m)" ]]
         then
             echo ""
             echo "Error!"

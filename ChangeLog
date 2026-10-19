@@ -1,5 +1,7 @@
 Changes in primecount-8.9, 2026-10-19
 
+* util.cpp: Remove alpha_z tuning factor from Gourdon's algorithm, use z = y.
+* CmdOptions.cpp: Remove --alpha-y and --alpha-z, use --alpha for Gourdon's algorithm.
 * test/gourdon: Regenerate D, AC and Phi0 tests using y = z.
 * FactorTable.hpp: Reduce Deleglise-Rivat S2_hard memory using 16-bit prime factor ordinals.
 * D_avx2.hpp: AVX2 filtering for Gourdon's D algorithm.

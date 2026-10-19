@@ -268,8 +268,6 @@ CmdOptions parseOptions(int argc, char** argv)
   {
     { "-a", std::make_pair(OPTION_ALPHA, REQUIRED_PARAM) },
     { "--alpha", std::make_pair(OPTION_ALPHA, REQUIRED_PARAM) },
-    { "--alpha-y", std::make_pair(OPTION_ALPHA_Y, REQUIRED_PARAM) },
-    { "--alpha-z", std::make_pair(OPTION_ALPHA_Z, REQUIRED_PARAM) },
     { "-d", std::make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
     { "--deleglise-rivat", std::make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
     { "--deleglise-rivat-64", std::make_pair(OPTION_DELEGLISE_RIVAT_64, NO_PARAM) },
@@ -342,8 +340,6 @@ CmdOptions parseOptions(int argc, char** argv)
     switch (optionID)
     {
       case OPTION_ALPHA:        set_alpha(getAlpha(opt)); break;
-      case OPTION_ALPHA_Y:      set_alpha_y(getAlpha(opt)); break;
-      case OPTION_ALPHA_Z:      set_alpha_z(getAlpha(opt)); break;
       case OPTION_DOUBLE_CHECK: set_double_check(true); break;
       case OPTION_HELP:         help(/* exitCode */ 0); break;
       case OPTION_NUMBER:       numbers.push_back(getVal<maxint_t>(opt)); break;

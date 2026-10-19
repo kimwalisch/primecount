@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Find the fastest alpha_z tuning factors for primecount.
+# Find the fastest alpha tuning factors for primecount.
 # Usage:
-#   ./find_fastest_alpha_z_gourdon.sh [--start=n] [--stop=n] [-t=threads]
+#   ./find_fastest_alpha_gourdon.sh [--start=n] [--stop=n] [-t=threads]
 # Description:
 #   This script calculates pi(10^n) for start <= n <= stop using different
 #   alpha tuning factors and prints out the fastest alphas. The fastest
@@ -53,9 +53,9 @@ do
         shift
         ;;
         *)
-        echo "Find the fastest alpha_z tuning factors for primecount."
+        echo "Find the fastest alpha tuning factors for primecount."
         echo "Usage:"
-        echo "  ./find_fastest_alpha_z_gourdon.sh [--start=n] [--stop=n] [-t=threads]"
+        echo "  ./find_fastest_alpha_gourdon.sh [--start=n] [--stop=n] [-t=threads]"
         echo "Description:"
         echo "  This script calculates pi(10^n) for start <= n <= stop using different"
         echo "  alpha tuning factors and prints out the fastest alphas. The fastest"
@@ -122,10 +122,10 @@ function minimum
 }
 
 # $1: primecount args
-function get_primecount_alpha_z
+function get_primecount_alpha
 {
-    alpha_z=3
-    echo $alpha_z
+    alpha=$(./primecount $1 --Sigma -s | grep alpha | cut -d'=' -f2 | cut -d' ' -f2)
+    echo $alpha
 }
 
 # $1: primecount args
@@ -139,9 +139,9 @@ function get_primecount_seconds
 # Calculate pi(10^i) for start <= i <= stop
 for ((i = start; i <= stop; i++))
 do
-    alpha_z=$(get_primecount_alpha_z "1e$i")
+    alpha=$(get_primecount_alpha "1e$i")
     fastest_seconds=10^30
-    fastest_alpha_z=$alpha_z
+    fastest_alpha=$alpha
     found_fastest=false
     too_fast=false
     iter_count=0
@@ -153,7 +153,7 @@ do
 
     for div in 2 4 8 16 32 64;
     do
-        copy_fastest_alpha_z=$fastest_alpha_z
+        copy_fastest_alpha=$fastest_alpha
 
         for ((j = 0; j < repeat; j++))
         do
@@ -163,17 +163,17 @@ do
                 break
             fi
 
-            pivot=$(calc "$copy_fastest_alpha_z / $div")
-            max_alpha_z=$(calc "$copy_fastest_alpha_z + $pivot")
-            new_alpha_z=$(calc "$copy_fastest_alpha_z - $pivot")
-            new_alpha_z=$(maximum 1.000 $new_alpha_z)
-            increment=$(calc "($max_alpha_z - $new_alpha_z) / $div_increment")
+            pivot=$(calc "$copy_fastest_alpha / $div")
+            max_alpha=$(calc "$copy_fastest_alpha + $pivot")
+            new_alpha=$(calc "$copy_fastest_alpha - $pivot")
+            new_alpha=$(maximum 1.000 $new_alpha)
+            increment=$(calc "($max_alpha - $new_alpha) / $div_increment")
             increment=$(maximum 0.01 $increment)
 
-            while [[ $(is_smaller_equal $new_alpha_z $max_alpha_z) -eq 1 ]]
+            while [[ $(is_smaller_equal $new_alpha $max_alpha) -eq 1 ]]
             do
-                seconds=$(get_primecount_seconds "1e$i --gourdon -t$threads --alpha-z=$new_alpha_z")
-                echo "1e$i --gourdon --threads=$threads --alpha-z=$new_alpha_z, seconds: $seconds"
+                seconds=$(get_primecount_seconds "1e$i --gourdon -t$threads --alpha=$new_alpha")
+                echo "1e$i --gourdon --threads=$threads --alpha=$new_alpha, seconds: $seconds"
                 iter_count=$(($iter_count + 1))
 
                 if [[ $iter_count -eq 2 ]]
@@ -191,7 +191,7 @@ do
                 if [[ $(is_smaller $seconds $fastest_seconds) -eq 1 ]]
                 then
                     found_fastest=true
-                    fastest_alpha_z=$new_alpha_z
+                    fastest_alpha=$new_alpha
                     fastest_seconds=$seconds
                 fi
 
@@ -207,7 +207,7 @@ do
                     fi
                 fi
 
-                new_alpha_z=$(calc "$new_alpha_z + $increment")
+                new_alpha=$(calc "$new_alpha + $increment")
             done
         done
 
@@ -217,10 +217,10 @@ do
     if [[ "$found_fastest" != "true" ]] || \
        [[ "$too_fast" = "true" ]]
     then
-        fastest_alpha_z="undef"
+        fastest_alpha="undef"
         fastest_seconds="undef"
         old_seconds="undef"
     fi
 
-    echo "Result: fastest_alpha_z=$fastest_alpha_z, seconds=$fastest_seconds, old_alpha_z=$alpha_z, old_seconds=$old_seconds"
+    echo "Result: fastest_alpha=$fastest_alpha, seconds=$fastest_seconds, old_alpha=$alpha, old_seconds=$old_seconds"
 done

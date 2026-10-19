@@ -35,7 +35,7 @@ start=1
 stop=25
 instructions=0
 repeat=2
-threads=$(./primecount 1e18 --Sigma --alpha-z=1 -s | grep threads | cut -d'=' -f2 | cut -d' ' -f2)
+threads=$(./primecount 1e18 --Sigma -s | grep threads | cut -d'=' -f2 | cut -d' ' -f2)
 
 for i in "$@"
 do
@@ -122,10 +122,10 @@ function minimum
 }
 
 # $1: primecount args
-function get_primecount_alpha_y
+function get_primecount_alpha
 {
-    alpha_y=$(./primecount $1 --Sigma --alpha-z=1 -s | grep alpha_y | cut -d'=' -f2 | cut -d' ' -f2)
-    echo $alpha_y
+    alpha=$(./primecount $1 --Sigma -s | grep alpha | cut -d'=' -f2 | cut -d' ' -f2)
+    echo $alpha
 }
 
 # $1: primecount args
@@ -138,9 +138,9 @@ function get_primecount_instructions
 # Calculate pi(10^i) for start <= i <= stop
 for ((i = start; i <= stop; i++))
 do
-    alpha_y=$(get_primecount_alpha_y "1e$i")
+    alpha=$(get_primecount_alpha "1e$i")
     optimal_instructions=10^30
-    optimal_alpha_y=$alpha_y
+    optimal_alpha=$alpha
     found_optimal=false
     too_fast=false
     iter_count=0
@@ -152,7 +152,7 @@ do
 
     for div in 2 4 8 16 32 64;
     do
-        copy_optimal_alpha_y=$optimal_alpha_y
+        copy_optimal_alpha=$optimal_alpha
 
         for ((j = 0; j < repeat; j++))
         do
@@ -162,17 +162,17 @@ do
                 break
             fi
 
-            pivot=$(calc "$copy_optimal_alpha_y / $div")
-            max_alpha_y=$(calc "$copy_optimal_alpha_y + $pivot")
-            new_alpha_y=$(calc "$copy_optimal_alpha_y - $pivot")
-            new_alpha_y=$(maximum 1.000 $new_alpha_y)
-            increment=$(calc "($max_alpha_y - $new_alpha_y) / $div_increment")
+            pivot=$(calc "$copy_optimal_alpha / $div")
+            max_alpha=$(calc "$copy_optimal_alpha + $pivot")
+            new_alpha=$(calc "$copy_optimal_alpha - $pivot")
+            new_alpha=$(maximum 1.000 $new_alpha)
+            increment=$(calc "($max_alpha - $new_alpha) / $div_increment")
             increment=$(maximum 0.01 $increment)
 
-            while [[ $(is_smaller_equal $new_alpha_y $max_alpha_y) -eq 1 ]]
+            while [[ $(is_smaller_equal $new_alpha $max_alpha) -eq 1 ]]
             do
                 iter_count=$(($iter_count + 1))
-                test_case="1e$i --gourdon --threads=$threads --alpha-z=1 --alpha-y=$new_alpha_y"
+                test_case="1e$i --gourdon --threads=$threads --alpha=$new_alpha"
                 instructions=""
     
                 if [[ -f "bench.txt" ]]
@@ -195,7 +195,7 @@ do
                 if [[ $(is_smaller $instructions $optimal_instructions) -eq 1 ]]
                 then
                     found_optimal=true
-                    optimal_alpha_y=$new_alpha_y
+                    optimal_alpha=$new_alpha
                     optimal_instructions=$instructions
                 fi
 
@@ -205,7 +205,7 @@ do
                     repeat=1
                 fi
 
-                new_alpha_y=$(calc "$new_alpha_y + $increment")
+                new_alpha=$(calc "$new_alpha + $increment")
             done
         done
 
@@ -215,10 +215,10 @@ do
     if [[ "$found_optimal" != "true" ]] || \
        [[ "$too_fast" = "true" ]]
     then
-        optimal_alpha_y="undef"
+        optimal_alpha="undef"
         optimal_instructions="undef"
         old_instructions="undef"
     fi
 
-    echo "Result: optimal_alpha_y=$optimal_alpha_y, instructions=$optimal_instructions, old_alpha_y=$alpha_y, old_instructions=$old_instructions"
+    echo "Result: optimal_alpha=$optimal_alpha, instructions=$optimal_instructions, old_alpha=$alpha, old_instructions=$old_instructions"
 done

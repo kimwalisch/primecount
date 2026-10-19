@@ -190,21 +190,12 @@ void test()
 #endif
 
     TEST2(pi_gourdon_64,          pi_lmo_parallel, 1500);
-
-    // Alternate between the default alpha_z and
-    // alpha_z = 1.5 to test both y == z and y < z
-    // in the Gourdon algorithm.
-    set_alpha_z(1.5);
-
 #ifdef HAVE_INT128_T
     TEST2(pi_gourdon_128,         pi_lmo_parallel, 1500);
-    set_alpha_z(-1);
 #endif
 
     TEST_NTH_PRIME(nth_prime_64,  10000, 300);
-
 #ifdef HAVE_INT128_T
-    set_alpha_z(1.5);
     TEST_NTH_PRIME(nth_prime_128, 10000, 300);
 #endif
   }

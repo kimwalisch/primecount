@@ -257,16 +257,14 @@ void print_vars(maxint_t x, int64_t y, int64_t c, int threads)
 void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
 {
   int64_t x_star = get_x_star_gourdon(x, y);
-  double alpha_y = get_alpha_y(x, y);
-  double alpha_z = get_alpha_z(y, z);
+  double alpha = get_alpha(x, y);
 
   std::cout << "x = " << x << std::endl;
   std::cout << "y = " << y << std::endl;
   std::cout << "z = " << z << std::endl;
   std::cout << "k = " << k << std::endl;
   std::cout << "x_star = " << x_star << std::endl;
-  std::cout << "alpha_y = " << to_string(alpha_y, 3) << std::endl;
-  std::cout << "alpha_z = " << to_string(alpha_z, 3) << std::endl;
+  std::cout << "alpha = " << to_string(alpha, 3) << std::endl;
 
   print_threads(threads);
 }
@@ -276,10 +274,10 @@ void print_gourdon_vars(maxint_t x, int64_t y, int threads)
 {
   if (is_print_variables())
   {
-    double alpha_y = get_alpha_y(x, y);
+    double alpha = get_alpha(x, y);
     std::cout << "x = " << x << std::endl;
     std::cout << "y = " << y << std::endl;
-    std::cout << "alpha_y = " << to_string(alpha_y, 3) << std::endl;
+    std::cout << "alpha = " << to_string(alpha, 3) << std::endl;
     print_threads(threads);
     std::cout << std::endl;
   }

@@ -136,8 +136,7 @@ Advanced options for the Deleglise-Rivat algorithm:
 
 Advanced options for Xavier Gourdon's algorithm:
 
-      --alpha-y=NUM            Set tuning factor: y = x^(1/3) * alpha_y
-      --alpha-z=NUM            Set tuning factor: z = y * alpha_z
+  -a, --alpha=NUM              Set tuning factor: y = x^(1/3) * alpha
       --AC                     Compute the A + C formulas
       --B                      Compute the B formula
       --D                      Compute the D formula

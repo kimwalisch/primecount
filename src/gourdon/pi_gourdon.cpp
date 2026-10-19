@@ -41,12 +41,10 @@ int64_t pi_gourdon_64(int64_t x,
   if (x < 2)
     return 0;
 
-  auto alpha = get_alpha_gourdon(x);
-  double alpha_y = alpha.first;
-  double alpha_z = alpha.second;
+  double alpha = get_alpha_gourdon(x);
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
-  int64_t y = (int64_t)(x13 * alpha_y);
+  int64_t y = (int64_t)(x13 * alpha);
 
   // x^(1/3) < y < x^(1/2)
   y = std::max(y, x13 + 1);
@@ -54,12 +52,7 @@ int64_t pi_gourdon_64(int64_t x,
   y = std::max(y, (int64_t) 1);
 
   int64_t k = PhiTiny::get_k(x);
-  int64_t z = (int64_t)(y * alpha_z);
-
-  // y <= z < x^(1/2)
-  z = std::max(z, y);
-  z = std::min(z, sqrtx - 1);
-  z = std::max(z, (int64_t) 1);
+  int64_t z = y;
 
   if (is_print)
   {
@@ -105,13 +98,10 @@ int128_t pi_gourdon_128(int128_t x,
   if (x < 2)
     return 0;
 
-  auto alpha = get_alpha_gourdon(x);
-  double alpha_y = alpha.first;
-  double alpha_z = alpha.second;
-
+  double alpha = get_alpha_gourdon(x);
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
-  int64_t y = (int64_t)(x13 * alpha_y);
+  int64_t y = (int64_t)(x13 * alpha);
 
   // x^(1/3) < y < x^(1/2)
   y = std::max(y, x13 + 1);
@@ -125,12 +115,7 @@ int128_t pi_gourdon_128(int128_t x,
     throw primecount_error("pi_gourdon_128(x): x is too large");
 
   int64_t k = PhiTiny::get_k(x);
-  int64_t z = (int64_t)(y * alpha_z);
-
-  // y <= z < x^(1/2)
-  z = std::max(z, y);
-  z = std::min(z, sqrtx - 1);
-  z = std::max(z, (int64_t) 1);
+  int64_t z = y;
 
   if (is_print)
   {
