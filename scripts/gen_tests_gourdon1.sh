@@ -19,7 +19,6 @@ do
         res=$(./primecount 1e$i --$formula)
         x=$(./primecount 1e$i --$formula -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula -s | grep '^y =' | cut -f3 -d' ')
-        z=$(./primecount 1e$i --$formula -s | grep '^z =' | cut -f3 -d' ')
         k=$(./primecount 1e$i --$formula -s | grep '^k =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i -g -s | grep "$formula_label = $res\$")
@@ -30,12 +29,11 @@ do
             exit 1
         fi
 
-        echo "{ ${x}, ${y}, ${z}, ${k}, ${res} },"
+        echo "{ ${x}, ${y}, ${k}, ${res} },"
 
         res=$(./primecount 1e$i --$formula --alpha=1)
         x=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^y =' | cut -f3 -d' ')
-        z=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^z =' | cut -f3 -d' ')
         k=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^k =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i --alpha=1 -g -s | grep "$formula_label = $res\$")
@@ -46,12 +44,11 @@ do
             exit 1
         fi
 
-        echo "{ ${x}, ${y}, ${z}, ${k}, ${res} },"
+        echo "{ ${x}, ${y}, ${k}, ${res} },"
 
         res=$(./primecount 1e$i --$formula --alpha=10000000)
         x=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^y =' | cut -f3 -d' ')
-        z=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^z =' | cut -f3 -d' ')
         k=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^k =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i --alpha=10000000 -g -s | grep "$formula_label = $res\$")
@@ -62,7 +59,7 @@ do
             exit 1
         fi
 
-        echo "{ ${x}, ${y}, ${z}, ${k}, ${res} },"
+        echo "{ ${x}, ${y}, ${k}, ${res} },"
     done
 
     # A few larger computations using default alpha
@@ -71,7 +68,6 @@ do
         res=$(./primecount 1e$i --$formula)
         x=$(./primecount 1e$i --$formula -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula -s | grep '^y =' | cut -f3 -d' ')
-        z=$(./primecount 1e$i --$formula -s | grep '^z =' | cut -f3 -d' ')
         k=$(./primecount 1e$i --$formula -s | grep '^k =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i -g -s | grep "$formula_label = $res\$")
@@ -82,7 +78,7 @@ do
             exit 1
         fi
 
-        echo "{ ${x}, ${y}, ${z}, ${k}, ${res} },"
+        echo "{ ${x}, ${y}, ${k}, ${res} },"
     done
 
     echo ""

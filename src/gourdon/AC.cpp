@@ -79,7 +79,6 @@ namespace primecount {
 
 int64_t AC(int64_t x,
            int64_t y,
-           int64_t z,
            int64_t k,
            int threads,
            bool is_print)
@@ -91,7 +90,7 @@ int64_t AC(int64_t x,
     print("");
     print("=== AC(x, y) ===");
     print(AC_algo_name());
-    print_gourdon_vars(x, y, z, k, threads);
+    print_gourdon_vars(x, y, k, threads);
     time = get_time();
   }
 
@@ -107,7 +106,7 @@ int64_t AC(int64_t x,
   PiTable pi(max_prime, threads);
 
   auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-  int64_t sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, pi, primes, threads, is_print);
+  int64_t sum = AC_OpenMP((uint64_t) x, y, k, x_star, pi, primes, threads, is_print);
 
   if (is_print)
     print("A + C", sum, time);
@@ -119,7 +118,6 @@ int64_t AC(int64_t x,
 
 int128_t AC(int128_t x,
             int64_t y,
-            int64_t z,
             int64_t k,
             int threads,
             bool is_print)
@@ -131,7 +129,7 @@ int128_t AC(int128_t x,
     print("");
     print("=== AC(x, y) ===");
     print(AC_algo_name());
-    print_gourdon_vars(x, y, z, k, threads);
+    print_gourdon_vars(x, y, k, threads);
     time = get_time();
   }
 
@@ -151,12 +149,12 @@ int128_t AC(int128_t x,
   if (max_prime <= pstd::numeric_limits<uint32_t>::max())
   {
     auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, pi, primes, threads, is_print);
+    sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
   else
   {
     auto primes = pi.get_primes<int64_t>(max_prime, threads);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, pi, primes, threads, is_print);
+    sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
 
   if (is_print)

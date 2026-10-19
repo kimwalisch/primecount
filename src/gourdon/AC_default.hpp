@@ -125,14 +125,13 @@ T A(T xlow,
 }
 
 /// Compute the 1st part of the C formula.
-/// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
-/// x / (primes[b] * m) <= z
+/// pi[(x/y)^(1/3)] < b <= pi[sqrt(y)]
+/// x / (primes[b] * m) <= y
 /// low <= x / (primes[b] * m) < high
 ///
 /// m is either a prime <= y or a product of 2 distinct primes.
-/// In both cases m is coprime to the first b primes, m <= z,
-/// and its largest prime factor is <= y.
-/// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
+/// In both cases m is coprime to the first b primes and m <= y.
+/// Since each prime factor of m is > (x / y)^(1/3) and y < sqrt(x),
 /// m cannot contain more than 2 prime factors.
 ///
 template <typename T,
@@ -143,17 +142,16 @@ T C1(T xlow,
      XP xp,
      uint64_t b,
      uint64_t y,
-     uint64_t z,
      const Primes& primes,
      const PiTable& pi,
      const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
   uint64_t prime = primes[b];
-  uint64_t max_m = min(xlow / prime, z);
+  uint64_t max_m = min(xlow / prime, y);
   uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   uint64_t min_m = fast_div64(xhigh, prime);
-  min_m = max3(min_m, x_div_prime3, z / prime);
+  min_m = max3(min_m, x_div_prime3, y / prime);
 
   if (min_m >= max_m)
     return 0;
@@ -205,7 +203,7 @@ T C1(T xlow,
 /// Compute the 2nd part of the C formula.
 /// Computes the clustered and sparse easy leaves of the C
 /// formula for which the second factor is necessarily prime.
-/// pi[sqrt(z)] < b <= pi[x_star]
+/// pi[sqrt(y)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
@@ -292,7 +290,6 @@ template <typename T,
           typename Primes>
 T AC_OpenMP_default(T x,
                     int64_t y,
-                    int64_t z,
                     int64_t k,
                     int64_t x_star,
                     const PiTable& pi,
@@ -304,22 +301,20 @@ T AC_OpenMP_default(T x,
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
   int64_t xy = x / y;
-  int64_t xz = x / z;
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t thread_threshold = 1000;
-  int max_threads = (int) std::pow(xz, 1 / 3.7);
+  int max_threads = (int) std::pow(xy, 1 / 3.7);
   threads = min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
   INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
   int64_t pi_y = pi[y];
   int64_t max_clustered_global = primes[pi_y];
-  int64_t sqrtz = isqrt(z);
-  int64_t pi_sqrtz = pi[sqrtz];
+  int64_t sqrty = isqrt(y);
+  int64_t pi_sqrty = pi[sqrty];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
-  int64_t pi_root3_xz = pi[iroot<3>(xz)];
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -365,25 +360,25 @@ T AC_OpenMP_default(T x,
         T xlow = x / max(low, 1);
         T xhigh = x / high;
 
-        if (low < z)
+        if (low < y)
         {
-          int64_t min_c1 = max(k, pi_root3_xz);
-          int64_t min_c1_prime = min(xz / high, sqrtz);
+          int64_t min_c1 = max(k, pi_root3_xy);
+          int64_t min_c1_prime = min(xy / high, sqrty);
           min_c1 = max3(min_c1, pi_sqrt_low, pi[min_c1_prime]) + 1;
 
-          // C1 formula: pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
-          for (int64_t b = min_c1; b <= pi_sqrtz; b++)
+          // C1 formula: pi[(x/y)^(1/3)] < b <= pi[sqrt(y)]
+          for (int64_t b = min_c1; b <= pi_sqrty; b++)
           {
             T xp = x / primes[b];
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum -= C1(xlow, xhigh, uint64_t(xp), b, y, z, primes, pi, segmentedPi);
+              sum -= C1(xlow, xhigh, uint64_t(xp), b, y, primes, pi, segmentedPi);
             else
-              sum -= C1(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
+              sum -= C1(xlow, xhigh, xp, b, y, primes, pi, segmentedPi);
           }
         }
 
-        int64_t min_c2 = max3(k, pi_root3_xy, pi_sqrtz);
+        int64_t min_c2 = max3(k, pi_root3_xy, pi_sqrty);
         int64_t min_c2_prime = min(xhigh / y, x_star);
         min_c2 = max3(min_c2, pi_sqrt_low, pi[min_c2_prime]) + 1;
         int64_t x_div_high2 = fast_div64(xhigh, high);
@@ -402,7 +397,7 @@ T AC_OpenMP_default(T x,
         min_c2_sparse = max3(min_c2, min_c2_sparse, max_c2_clustered + 1);
         int64_t max_a = pi[min(sqrt_xlow, x13)];
 
-        // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
+        // C2 formula: pi[sqrt(y)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2_clustered; b++)
         {
           T xp = x / primes[b];
@@ -413,7 +408,7 @@ T AC_OpenMP_default(T x,
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
 
-        // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
+        // C2 formula: pi[sqrt(y)] < b <= pi[x_star]
         for (int64_t b = min_c2_sparse; b <= max_c2; b++)
         {
           T xp = x / primes[b];

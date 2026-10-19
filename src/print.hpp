@@ -43,9 +43,9 @@ void print_vars(maxint_t x, int64_t y, int64_t c, int threads);
 void print_seconds(double seconds);
 void print_status(const std::string& status);
 
-void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads);
+void print_gourdon(maxint_t x, int64_t y, int64_t k, int threads);
 void print_gourdon_vars(maxint_t x, int64_t y, int threads);
-void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k,  int threads);
+void print_gourdon_vars(maxint_t x, int64_t y, int64_t k, int threads);
 
 void print_nth_prime_sieve(uint64_t n,
                            bool sieve_forward,

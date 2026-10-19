@@ -52,14 +52,13 @@ int64_t pi_gourdon_64(int64_t x,
   y = std::max(y, (int64_t) 1);
 
   int64_t k = PhiTiny::get_k(x);
-  int64_t z = y;
 
   if (is_print)
   {
     print("");
     print("=== pi_gourdon_64(x) ===");
     print("pi(x) = A - B + C + D + Phi0 + Sigma");
-    print_gourdon(x, y, z, k, threads);
+    print_gourdon(x, y, k, threads);
   }
 
   // For very short computations (< 1 second) we achieve the best
@@ -73,10 +72,10 @@ int64_t pi_gourdon_64(int64_t x,
   // both the CPU and operating system.
 
   int64_t sigma = Sigma(x, y, threads, is_print);
-  int64_t phi0 = Phi0(x, y, z, k, threads, is_print);
-  int64_t ac = AC(x, y, z, k, threads, is_print);
+  int64_t phi0 = Phi0(x, y, k, threads, is_print);
+  int64_t ac = AC(x, y, k, threads, is_print);
   int64_t b = B(x, y, threads, is_print);
-  int64_t d = D(x, y, z, k, threads, is_print);
+  int64_t d = D(x, y, k, threads, is_print);
   int64_t pix = ac - b + d + phi0 + sigma;
 
   verify_pix("pi_gourdon_64", x, pix);
@@ -115,14 +114,13 @@ int128_t pi_gourdon_128(int128_t x,
     throw primecount_error("pi_gourdon_128(x): x is too large");
 
   int64_t k = PhiTiny::get_k(x);
-  int64_t z = y;
 
   if (is_print)
   {
     print("");
     print("=== pi_gourdon_128(x) ===");
     print("pi(x) = A - B + C + D + Phi0 + Sigma");
-    print_gourdon(x, y, z, k, threads);
+    print_gourdon(x, y, k, threads);
   }
 
   // For very short computations (< 1 second) we achieve the best
@@ -136,10 +134,10 @@ int128_t pi_gourdon_128(int128_t x,
   // both the CPU and operating system.
 
   int128_t sigma = Sigma(x, y, threads, is_print);
-  int128_t phi0 = Phi0(x, y, z, k, threads, is_print);
-  int128_t ac = AC(x, y, z, k, threads, is_print);
+  int128_t phi0 = Phi0(x, y, k, threads, is_print);
+  int128_t ac = AC(x, y, k, threads, is_print);
   int128_t b = B(x, y, threads, is_print);
-  int128_t d = D(x, y, z, k, threads, is_print);
+  int128_t d = D(x, y, k, threads, is_print);
   int128_t pix = ac - b + d + phi0 + sigma;
 
   verify_pix("pi_gourdon_128", x, pix);

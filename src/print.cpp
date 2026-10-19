@@ -254,14 +254,13 @@ void print_vars(maxint_t x, int64_t y, int64_t c, int threads)
 }
 
 /// Used by pi_gourdon(x)
-void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
+void print_gourdon(maxint_t x, int64_t y, int64_t k, int threads)
 {
   int64_t x_star = get_x_star_gourdon(x, y);
   double alpha = get_alpha(x, y);
 
   std::cout << "x = " << x << std::endl;
   std::cout << "y = " << y << std::endl;
-  std::cout << "z = " << z << std::endl;
   std::cout << "k = " << k << std::endl;
   std::cout << "x_star = " << x_star << std::endl;
   std::cout << "alpha = " << to_string(alpha, 3) << std::endl;
@@ -284,11 +283,11 @@ void print_gourdon_vars(maxint_t x, int64_t y, int threads)
 }
 
 /// Only enabled for partial formulas
-void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
+void print_gourdon_vars(maxint_t x, int64_t y, int64_t k, int threads)
 {
   if (is_print_variables())
   {
-    print_gourdon(x, y, z, k, threads);
+    print_gourdon(x, y, k, threads);
     std::cout << std::endl;
   }
 }

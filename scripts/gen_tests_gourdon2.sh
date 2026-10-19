@@ -56,7 +56,6 @@ do
         res=$(./primecount 1e$i --$formula)
         x=$(./primecount 1e$i --$formula -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula -s | grep '^y =' | cut -f3 -d' ')
-        z=$(./primecount 1e$i --$formula -s | grep '^z =' | cut -f3 -d' ')
         k=$(./primecount 1e$i --$formula -s | grep '^k =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i -g -s | grep "= $res\$")

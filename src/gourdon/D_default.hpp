@@ -53,9 +53,8 @@ using namespace primecount;
 template <typename T, typename Primes, typename FactorTable>
 T D_thread_default(T x,
                    int64_t x_star,
-                   int64_t xz,
+                   int64_t xy,
                    int64_t y,
-                   int64_t z,
                    int64_t k,
                    const Primes& primes,
                    const PiTable& pi,
@@ -68,10 +67,10 @@ T D_thread_default(T x,
   int64_t low1 = max(low, 1);
   int64_t segments = thread.segments;
   int64_t segment_size = thread.segment_size;
-  int64_t pi_sqrtz = pi[isqrt(z)];
-  int64_t limit = min(low + segment_size * segments, xz);
+  int64_t pi_sqrty = pi[isqrt(y)];
+  int64_t limit = min(low + segment_size * segments, xy);
   int64_t max_b = pi[min3(isqrt(x / low1), isqrt(limit), x_star)];
-  int64_t min_b = pi[min(xz / limit, x_star)];
+  int64_t min_b = pi[min(xy / limit, x_star)];
   min_b = max(k, min_b) + 1;
 
   if (min_b > max_b)
@@ -99,17 +98,17 @@ T D_thread_default(T x,
     sieve.init_counter(low, high);
     int64_t b = min_b;
 
-    // For k + 1 <= b <= pi_sqrtz
+    // For k + 1 <= b <= pi_sqrty
     // Find all special leaves in the current segment that are
     // composed of a prime and a square free number:
     // low <= x / (primes[b] * m) < high
-    for (int64_t last = min(pi_sqrtz, max_b); b <= last; b++)
+    for (int64_t last = min(pi_sqrty, max_b); b <= last; b++)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t xp_low = min(fast_div(xp, low1), z);
-      int64_t xp_high = min(fast_div(xp, high), z);
-      int64_t min_m = max(xp_high, z / prime);
+      int64_t xp_low = min(fast_div(xp, low1), y);
+      int64_t xp_high = min(fast_div(xp, high), y);
+      int64_t min_m = max(xp_high, y / prime);
       int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
 
       if (prime >= max_m)
@@ -256,7 +255,7 @@ T D_thread_default(T x,
       sieve.cross_off_count(prime, b);
     }
 
-    // For pi_sqrtz < b <= pi_x_star
+    // For pi_sqrty < b <= pi_x_star
     // Find all special leaves in the current segment
     // that are composed of 2 primes:
     // low <= x / (primes[b] * primes[l]) < high

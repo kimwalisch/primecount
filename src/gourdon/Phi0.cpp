@@ -7,11 +7,8 @@
 ///        page 3 of Gourdon's paper.
 ///
 ///        The only difference in the computation of the ordinary
-///        leaves compared to the Deleglise-Rivat algorithm is that we
-///        iterate over all square free numbers <= z (instead of y)
-///        whose largest prime factor <= y, with z >= y and
-///        z < x^(1/2). Also the small constant is named k instead
-///        of c.
+///        leaves compared to the Deleglise-Rivat algorithm is that
+///        the small constant is named k instead of c.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -43,7 +40,7 @@ namespace {
 ///
 template <int MU, typename T, typename P>
 T Phi0_thread(T x,
-              int64_t z,
+              int64_t y,
               uint64_t b,
               int64_t k,
               T square_free,
@@ -54,22 +51,21 @@ T Phi0_thread(T x,
   for (b++; b < primes.size(); b++)
   {
     T next = square_free * primes[b];
-    if (next > z) break;
+    if (next > y) break;
     phi0 += MU * phi_tiny(x / next, k);
-    phi0 += Phi0_thread<-MU>(x, z, b, k, next, primes);
+    phi0 += Phi0_thread<-MU>(x, y, b, k, next, primes);
   }
 
   return phi0;
 }
 
 /// Parallel computation of the ordinary leaves.
-/// Run time: O(z)
+/// Run time: O(y)
 /// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
 X Phi0_OpenMP(X x,
               Y y,
-              int64_t z,
               int64_t k,
               int threads)
 {
@@ -86,7 +82,7 @@ X Phi0_OpenMP(X x,
   for (int64_t b = k + 1; b <= pi_y; b++)
   {
     phi0 -= phi_tiny(x / primes[b], k);
-    phi0 += Phi0_thread<1>(x, z, b, k, (X) primes[b], primes);
+    phi0 += Phi0_thread<1>(x, y, b, k, (X) primes[b], primes);
   }
 
   return phi0;
@@ -98,7 +94,6 @@ namespace primecount {
 
 int64_t Phi0(int64_t x,
              int64_t y,
-             int64_t z,
              int64_t k,
              int threads,
              bool is_print)
@@ -109,11 +104,11 @@ int64_t Phi0(int64_t x,
   {
     print("");
     print("=== Phi0(x, y) ===");
-    print_gourdon_vars(x, y, z, k, threads);
+    print_gourdon_vars(x, y, k, threads);
     time = get_time();
   }
 
-  int64_t phi0 = Phi0_OpenMP(x, (uint32_t) y, z, k, threads);
+  int64_t phi0 = Phi0_OpenMP(x, (uint32_t) y, k, threads);
 
   if (is_print)
     print("Phi0", phi0, time);
@@ -125,7 +120,6 @@ int64_t Phi0(int64_t x,
 
 int128_t Phi0(int128_t x,
               int64_t y,
-              int64_t z,
               int64_t k,
               int threads,
               bool is_print)
@@ -136,7 +130,7 @@ int128_t Phi0(int128_t x,
   {
     print("");
     print("=== Phi0(x, y) ===");
-    print_gourdon_vars(x, y, z, k, threads);
+    print_gourdon_vars(x, y, k, threads);
     time = get_time();
   }
 
@@ -144,9 +138,9 @@ int128_t Phi0(int128_t x,
 
   // uses less memory
   if (y <= pstd::numeric_limits<uint32_t>::max())
-    phi0 = Phi0_OpenMP(x, (uint32_t) y, z, k, threads);
+    phi0 = Phi0_OpenMP(x, (uint32_t) y, k, threads);
   else
-    phi0 = Phi0_OpenMP(x, y, z, k, threads);
+    phi0 = Phi0_OpenMP(x, y, k, threads);
 
   if (is_print)
     print("Phi0", phi0, time);

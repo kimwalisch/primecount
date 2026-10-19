@@ -149,15 +149,14 @@ maxint_t AC(maxint_t x, int threads)
 #endif
 
   int64_t k = PhiTiny::get_k(x);
-  int64_t z = y;
 
   if (is_print())
     set_print_variables(true);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return AC((int64_t) x, y, z, k, threads);
+    return AC((int64_t) x, y, k, threads);
   else
-    return AC(x, y, z, k, threads);
+    return AC(x, y, k, threads);
 }
 
 maxint_t B(maxint_t x, int threads)
@@ -216,15 +215,14 @@ maxint_t D(maxint_t x, int threads)
 #endif
 
   int64_t k = PhiTiny::get_k(x);
-  int64_t z = y;
 
   if (is_print())
     set_print_variables(true);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return D((int64_t) x, y, z, k, threads);
+    return D((int64_t) x, y, k, threads);
   else
-    return D(x, y, z, k, threads);
+    return D(x, y, k, threads);
 }
 
 maxint_t Phi0(maxint_t x, int threads)
@@ -251,15 +249,14 @@ maxint_t Phi0(maxint_t x, int threads)
 #endif
 
   int64_t k = PhiTiny::get_k(x);
-  int64_t z = y;
 
   if (is_print())
     set_print_variables(true);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return Phi0((int64_t) x, y, z, k, threads);
+    return Phi0((int64_t) x, y, k, threads);
   else
-    return Phi0(x, y, z, k, threads);
+    return Phi0(x, y, k, threads);
 }
 
 maxint_t Sigma(maxint_t x, int threads)
