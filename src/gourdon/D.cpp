@@ -12,10 +12,9 @@
 /// file in the top level directory.
 ///
 
-#include "FactorTableD.hpp"
-
 #include <primecount-internal.hpp>
 #include <cpu_arch_macros.hpp>
+#include <FactorTable.hpp>
 #include <gourdon.hpp>
 #include <int128_t.hpp>
 #include <LoadBalancerS2.hpp>
@@ -199,7 +198,7 @@ int64_t D(int64_t x,
     time = get_time();
   }
 
-  FactorTableD<uint16_t> factor(y, z, threads);
+  FactorTable<uint16_t> factor(y, threads);
   PiTable pi(y, threads);
   auto primes = pi.get_primes<uint32_t>(y, threads);
   int64_t sum = D_OpenMP(x, y, z, k, pi, primes, factor, threads, is_print);
@@ -233,9 +232,9 @@ int128_t D(int128_t x,
   int128_t sum;
 
   // Use 16-bit factor table entries whenever possible.
-  if (z <= FactorTableD<uint16_t>::max())
+  if (y <= FactorTable<uint16_t>::max())
   {
-    FactorTableD<uint16_t> factor(y, z, threads);
+    FactorTable<uint16_t> factor(y, threads);
     PiTable pi(y, threads);
 
     if (y <= UINT32_MAX)
@@ -251,7 +250,7 @@ int128_t D(int128_t x,
   }
   else
   {
-    FactorTableD<uint32_t> factor(y, z, threads);
+    FactorTable<uint32_t> factor(y, threads);
     PiTable pi(y, threads);
     auto primes = pi.get_primes<int64_t>(y, threads);
     sum = D_OpenMP(x, y, z, k, pi, primes, factor, threads, is_print);

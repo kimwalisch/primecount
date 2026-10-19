@@ -1,7 +1,6 @@
 ///
 /// @file  FactorTable.cpp
-///        Static lookup tables used by the FactorTable
-///        and FactorTableD classes.
+///        Static lookup tables used by the FactorTable class.
 ///
 ///        In-depth description of the factor table data structure:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf

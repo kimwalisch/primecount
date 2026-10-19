@@ -178,6 +178,11 @@ public:
     return factor_[index];
   }
 
+  const T* data() const
+  {
+    return factor_.data();
+  }
+
   /// Encode prime index for use in the factor table
   static int64_t encode(int64_t prime_index)
   {

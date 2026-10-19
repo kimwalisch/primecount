@@ -12,9 +12,9 @@
 ///        balancing, it scales well up to a large number of CPU cores
 ///        because the compute threads are completely independent from
 ///        each other. This implementation also uses the highly
-///        optimized Sieve class and the FactorTableD class which is a
-///        compressed lookup table of moebius function values,
-///        least prime factors and max prime factors.
+///        optimized Sieve class and the FactorTable class which is a
+///        compressed lookup table of moebius function values and
+///        least prime factors.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf

@@ -75,29 +75,6 @@ Vector<int8_t> generate_moebius(int64_t max,
   return mu;
 }
 
-/// Returns a vector with the largest prime factors
-/// of the integers <= max.
-/// @Examples: mpf(2) = 2, mpf(15) = 5
-///
-Vector<uint32_t> generate_mpf(int64_t max,
-                              const Vector<uint32_t>& primes)
-{
-  if_unlikely(max > pstd::numeric_limits<uint32_t>::max())
-    throw primecount_error("generate_mpf(max): max must be < 2^32");
-
-  ASSERT(int64_t(primes.size()) - 1 == pi_noprint(max, 1));
-
-  int64_t size = max + 1;
-  Vector<uint32_t> mpf(size);
-  std::fill(mpf.begin(), mpf.end(), 1);
-
-  for (std::size_t i = 1; i < primes.size(); i++)
-    for (int64_t j = primes[i]; j < size; j += primes[i])
-      mpf[j] = primes[i];
-
-  return mpf;
-}
-
 /// Returns a vector with the least prime factors
 /// of the integers <= max.
 /// @Examples: lpf(2) = 2, lpf(15) = 3

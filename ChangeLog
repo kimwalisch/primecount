@@ -1,5 +1,6 @@
 Changes in primecount-8.9, 2026-10-19
 
+* D.cpp: Use FactorTable instead of FactorTableD, remove FactorTableD.hpp.
 * util.cpp: Remove alpha_z tuning factor from Gourdon's algorithm, use z = y.
 * CmdOptions.cpp: Remove --alpha-y and --alpha-z, use --alpha for Gourdon's algorithm.
 * test/gourdon: Regenerate D, AC and Phi0 tests using y = z.
