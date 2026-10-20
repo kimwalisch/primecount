@@ -36,7 +36,7 @@ namespace {
 ///
 int64_t S2(int64_t x,
            int64_t y,
-           int64_t c,
+           int64_t k,
            int64_t pi_y,
            const Vector<uint32_t>& primes,
            const Vector<uint32_t>& lpf,
@@ -48,13 +48,13 @@ int64_t S2(int64_t x,
   Vector<bool> sieve(limit);
   std::fill(sieve.begin(), sieve.end(), 1);
 
-  // phi(y, b) nodes with b <= c do not contribute to S2, so
-  // we sieve out the multiples of the first c primes
-  for (; b <= c; b++)
+  // phi(y, b) nodes with b <= k do not contribute to S2, so
+  // we sieve out the multiples of the first k primes
+  for (; b <= k; b++)
   {
     int64_t prime = primes[b];
-    for (int64_t k = prime; k < limit; k += prime)
-      sieve[k] = 0;
+    for (int64_t j = prime; j < limit; j += prime)
+      sieve[j] = 0;
   }
 
   for (; b < pi_y; b++)
@@ -80,8 +80,8 @@ int64_t S2(int64_t x,
     }
 
     // remove the multiples of the b-th prime
-    for (int64_t k = prime; k < limit; k += prime * 2)
-      sieve[k] = 0;
+    for (int64_t j = prime; j < limit; j += prime * 2)
+      sieve[j] = 0;
   }
 
   return s2;
@@ -105,7 +105,7 @@ int64_t pi_lmo2(int64_t x)
   double alpha = get_alpha_lmo(x);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
-  int64_t c = PhiTiny::get_c(y);
+  int64_t k = PhiTiny::get_k(y);
 
   auto primes = generate_primes<uint32_t>(y);
   auto lpf = generate_lpf(y, primes);
@@ -113,8 +113,8 @@ int64_t pi_lmo2(int64_t x)
 
   int64_t pi_y = primes.size() - 1;
   int64_t p2 = P2(x, y, pi_y, threads);
-  int64_t s1 = S1(x, y, c, threads);
-  int64_t s2 = S2(x, y, c, pi_y, primes, lpf, mu);
+  int64_t s1 = S1(x, y, k, threads);
+  int64_t s2 = S2(x, y, k, pi_y, primes, lpf, mu);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

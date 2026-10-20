@@ -47,7 +47,7 @@ template <typename T, typename Primes>
 T S2_easy_OpenMP(T x,
                  int64_t y,
                  int64_t xy,
-                 int64_t c,
+                 int64_t k,
                  const PiTable& pi,
                  const Primes& primes,
                  int threads,
@@ -66,7 +66,7 @@ T S2_easy_OpenMP(T x,
   StatusS2 status(x, y, is_print);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
-  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(c, pi_sqrty) + 1);
+  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_sqrty) + 1);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
   #pragma omp parallel num_threads(threads) reduction(+: sum)
@@ -338,7 +338,7 @@ template <typename T,
 T S2_easy_OpenMP(T x,
                  int64_t y,
                  int64_t xy,
-                 int64_t c,
+                 int64_t k,
                  const PiTable& pi,
                  const Primes& primes,
                  int threads,
@@ -363,7 +363,7 @@ T S2_easy_OpenMP(T x,
   StatusS2 status(x, y, is_print);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
-  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(c, pi_sqrty) + 1);
+  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_sqrty) + 1);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
   #pragma omp parallel num_threads(threads) reduction(+: sum)
@@ -407,7 +407,7 @@ namespace primecount {
 int64_t S2_easy(int64_t x,
                 int64_t y,
                 int64_t xy,
-                int64_t c,
+                int64_t k,
                 int threads,
                 bool is_print)
 {
@@ -418,13 +418,13 @@ int64_t S2_easy(int64_t x,
     print("");
     print("=== S2_easy(x, y) ===");
     print_algo_name();
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
   PiTable pi(y, threads);
   auto primes = pi.get_primes<uint32_t>(y, threads);
-  int64_t sum = S2_easy_OpenMP((uint64_t) x, y, xy, c, pi, primes, threads, is_print);
+  int64_t sum = S2_easy_OpenMP((uint64_t) x, y, xy, k, pi, primes, threads, is_print);
 
   if (is_print)
     print("S2_easy", sum, time);
@@ -437,7 +437,7 @@ int64_t S2_easy(int64_t x,
 int128_t S2_easy(int128_t x,
                  int64_t y,
                  int64_t xy,
-                 int64_t c,
+                 int64_t k,
                  int threads,
                  bool is_print)
 {
@@ -448,7 +448,7 @@ int128_t S2_easy(int128_t x,
     print("");
     print("=== S2_easy(x, y) ===");
     print_algo_name();
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
@@ -459,12 +459,12 @@ int128_t S2_easy(int128_t x,
   if (y <= pstd::numeric_limits<uint32_t>::max())
   {
     auto primes = pi.get_primes<uint32_t>(y, threads);
-    sum = S2_easy_OpenMP((uint128_t) x, y, xy, c, pi, primes, threads, is_print);
+    sum = S2_easy_OpenMP((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
   }
   else
   {
     auto primes = pi.get_primes<int64_t>(y, threads);
-    sum = S2_easy_OpenMP((uint128_t) x, y, xy, c, pi, primes, threads, is_print);
+    sum = S2_easy_OpenMP((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
   }
 
   if (is_print)

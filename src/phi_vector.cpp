@@ -115,24 +115,24 @@ public:
       return phi_cache(x, a) * SIGN;
 
     int64_t sum;
-    int64_t c = PhiTiny::max_a();
-    int64_t larger_c = min(max_a_cached_, a);
-    larger_c = std::max(c, larger_c);
-    ASSERT(c < a);
+    int64_t k = PhiTiny::max_a();
+    int64_t larger_k = min(max_a_cached_, a);
+    larger_k = std::max(k, larger_k);
+    ASSERT(k < a);
 
-    // Usually our algorithm starts at c because phi(x, c) can be
-    // computed in O(1) time using phi_tiny(x, c). However, if a
-    // larger value of c is cached, then it is better to start at that
-    // value, since phi_cache(x, larger_c) also takes O(1) time.
-    if (is_cached(x, larger_c))
-      sum = phi_cache(x, (c = larger_c)) * SIGN;
+    // Usually our algorithm starts at k because phi(x, k) can be
+    // computed in O(1) time using phi_tiny(x, k). However, if a
+    // larger value of k is cached, then it is better to start at that
+    // value, since phi_cache(x, larger_k) also takes O(1) time.
+    if (is_cached(x, larger_k))
+      sum = phi_cache(x, (k = larger_k)) * SIGN;
     else
-      sum = phi_tiny(x, c) * SIGN;
+      sum = phi_tiny(x, k) * SIGN;
 
     int64_t sqrtx = isqrt(x);
     int64_t i;
 
-    for (i = c + 1; i <= a; i++)
+    for (i = k + 1; i <= a; i++)
     {
       // phi(x / prime[i], i - 1) = 1 if x / prime[i] <= prime[i-1].
       // However we can do slightly better:

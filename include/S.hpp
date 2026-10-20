@@ -19,17 +19,17 @@
 
 namespace primecount {
 
-int64_t S1(int64_t x, int64_t y, int64_t c, int threads, bool print = is_print());
-int64_t S2_trivial(int64_t x, int64_t y, int64_t xy, int64_t c, int threads, bool print = is_print());
-int64_t S2_easy(int64_t x, int64_t y, int64_t xy, int64_t c, int threads, bool print = is_print());
-int64_t S2_hard(int64_t x, int64_t y, int64_t xy, int64_t c, int threads, bool print = is_print());
+int64_t S1(int64_t x, int64_t y, int64_t k, int threads, bool print = is_print());
+int64_t S2_trivial(int64_t x, int64_t y, int64_t xy, int64_t k, int threads, bool print = is_print());
+int64_t S2_easy(int64_t x, int64_t y, int64_t xy, int64_t k, int threads, bool print = is_print());
+int64_t S2_hard(int64_t x, int64_t y, int64_t xy, int64_t k, int threads, bool print = is_print());
 
 #ifdef HAVE_INT128_T
 
-int128_t S1(int128_t x, int64_t y, int64_t c, int threads, bool print = is_print());
-int128_t S2_trivial(int128_t x, int64_t y, int64_t xy, int64_t c, int threads, bool print = is_print());
-int128_t S2_easy(int128_t x, int64_t y, int64_t xy, int64_t c, int threads, bool print = is_print());
-int128_t S2_hard(int128_t x, int64_t y, int64_t xy, int64_t c, int threads, bool print = is_print());
+int128_t S1(int128_t x, int64_t y, int64_t k, int threads, bool print = is_print());
+int128_t S2_trivial(int128_t x, int64_t y, int64_t xy, int64_t k, int threads, bool print = is_print());
+int128_t S2_easy(int128_t x, int64_t y, int64_t xy, int64_t k, int threads, bool print = is_print());
+int128_t S2_hard(int128_t x, int64_t y, int64_t xy, int64_t k, int threads, bool print = is_print());
 
 #endif
 

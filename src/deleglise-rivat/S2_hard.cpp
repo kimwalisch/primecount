@@ -52,7 +52,7 @@ template <typename T, typename Primes, typename FactorTable>
 T S2_hard_thread(T x,
                  int64_t y,
                  int64_t xy,
-                 int64_t c,
+                 int64_t k,
                  const Primes& primes,
                  const PiTable& pi,
                  const FactorTable& factor,
@@ -69,7 +69,7 @@ T S2_hard_thread(T x,
   int64_t max_b = (limit <= y) ? pi_sqrty
       : pi[min3(isqrt(x / low1), isqrt(xy), y)];
   int64_t min_b = pi[min(xy / limit, primes[max_b])];
-  min_b = max(c, min_b) + 1;
+  min_b = max(k, min_b) + 1;
 
   if (min_b > max_b)
     return 0;
@@ -91,7 +91,7 @@ T S2_hard_thread(T x,
     sieve.init_counter(low, high);
     int64_t b = min_b;
 
-    // For c + 1 <= b <= pi_sqrty
+    // For k + 1 <= b <= pi_sqrty
     // Find all special leaves in the current segment that are
     // composed of a prime and a square free number:
     // low <= x / (primes[b] * m) < high
@@ -183,7 +183,7 @@ template <typename T, typename Primes, typename FactorTable>
 T S2_hard_OpenMP(T x,
                  int64_t y,
                  int64_t xy,
-                 int64_t c,
+                 int64_t k,
                  const PiTable& pi,
                  const Primes& primes,
                  const FactorTable& factor,
@@ -206,7 +206,7 @@ T S2_hard_OpenMP(T x,
     while (loadBalancer.get_work(thread))
     {
       thread.start_time = get_time();
-      thread.sum = S2_hard_thread(x, y, xy, c, primes, pi, factor, thread);
+      thread.sum = S2_hard_thread(x, y, xy, k, primes, pi, factor, thread);
       thread.stop_time = get_time();
       sum += thread.sum;
     }
@@ -222,7 +222,7 @@ namespace primecount {
 int64_t S2_hard(int64_t x,
                 int64_t y,
                 int64_t xy,
-                int64_t c,
+                int64_t k,
                 int threads,
                 bool is_print)
 {
@@ -232,7 +232,7 @@ int64_t S2_hard(int64_t x,
   {
     print("");
     print("=== S2_hard(x, y) ===");
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
@@ -240,7 +240,7 @@ int64_t S2_hard(int64_t x,
   int64_t max_prime = min(y, xy / isqrt(y));
   PiTable pi(max_prime, threads);
   auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-  int64_t sum = S2_hard_OpenMP(x, y, xy, c, pi, primes, factor, threads, is_print);
+  int64_t sum = S2_hard_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
 
   if (is_print)
     print("S2_hard", sum, time);
@@ -253,7 +253,7 @@ int64_t S2_hard(int64_t x,
 int128_t S2_hard(int128_t x,
                  int64_t y,
                  int64_t xy,
-                 int64_t c,
+                 int64_t k,
                  int threads,
                  bool is_print)
 {
@@ -263,7 +263,7 @@ int128_t S2_hard(int128_t x,
   {
     print("");
     print("=== S2_hard(x, y) ===");
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
@@ -279,12 +279,12 @@ int128_t S2_hard(int128_t x,
     if (max_prime <= UINT32_MAX)
     {
       auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-      sum = S2_hard_OpenMP(x, y, xy, c, pi, primes, factor, threads, is_print);
+      sum = S2_hard_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
     }
     else
     {
       auto primes = pi.get_primes<int64_t>(max_prime, threads);
-      sum = S2_hard_OpenMP(x, y, xy, c, pi, primes, factor, threads, is_print);
+      sum = S2_hard_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
     }
   }
   else
@@ -293,7 +293,7 @@ int128_t S2_hard(int128_t x,
     int64_t max_prime = min(y, xy / isqrt(y));
     PiTable pi(max_prime, threads);
     auto primes = pi.get_primes<int64_t>(max_prime, threads);
-    sum = S2_hard_OpenMP(x, y, xy, c, pi, primes, factor, threads, is_print);
+    sum = S2_hard_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
   }
 
   if (is_print)

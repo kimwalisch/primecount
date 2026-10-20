@@ -38,7 +38,7 @@ int64_t pi_lmo1(int64_t x)
 
   int threads = 1;
   int64_t y = iroot<3>(x);
-  int64_t c = PhiTiny::get_c(y);
+  int64_t k = PhiTiny::get_k(y);
   int64_t s1 = 0;
   int64_t s2 = 0;
 
@@ -52,11 +52,11 @@ int64_t pi_lmo1(int64_t x)
 
   // ordinary leaves
   for (int64_t n = 1; n <= y; n++)
-    if (lpf[n] > primes[c])
-      s1 += mu[n] * phi(x / n, c, threads, is_print);
+    if (lpf[n] > primes[k])
+      s1 += mu[n] * phi(x / n, k, threads, is_print);
 
   // special leaves
-  for (int64_t b = c + 1; b < pi_y; b++)
+  for (int64_t b = k + 1; b < pi_y; b++)
     for (int64_t m = (y / primes[b]) + 1; m <= y; m++)
       if (lpf[m] > primes[b])
         s2 -= mu[m] * phi(x / (primes[b] * m), b - 1, threads, is_print);

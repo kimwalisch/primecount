@@ -96,7 +96,7 @@ Vector<uint32_t> generate_lpf(int64_t max,
   // named pmin(n) in Tomás Oliveira e Silva's paper:
   // "Computing π(x): the combinatorial method".
   // The reason why lpf(1) is defined to be +Infinity is
-  // that phi(x / 1, c) contributes to the ordinary leaves
+  // that phi(x / 1, k) contributes to the ordinary leaves
   // (S1) in the Lagarias-Miller-Odlyzko and
   // Deleglise-Rivat prime counting algorithms. And
   // lpf(1) = +Infinity allows to simplify that algorithm.

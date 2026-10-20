@@ -40,13 +40,13 @@ template <typename T>
 T S2(T x,
      int64_t y,
      int64_t xy,
-     int64_t c,
+     int64_t k,
      int threads,
      bool is_print)
 {
-  T s2_trivial = S2_trivial(x, y, xy, c, threads, is_print);
-  T s2_easy = S2_easy(x, y, xy, c, threads, is_print);
-  T s2_hard = S2_hard(x, y, xy, c, threads, is_print);
+  T s2_trivial = S2_trivial(x, y, xy, k, threads, is_print);
+  T s2_easy = S2_easy(x, y, xy, k, threads, is_print);
+  T s2_hard = S2_hard(x, y, xy, k, threads, is_print);
   T s2 = s2_trivial + s2_easy + s2_hard;
 
   return s2;
@@ -73,19 +73,19 @@ int64_t pi_deleglise_rivat_64(int64_t x,
   int64_t y = (int64_t) (x13 * alpha);
   int64_t xy = x / y;
   int64_t pi_y = pi_noprint(y, threads);
-  int64_t c = PhiTiny::get_c(y);
+  int64_t k = PhiTiny::get_k(y);
 
   if (is_print)
   {
     print("");
     print("=== pi_deleglise_rivat_64(x) ===");
     print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-    print(x, y, c, threads);
+    print(x, y, k, threads);
   }
 
   int64_t p2 = P2(x, y, pi_y, threads, is_print);
-  int64_t s1 = S1(x, y, c, threads, is_print);
-  int64_t s2 = S2(x, y, xy, c, threads, is_print);
+  int64_t s1 = S1(x, y, k, threads, is_print);
+  int64_t s2 = S2(x, y, xy, k, threads, is_print);
   int64_t phi = s1 + s2;
   int64_t pix = phi + pi_y - 1 - p2;
 
@@ -119,19 +119,19 @@ int128_t pi_deleglise_rivat_128(int128_t x,
 
   int64_t xy = (int64_t) (x / y);
   int64_t pi_y = pi_noprint(y, threads);
-  int64_t c = PhiTiny::get_c(y);
+  int64_t k = PhiTiny::get_k(y);
 
   if (is_print)
   {
     print("");
     print("=== pi_deleglise_rivat_128(x) ===");
     print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-    print(x, y, c, threads);
+    print(x, y, k, threads);
   }
 
   int128_t p2 = P2(x, y, pi_y, threads, is_print);
-  int128_t s1 = S1(x, y, c, threads, is_print);
-  int128_t s2 = S2(x, y, xy, c, threads, is_print);
+  int128_t s1 = S1(x, y, k, threads, is_print);
+  int128_t s2 = S2(x, y, xy, k, threads, is_print);
   int128_t phi = s1 + s2;
   int128_t pix = phi + pi_y - 1 - p2;
 

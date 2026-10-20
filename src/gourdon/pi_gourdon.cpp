@@ -51,7 +51,8 @@ int64_t pi_gourdon_64(int64_t x,
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
 
-  int64_t k = PhiTiny::get_k(x);
+  // k <= PrimePi[min(x_star, sqrt(x / y))]
+  int64_t k = PhiTiny::get_k(iroot<4>(x));
 
   if (is_print)
   {
@@ -113,7 +114,8 @@ int128_t pi_gourdon_128(int128_t x,
   if_unlikely(x > (int128_t(y) << 62))
     throw primecount_error("pi_gourdon_128(x): x is too large");
 
-  int64_t k = PhiTiny::get_k(x);
+  // k <= PrimePi[min(x_star, sqrt(x / y))]
+  int64_t k = PhiTiny::get_k(iroot<4>(x));
 
   if (is_print)
   {

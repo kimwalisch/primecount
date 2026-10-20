@@ -39,7 +39,7 @@ template <typename T>
 T S2_trivial(T x,
              int64_t y,
              int64_t xy,
-             int64_t c,
+             int64_t k,
              int threads)
 {
   if (y < 2)
@@ -48,8 +48,8 @@ T S2_trivial(T x,
   PiTable pi(y, threads);
   int64_t pi_y = pi[y];
   int64_t sqrt_xy = isqrt(xy);
-  int64_t prime_c = nth_prime(c);
-  int64_t start = std::max(prime_c, sqrt_xy) + 1;
+  int64_t prime_k = nth_prime(k);
+  int64_t start = std::max(prime_k, sqrt_xy) + 1;
 
   if (start >= y)
     return 0;
@@ -95,7 +95,7 @@ namespace primecount {
 int64_t S2_trivial(int64_t x,
                    int64_t y,
                    int64_t xy,
-                   int64_t c,
+                   int64_t k,
                    int threads,
                    bool is_print)
 {
@@ -105,11 +105,11 @@ int64_t S2_trivial(int64_t x,
   {
     print("");
     print("=== S2_trivial(x, y) ===");
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
-  int64_t sum = ::S2_trivial(x, y, xy, c, threads);
+  int64_t sum = ::S2_trivial(x, y, xy, k, threads);
 
   if (is_print)
     print("S2_trivial", sum, time);
@@ -122,7 +122,7 @@ int64_t S2_trivial(int64_t x,
 int128_t S2_trivial(int128_t x,
                     int64_t y,
                     int64_t xy,
-                    int64_t c,
+                    int64_t k,
                     int threads,
                     bool is_print)
 {
@@ -132,11 +132,11 @@ int128_t S2_trivial(int128_t x,
   {
     print("");
     print("=== S2_trivial(x, y) ===");
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
-  int128_t sum = ::S2_trivial(x, y, xy, c, threads);
+  int128_t sum = ::S2_trivial(x, y, xy, k, threads);
 
   if (is_print)
     print("S2_trivial", sum, time);

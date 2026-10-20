@@ -24,7 +24,7 @@ struct formula_params
   int64_t x;
   int64_t y;
   int64_t xy;
-  int64_t c;
+  int64_t k;
   int64_t res;
 };
 
@@ -85,13 +85,13 @@ int main()
 
   for (const formula_params& params : test_cases)
   {
-    int64_t res = S2_hard(params.x, params.y, params.xy, params.c, threads);
-    std::cout << "S2_hard_64bit(" << params.x << ", " << params.y << ", " << params.xy << ", " << params.c << ") = " << res;
+    int64_t res = S2_hard(params.x, params.y, params.xy, params.k, threads);
+    std::cout << "S2_hard_64bit(" << params.x << ", " << params.y << ", " << params.xy << ", " << params.k << ") = " << res;
     check(res == params.res);
 
     #ifdef HAVE_INT128_T
-      int128_t res2 = S2_hard((int128_t) params.x, params.y, params.xy, params.c, threads);
-      std::cout << "S2_hard_128bit(" << params.x << ", " << params.y << ", " << params.xy << ", " << params.c << ") = " << res2;
+      int128_t res2 = S2_hard((int128_t) params.x, params.y, params.xy, params.k, threads);
+      std::cout << "S2_hard_128bit(" << params.x << ", " << params.y << ", " << params.xy << ", " << params.k << ") = " << res2;
       check(res2 == params.res);
     #endif
   }

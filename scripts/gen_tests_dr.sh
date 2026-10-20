@@ -11,7 +11,7 @@ do
         x=$(./primecount 1e$i --$formula -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula -s | grep '^y =' | cut -f3 -d' ')
         xy=$((x / y))
-        c=$(./primecount 1e$i --$formula -s | grep '^c =' | cut -f3 -d' ')
+        k=$(./primecount 1e$i --$formula -s | grep '^k =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i -d -s | grep "${formula//-/_} = $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -d)" != "$(./primecount 1e$i -m)" ]]
@@ -21,13 +21,13 @@ do
             exit 1
         fi
 
-        echo "{ ${x}, ${y}, ${xy}, ${c}, ${res} },"
+        echo "{ ${x}, ${y}, ${xy}, ${k}, ${res} },"
 
         res=$(./primecount 1e$i --$formula --alpha=1)
         x=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^y =' | cut -f3 -d' ')
         xy=$((x / y))
-        c=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^c =' | cut -f3 -d' ')
+        k=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^k =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i --alpha=1 -d -s | grep "${formula//-/_} = $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -d --alpha=1)" != "$(./primecount 1e$i -m)" ]]
@@ -37,13 +37,13 @@ do
             exit 1
         fi
 
-        echo "{ ${x}, ${y}, ${xy}, ${c}, ${res} },"
+        echo "{ ${x}, ${y}, ${xy}, ${k}, ${res} },"
 
         res=$(./primecount 1e$i --$formula --alpha=10000000)
         x=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^y =' | cut -f3 -d' ')
         xy=$((x / y))
-        c=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^c =' | cut -f3 -d' ')
+        k=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^k =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i --alpha=10000000 -d -s | grep "${formula//-/_} = $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -d --alpha=10000000)" != "$(./primecount 1e$i -m)" ]]
@@ -53,7 +53,7 @@ do
             exit 1
         fi
 
-        echo "{ ${x}, ${y}, ${xy}, ${c}, ${res} },"
+        echo "{ ${x}, ${y}, ${xy}, ${k}, ${res} },"
     done
 
     # A few larger computations using default alpha
@@ -63,7 +63,7 @@ do
         x=$(./primecount 1e$i --$formula -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula -s | grep '^y =' | cut -f3 -d' ')
         xy=$((x / y))
-        c=$(./primecount 1e$i --$formula -s | grep '^c =' | cut -f3 -d' ')
+        k=$(./primecount 1e$i --$formula -s | grep '^k =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i -d -s | grep "= $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -d)" != "$(./primecount 1e$i -m)" ]]
@@ -73,7 +73,7 @@ do
             exit 1
         fi
 
-        echo "{ ${x}, ${y}, ${xy}, ${c}, ${res} },"
+        echo "{ ${x}, ${y}, ${xy}, ${k}, ${res} },"
     done
 
     echo ""

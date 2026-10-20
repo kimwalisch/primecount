@@ -6,9 +6,8 @@
 ///        correct, however the correct Phi0 formula can be found on
 ///        page 3 of Gourdon's paper.
 ///
-///        The only difference in the computation of the ordinary
-///        leaves compared to the Deleglise-Rivat algorithm is that
-///        the small constant is named k instead of c.
+///        The computation of the ordinary leaves is identical to
+///        the Deleglise-Rivat algorithm (see S1.cpp).
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///

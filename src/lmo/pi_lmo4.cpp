@@ -63,7 +63,7 @@ void cross_off(int64_t prime,
 /// Calculate the contribution of the special leaves
 int64_t S2(int64_t x,
            int64_t y,
-           int64_t c,
+           int64_t k,
            int64_t pi_y,
            const Vector<uint32_t>& primes,
            const Vector<uint32_t>& lpf,
@@ -88,20 +88,20 @@ int64_t S2(int64_t x,
 
     std::fill(sieve.begin(), sieve.end(), 1);
 
-    // phi(y, b) nodes with b <= c do not contribute to S2, so
-    // we sieve out the multiples of the first c primes
-    for (int64_t b = 1; b <= c; b++)
+    // phi(y, b) nodes with b <= k do not contribute to S2, so
+    // we sieve out the multiples of the first k primes
+    for (int64_t b = 1; b <= k; b++)
     {
-      int64_t k = next[b];
-      for (int64_t prime = primes[b]; k < high; k += prime)
-        sieve[k - low] = 0;
-      next[b] = k;
+      int64_t j = next[b];
+      for (int64_t prime = primes[b]; j < high; j += prime)
+        sieve[j - low] = 0;
+      next[b] = j;
     }
 
     // initialize binary indexed tree from sieve
     tree.init(sieve);
 
-    for (int64_t b = c + 1; b < pi_y; b++)
+    for (int64_t b = k + 1; b < pi_y; b++)
     {
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
@@ -158,7 +158,7 @@ int64_t pi_lmo4(int64_t x)
   double alpha = get_alpha_lmo(x);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
-  int64_t c = PhiTiny::get_c(y);
+  int64_t k = PhiTiny::get_k(y);
 
   auto primes = generate_primes<uint32_t>(y);
   auto lpf = generate_lpf(y, primes);
@@ -166,8 +166,8 @@ int64_t pi_lmo4(int64_t x)
 
   int64_t pi_y = primes.size() - 1;
   int64_t p2 = P2(x, y, pi_y, threads);
-  int64_t s1 = S1(x, y, c, threads);
-  int64_t s2 = S2(x, y, c, pi_y, primes, lpf, mu);
+  int64_t s1 = S1(x, y, k, threads);
+  int64_t s2 = S2(x, y, k, pi_y, primes, lpf, mu);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

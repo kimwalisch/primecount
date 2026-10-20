@@ -18,7 +18,6 @@
 #ifndef PHITINY_HPP
 #define PHITINY_HPP
 
-#include <imath.hpp>
 #include <int128_t.hpp>
 #include <Vector.hpp>
 
@@ -43,22 +42,12 @@ inline constexpr uint64_t max_a()
   return 8;
 }
 
-inline uint64_t get_c(uint64_t y)
+inline uint64_t get_k(uint64_t y)
 {
   if (y < pi.size())
     return pi[y];
   else
     return max_a();
-}
-
-/// In Xavier Gourdon's algorithm the small
-/// constant is named k instead of c.
-/// k <= PrimePi[min(x_star, sqrt(x / y))]
-///
-template <typename T>
-uint64_t get_k(T x)
-{
-  return get_c(iroot<4>(x));
 }
 
 } // namespace

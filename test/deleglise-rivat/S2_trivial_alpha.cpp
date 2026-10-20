@@ -24,7 +24,7 @@ struct formula_params
   int64_t x;
   int64_t y;
   int64_t xy;
-  int64_t c;
+  int64_t k;
   int64_t res;
 };
 
@@ -85,13 +85,13 @@ int main()
 
   for (const formula_params& params : test_cases)
   {
-    int64_t res = S2_trivial(params.x, params.y, params.xy, params.c, threads);
-    std::cout << "S2_trivial_64bit(" << params.x << ", " << params.y << ", " << params.xy << ", " << params.c << ") = " << res;
+    int64_t res = S2_trivial(params.x, params.y, params.xy, params.k, threads);
+    std::cout << "S2_trivial_64bit(" << params.x << ", " << params.y << ", " << params.xy << ", " << params.k << ") = " << res;
     check(res == params.res);
 
     #ifdef HAVE_INT128_T
-      int128_t res2 = S2_trivial((int128_t) params.x, params.y, params.xy, params.c, threads);
-      std::cout << "S2_trivial_128bit(" << params.x << ", " << params.y << ", " << params.xy << ", " << params.c << ") = " << res2;
+      int128_t res2 = S2_trivial((int128_t) params.x, params.y, params.xy, params.k, threads);
+      std::cout << "S2_trivial_128bit(" << params.x << ", " << params.y << ", " << params.xy << ", " << params.k << ") = " << res2;
       check(res2 == params.res);
     #endif
   }
@@ -102,11 +102,11 @@ int main()
     int128_t x = ((int128_t) 10000000000) * ((int128_t) 10000000000);
     int64_t y = 209809060;
     int64_t xy = 476623840743;
-    int64_t c = 8;
-    int128_t res1 = S2_trivial(x, y, xy, c, threads);
+    int64_t k = 8;
+    int128_t res1 = S2_trivial(x, y, xy, k, threads);
     int128_t res2 = 66066585011132;
 
-    std::cout << "S2_trivial_128bit(" << x << ", " << y << ", " << xy << ", " << c << ") = " << res1;
+    std::cout << "S2_trivial_128bit(" << x << ", " << y << ", " << xy << ", " << k << ") = " << res1;
     check(res1 == res2);
   }
 #endif

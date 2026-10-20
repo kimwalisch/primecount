@@ -50,7 +50,7 @@ namespace {
 int64_t S2_thread(int64_t x,
                   int64_t y,
                   int64_t xy,
-                  int64_t c,
+                  int64_t k,
                   const PiTable& pi,
                   const Vector<uint32_t>& primes,
                   const Vector<uint32_t>& lpf,
@@ -66,7 +66,7 @@ int64_t S2_thread(int64_t x,
   int64_t limit = min(low + segment_size * segments, xy + 1);
   int64_t max_b = pi[min(isqrt(x / low1), y - 1)];
   int64_t min_b = pi[min(xy / limit, primes[max_b])];
-  min_b = max(c, min_b) + 1;
+  min_b = max(k, min_b) + 1;
 
   if (min_b > max_b)
     return 0;
@@ -88,7 +88,7 @@ int64_t S2_thread(int64_t x,
     sieve.init_counter(low, high);
     int64_t b = min_b;
 
-    // For c + 1 <= b <= pi_sqrty
+    // For k + 1 <= b <= pi_sqrty
     // Find all special leaves in the current segment that are
     // composed of a prime and a square free number:
     // low <= x / (primes[b] * m) < high
@@ -168,7 +168,7 @@ int64_t S2_thread(int64_t x,
 int64_t S2(int64_t x,
            int64_t y,
            int64_t xy,
-           int64_t c,
+           int64_t k,
            const PiTable& pi,
            const Vector<uint32_t>& primes,
            const Vector<uint32_t>& lpf,
@@ -201,7 +201,7 @@ int64_t S2(int64_t x,
     while (loadBalancer.get_work(thread))
     {
       thread.start_time = get_time();
-      thread.sum = S2_thread(x, y, xy, c, pi, primes, lpf, mu, thread);
+      thread.sum = S2_thread(x, y, xy, k, pi, primes, lpf, mu, thread);
       thread.stop_time = get_time();
       sum += thread.sum;
     }
@@ -233,14 +233,14 @@ int64_t pi_lmo_parallel(int64_t x,
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t xy = x / y;
-  int64_t c = PhiTiny::get_c(y);
+  int64_t k = PhiTiny::get_k(y);
 
   if (is_print)
   {
     print("");
     print("=== pi_lmo_parallel(x) ===");
     print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-    print(x, y, c, threads);
+    print(x, y, k, threads);
   }
 
   PiTable pi(y, threads);
@@ -250,8 +250,8 @@ int64_t pi_lmo_parallel(int64_t x,
 
   int64_t pi_y = pi[y];
   int64_t p2 = P2(x, y, pi_y, threads, is_print);
-  int64_t s1 = S1(x, y, c, threads, is_print);
-  int64_t s2 = S2(x, y, xy, c, pi, primes, lpf, mu, threads, is_print);
+  int64_t s1 = S1(x, y, k, threads, is_print);
+  int64_t s2 = S2(x, y, xy, k, pi, primes, lpf, mu, threads, is_print);
   int64_t phi = s1 + s2;
   int64_t pix = phi + pi_y - 1 - p2;
 

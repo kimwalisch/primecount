@@ -1,5 +1,6 @@
 Changes in primecount-8.9, 2026-10-20
 
+* Use phi(x, k) instead of phi(x, c) in all prime counting algorithms.
 * print.cpp: Don't print z = x / y in the --status output.
 * Use xy = x / y instead of z = x / y in the LMO and Deleglise-Rivat algorithms.
 * AC.cpp, D.cpp, Phi0.cpp: Remove z parameter, use y instead.
