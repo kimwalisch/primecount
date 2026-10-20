@@ -264,10 +264,10 @@ double get_alpha_gourdon(maxint_t x)
 ///
 int64_t get_x_star_gourdon(maxint_t x, int64_t y)
 {
-  y = max(y, (int64_t) 1);
+  y = max(y, 1);
   maxint_t yy = (maxint_t) y * y;
   int64_t x14 = iroot<4>(x);
-  int64_t x_star = (int64_t) max(x / yy, x14);
+  int64_t x_star = max(x / yy, x14);
 
   // x_star <= y holds if y >= x^(1/3), but for x = 2 and 3
   // we use y = 1. Without this bound x_star > y would cause
