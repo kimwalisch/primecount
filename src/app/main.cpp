@@ -137,10 +137,9 @@ maxint_t AC(maxint_t x, int threads)
   int64_t y = (int64_t)(x13 * alpha);
   int64_t k = PhiTiny::get_k(x14);
 
-  // x^(1/3) < y < x^(1/2)
+  // x^(1/3) < y <= x^(1/2)
   y = std::max(y, x13 + 1);
-  y = std::min(y, sqrtx - 1);
-  y = std::max(y, (int64_t) 1);
+  y = std::min(y, sqrtx);
 
 #ifdef HAVE_INT128_T
   // x / y is stored in int64_t variables, hence x / y must be
@@ -169,10 +168,9 @@ maxint_t B(maxint_t x, int threads)
   int64_t sqrtx = isqrt(x);
   int64_t y = (int64_t)(x13 * alpha);
 
-  // x^(1/3) < y < x^(1/2)
+  // x^(1/3) < y <= x^(1/2)
   y = std::max(y, x13 + 1);
-  y = std::min(y, sqrtx - 1);
-  y = std::max(y, (int64_t) 1);
+  y = std::min(y, sqrtx);
 
 #ifdef HAVE_INT128_T
   // x / y is stored in int64_t variables, hence x / y must be
@@ -203,10 +201,9 @@ maxint_t D(maxint_t x, int threads)
   int64_t y = (int64_t)(x13 * alpha);
   int64_t k = PhiTiny::get_k(x14);
 
-  // x^(1/3) < y < x^(1/2)
+  // x^(1/3) < y <= x^(1/2)
   y = std::max(y, x13 + 1);
-  y = std::min(y, sqrtx - 1);
-  y = std::max(y, (int64_t) 1);
+  y = std::min(y, sqrtx);
 
 #ifdef HAVE_INT128_T
   // x / y is stored in int64_t variables, hence x / y must be
@@ -237,10 +234,9 @@ maxint_t Phi0(maxint_t x, int threads)
   int64_t y = (int64_t)(x13 * alpha);
   int64_t k = PhiTiny::get_k(x14);
 
-  // x^(1/3) < y < x^(1/2)
+  // x^(1/3) < y <= x^(1/2)
   y = std::max(y, x13 + 1);
-  y = std::min(y, sqrtx - 1);
-  y = std::max(y, (int64_t) 1);
+  y = std::min(y, sqrtx);
 
 #ifdef HAVE_INT128_T
   // x / y is stored in int64_t variables, hence x / y must be
@@ -269,10 +265,9 @@ maxint_t Sigma(maxint_t x, int threads)
   int64_t sqrtx = isqrt(x);
   int64_t y = (int64_t)(x13 * alpha);
 
-  // x^(1/3) < y < x^(1/2)
+  // x^(1/3) < y <= x^(1/2)
   y = std::max(y, x13 + 1);
-  y = std::min(y, sqrtx - 1);
-  y = std::max(y, (int64_t) 1);
+  y = std::min(y, sqrtx);
 
 #ifdef HAVE_INT128_T
   // x / y is stored in int64_t variables, hence x / y must be

@@ -48,10 +48,9 @@ int64_t pi_gourdon_64(int64_t x,
   int64_t y = (int64_t)(x13 * alpha);
   int64_t k = PhiTiny::get_k(x14);
 
-  // x^(1/3) < y < x^(1/2)
+  // x^(1/3) < y <= x^(1/2)
   y = std::max(y, x13 + 1);
-  y = std::min(y, sqrtx - 1);
-  y = std::max(y, (int64_t) 1);
+  y = std::min(y, sqrtx);
 
   if (is_print)
   {
@@ -104,10 +103,9 @@ int128_t pi_gourdon_128(int128_t x,
   int64_t y = (int64_t)(x13 * alpha);
   int64_t k = PhiTiny::get_k(x14);
 
-  // x^(1/3) < y < x^(1/2)
+  // x^(1/3) < y <= x^(1/2)
   y = std::max(y, x13 + 1);
-  y = std::min(y, sqrtx - 1);
-  y = std::max(y, (int64_t) 1);
+  y = std::min(y, sqrtx);
 
   // x / y is stored in int64_t variables, hence x / y must be
   // <= 2^63-1. We use 2^62 as a safety buffer to protect

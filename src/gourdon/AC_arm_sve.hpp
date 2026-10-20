@@ -144,7 +144,7 @@ T A_arm_sve(T xlow,
 ///
 /// m is either a prime <= y or a product of 2 distinct primes.
 /// In both cases m is coprime to the first b primes and m <= y.
-/// Since each prime factor of m is > (x / y)^(1/3) and y < sqrt(x),
+/// Since each prime factor of m is > (x / y)^(1/3) and y <= sqrt(x),
 /// m cannot contain more than 2 prime factors.
 ///
 template <typename T,
