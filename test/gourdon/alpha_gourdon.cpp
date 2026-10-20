@@ -49,13 +49,12 @@ int main()
 
       for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
       {
-        set_alpha(alpha);
-        int64_t res2 = pi_gourdon_64(x, threads);
+        int64_t res2 = pi_gourdon_64(x, threads, alpha);
         std::cout << "alpha = " << alpha << ", pi_gourdon_64(" << x << ") = " << res2;
         check(res2 == res1);
 
         #ifdef HAVE_INT128_T
-          int128_t res3 = pi_gourdon_128(x, threads);
+          int128_t res3 = pi_gourdon_128(x, threads, alpha);
           std::cout << "alpha = " << alpha << ", pi_gourdon_128(" << x << ") = " << res3;
           check(res3 == res1);
         #endif
@@ -79,13 +78,12 @@ int main()
 
       for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
       {
-        set_alpha(alpha);
-        int64_t res2 = pi_gourdon_64(x, threads);
+        int64_t res2 = pi_gourdon_64(x, threads, alpha);
         std::cout << "alpha = " << alpha << ", pi_gourdon_64(" << x << ") = " << res2;
         check(res2 == res1);
 
         #ifdef HAVE_INT128_T
-          int128_t res3 = pi_gourdon_128(x, threads);
+          int128_t res3 = pi_gourdon_128(x, threads, alpha);
           std::cout << "alpha = " << alpha << ", pi_gourdon_128(" << x << ") = " << res3;
           check(res3 == res1);
         #endif
@@ -101,13 +99,12 @@ int main()
 
     for (double alpha : alphas)
     {
-      set_alpha(alpha);
-      int64_t res2 = pi_gourdon_64(x, threads);
+      int64_t res2 = pi_gourdon_64(x, threads, alpha);
       std::cout << "alpha = " << alpha << ", pi_gourdon_64(" << x << ") = " << res2;
       check(res2 == res1);
 
       #ifdef HAVE_INT128_T
-        int128_t res3 = pi_gourdon_128(x, threads);
+        int128_t res3 = pi_gourdon_128(x, threads, alpha);
         std::cout << "alpha = " << alpha << ", pi_gourdon_128(" << x << ") = " << res3;
         check(res3 == res1);
       #endif

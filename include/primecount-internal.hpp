@@ -22,28 +22,28 @@
 namespace primecount {
 
 int64_t pi_lmo1(int64_t x);
-int64_t pi_lmo2(int64_t x);
-int64_t pi_lmo3(int64_t x);
-int64_t pi_lmo4(int64_t x);
+int64_t pi_lmo2(int64_t x, double alpha = -1);
+int64_t pi_lmo3(int64_t x, double alpha = -1);
+int64_t pi_lmo4(int64_t x, double alpha = -1);
 int64_t pi_primesieve(int64_t x);
 
-int64_t pi(int64_t x, int threads);
+int64_t pi(int64_t x, int threads, double alpha = -1);
 int64_t pi_noprint(int64_t x, int threads);
-int64_t pi_deleglise_rivat(int64_t x, int threads);
+int64_t pi_deleglise_rivat(int64_t x, int threads, double alpha = -1);
 
 int64_t pi_cache(int64_t x, bool print = is_print());
-int64_t pi_deleglise_rivat_64(int64_t x, int threads, bool print = is_print());
+int64_t pi_deleglise_rivat_64(int64_t x, int threads, double alpha = -1, bool print = is_print());
 int64_t pi_legendre(int64_t x, int threads, bool print = is_print());
 int64_t pi_lehmer(int64_t x, int threads, bool print = is_print());
-int64_t pi_lmo5(int64_t x, bool print = is_print());
-int64_t pi_lmo_parallel(int64_t x, int threads, bool print = is_print());
+int64_t pi_lmo5(int64_t x, double alpha = -1, bool print = is_print());
+int64_t pi_lmo_parallel(int64_t x, int threads, double alpha = -1, bool print = is_print());
 int64_t pi_meissel(int64_t x, int threads, bool print = is_print());
 int64_t phi(int64_t x, int64_t a, int threads, bool print = is_print());
 int64_t P2(int64_t x, int64_t y, int64_t a, int threads, bool print = is_print());
 int64_t P3(int64_t x, int64_t y, int64_t a, int threads, bool print = is_print());
 
-int64_t nth_prime(int64_t n, int threads);
-int64_t nth_prime_64(int64_t n, int threads);
+int64_t nth_prime(int64_t n, int threads, double alpha = -1);
+int64_t nth_prime_64(int64_t n, int threads, double alpha = -1);
 
 int64_t Li(int64_t x);
 int64_t Li_inverse(int64_t x);
@@ -54,14 +54,14 @@ int64_t RiemannR_psi_inverse(int64_t x);
 
 #ifdef HAVE_INT128_T
   int128_t pi(int128_t x);
-  int128_t pi(int128_t x, int threads);
-  int128_t pi_deleglise_rivat(int128_t x, int threads);
-  int128_t pi_deleglise_rivat_128(int128_t x, int threads, bool print = is_print());
+  int128_t pi(int128_t x, int threads, double alpha = -1);
+  int128_t pi_deleglise_rivat(int128_t x, int threads, double alpha = -1);
+  int128_t pi_deleglise_rivat_128(int128_t x, int threads, double alpha = -1, bool print = is_print());
   int128_t P2(int128_t x, int64_t y, int64_t a, int threads, bool print = is_print());
 
   int128_t nth_prime(int128_t n);
-  int128_t nth_prime(int128_t n, int threads);
-  int128_t nth_prime_128(int128_t n, int threads);
+  int128_t nth_prime(int128_t n, int threads, double alpha = -1);
+  int128_t nth_prime_128(int128_t n, int threads, double alpha = -1);
 
   int128_t Li(int128_t);
   int128_t Li_inverse(int128_t);
@@ -73,12 +73,11 @@ int64_t RiemannR_psi_inverse(int64_t x);
 
 int get_status_precision(maxint_t x);
 void set_status_precision(int precision);
-void set_alpha(double alpha);
 double get_time();
 double get_alpha(maxint_t x, int64_t y);
-double get_alpha_lmo(maxint_t x);
-double get_alpha_deleglise_rivat(maxint_t x);
-double get_alpha_gourdon(maxint_t x);
+double get_alpha_lmo(maxint_t x, double alpha = -1);
+double get_alpha_deleglise_rivat(maxint_t x, double alpha = -1);
+double get_alpha_gourdon(maxint_t x, double alpha = -1);
 int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 void verify_pix(string_view_t pix_function, maxint_t x, maxint_t pix);
 

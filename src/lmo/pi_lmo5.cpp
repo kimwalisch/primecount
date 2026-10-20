@@ -155,13 +155,13 @@ namespace primecount {
 /// Run time: O(x^(2/3) / log x)
 /// Memory usage: O(x^(1/3) * (log x)^2)
 ///
-int64_t pi_lmo5(int64_t x, bool is_print)
+int64_t pi_lmo5(int64_t x, double alpha, bool is_print)
 {
   if (x < 2)
     return 0;
 
   int threads = 1;
-  double alpha = get_alpha_lmo(x);
+  alpha = get_alpha_lmo(x, alpha);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t k = PhiTiny::get_k(y);

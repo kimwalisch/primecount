@@ -36,12 +36,13 @@ namespace primecount {
 ///
 int64_t pi_gourdon_64(int64_t x,
                       int threads,
+                      double alpha,
                       bool is_print)
 {
   if (x < 2)
     return 0;
 
-  double alpha = get_alpha_gourdon(x);
+  alpha = get_alpha_gourdon(x, alpha);
   int64_t sqrtx = isqrt(x);
   int64_t x13 = iroot<3>(x);
   int64_t x14 = iroot<4>(x);
@@ -91,12 +92,13 @@ int64_t pi_gourdon_64(int64_t x,
 ///
 int128_t pi_gourdon_128(int128_t x,
                         int threads,
+                        double alpha,
                         bool is_print)
 {
   if (x < 2)
     return 0;
 
-  double alpha = get_alpha_gourdon(x);
+  alpha = get_alpha_gourdon(x, alpha);
   int64_t sqrtx = isqrt(x);
   int64_t x13 = iroot<3>(x);
   int64_t x14 = iroot<4>(x);

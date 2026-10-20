@@ -339,7 +339,7 @@ CmdOptions parseOptions(int argc, char** argv)
 
     switch (optionID)
     {
-      case OPTION_ALPHA:        set_alpha(getAlpha(opt)); break;
+      case OPTION_ALPHA:        opts.alpha = getAlpha(opt); break;
       case OPTION_DOUBLE_CHECK: set_double_check(true); break;
       case OPTION_HELP:         help(/* exitCode */ 0); break;
       case OPTION_NUMBER:       numbers.push_back(getVal<maxint_t>(opt)); break;

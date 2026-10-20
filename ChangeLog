@@ -1,5 +1,6 @@
 Changes in primecount-9.0, 2026-10-20
 
+* Pass alpha as function parameter, --alpha no longer affects nested pi(x) computations.
 * AC_*.hpp: Remove redundant y bounds from the C1 formula.
 * Tests: Cover y = sqrt(x) and both FactorTable entry widths.
 * pi_gourdon.cpp: Allow y = x^(1/2) in Gourdon's algorithm, simplify y bounds.

@@ -61,7 +61,7 @@ int main()
   {
     // Test one larger computation: pi(1e10)
     int64_t x = 10000000000;
-    int64_t res = pi_lmo5(x, threads);
+    int64_t res = pi_lmo5(x);
     std::cout << "pi_lmo5(" << x << ") = " << res;
     check(res == 455052511);
   }

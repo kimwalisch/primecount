@@ -125,12 +125,12 @@ int64_t to_int64(maxint_t x)
   return (int64_t) x;
 }
 
-maxint_t AC(maxint_t x, int threads)
+maxint_t AC(maxint_t x, int threads, double alpha)
 {
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha_gourdon(x);
+  alpha = get_alpha_gourdon(x, alpha);
   int64_t sqrtx = isqrt(x);
   int64_t x13 = iroot<3>(x);
   int64_t x14 = iroot<4>(x);
@@ -158,12 +158,12 @@ maxint_t AC(maxint_t x, int threads)
     return AC(x, y, k, threads);
 }
 
-maxint_t B(maxint_t x, int threads)
+maxint_t B(maxint_t x, int threads, double alpha)
 {
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha_gourdon(x);
+  alpha = get_alpha_gourdon(x, alpha);
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
   int64_t y = (int64_t)(x13 * alpha);
@@ -189,12 +189,12 @@ maxint_t B(maxint_t x, int threads)
     return B(x, y, threads);
 }
 
-maxint_t D(maxint_t x, int threads)
+maxint_t D(maxint_t x, int threads, double alpha)
 {
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha_gourdon(x);
+  alpha = get_alpha_gourdon(x, alpha);
   int64_t sqrtx = isqrt(x);
   int64_t x13 = iroot<3>(x);
   int64_t x14 = iroot<4>(x);
@@ -222,12 +222,12 @@ maxint_t D(maxint_t x, int threads)
     return D(x, y, k, threads);
 }
 
-maxint_t Phi0(maxint_t x, int threads)
+maxint_t Phi0(maxint_t x, int threads, double alpha)
 {
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha_gourdon(x);
+  alpha = get_alpha_gourdon(x, alpha);
   int64_t sqrtx = isqrt(x);
   int64_t x13 = iroot<3>(x);
   int64_t x14 = iroot<4>(x);
@@ -255,12 +255,12 @@ maxint_t Phi0(maxint_t x, int threads)
     return Phi0(x, y, k, threads);
 }
 
-maxint_t Sigma(maxint_t x, int threads)
+maxint_t Sigma(maxint_t x, int threads, double alpha)
 {
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha_gourdon(x);
+  alpha = get_alpha_gourdon(x, alpha);
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
   int64_t y = (int64_t)(x13 * alpha);
@@ -286,12 +286,12 @@ maxint_t Sigma(maxint_t x, int threads)
     return Sigma(x, y, threads);
 }
 
-maxint_t P2(maxint_t x, int threads)
+maxint_t P2(maxint_t x, int threads, double alpha)
 {
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha_deleglise_rivat(x);
+  alpha = get_alpha_deleglise_rivat(x, alpha);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
 #ifdef HAVE_INT128_T
@@ -313,12 +313,12 @@ maxint_t P2(maxint_t x, int threads)
     return P2(x, y, a, threads);
 }
 
-maxint_t S1(maxint_t x, int threads)
+maxint_t S1(maxint_t x, int threads, double alpha)
 {
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha_deleglise_rivat(x);
+  alpha = get_alpha_deleglise_rivat(x, alpha);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
 #ifdef HAVE_INT128_T
@@ -340,12 +340,12 @@ maxint_t S1(maxint_t x, int threads)
     return S1(x, y, k, threads);
 }
 
-maxint_t S2_trivial(maxint_t x, int threads)
+maxint_t S2_trivial(maxint_t x, int threads, double alpha)
 {
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha_deleglise_rivat(x);
+  alpha = get_alpha_deleglise_rivat(x, alpha);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
 #ifdef HAVE_INT128_T
@@ -368,12 +368,12 @@ maxint_t S2_trivial(maxint_t x, int threads)
     return S2_trivial(x, y, xy, k, threads);
 }
 
-maxint_t S2_easy(maxint_t x, int threads)
+maxint_t S2_easy(maxint_t x, int threads, double alpha)
 {
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha_deleglise_rivat(x);
+  alpha = get_alpha_deleglise_rivat(x, alpha);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
 #ifdef HAVE_INT128_T
@@ -396,12 +396,12 @@ maxint_t S2_easy(maxint_t x, int threads)
     return S2_easy(x, y, xy, k, threads);
 }
 
-maxint_t S2_hard(maxint_t x, int threads)
+maxint_t S2_hard(maxint_t x, int threads, double alpha)
 {
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha_deleglise_rivat(x);
+  alpha = get_alpha_deleglise_rivat(x, alpha);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
 #ifdef HAVE_INT128_T
@@ -439,37 +439,38 @@ int main (int argc, char* argv[])
 
     auto x = opts.x;
     auto a = opts.a;
+    auto alpha = opts.alpha;
     auto threads = get_num_threads();
     maxint_t res = 0;
 
     switch (opts.option)
     {
       case OPTION_DEFAULT:
-        res = pi(x, threads); break;
+        res = pi(x, threads, alpha); break;
       case OPTION_DELEGLISE_RIVAT:
-        res = pi_deleglise_rivat(x, threads); break;
+        res = pi_deleglise_rivat(x, threads, alpha); break;
       case OPTION_DELEGLISE_RIVAT_64:
-        res = pi_deleglise_rivat_64(to_int64(x), threads); break;
+        res = pi_deleglise_rivat_64(to_int64(x), threads, alpha); break;
       case OPTION_GOURDON:
-        res = pi_gourdon(x, threads); break;
+        res = pi_gourdon(x, threads, alpha); break;
       case OPTION_GOURDON_64:
-        res = pi_gourdon_64(to_int64(x), threads); break;
+        res = pi_gourdon_64(to_int64(x), threads, alpha); break;
       case OPTION_LEGENDRE:
         res = pi_legendre(to_int64(x), threads); break;
       case OPTION_LEHMER:
         res = pi_lehmer(to_int64(x), threads); break;
       case OPTION_LMO:
-        res = pi_lmo_parallel(to_int64(x), threads); break;
+        res = pi_lmo_parallel(to_int64(x), threads, alpha); break;
       case OPTION_LMO1:
         res = pi_lmo1(to_int64(x)); break;
       case OPTION_LMO2:
-        res = pi_lmo2(to_int64(x)); break;
+        res = pi_lmo2(to_int64(x), alpha); break;
       case OPTION_LMO3:
-        res = pi_lmo3(to_int64(x)); break;
+        res = pi_lmo3(to_int64(x), alpha); break;
       case OPTION_LMO4:
-        res = pi_lmo4(to_int64(x)); break;
+        res = pi_lmo4(to_int64(x), alpha); break;
       case OPTION_LMO5:
-        res = pi_lmo5(to_int64(x)); break;
+        res = pi_lmo5(to_int64(x), alpha); break;
       case OPTION_MEISSEL:
         res = pi_meissel(to_int64(x), threads); break;
       case OPTION_PRIMESIEVE:
@@ -487,38 +488,38 @@ int main (int argc, char* argv[])
       case OPTION_R_PSI_INVERSE:
         res = RiemannR_psi_inverse(x); break;
       case OPTION_NTHPRIME:
-        res = nth_prime(x, threads); break;
+        res = nth_prime(x, threads, alpha); break;
       case OPTION_NTHPRIME_64:
-        res = nth_prime_64(to_int64(x), threads); break;
+        res = nth_prime_64(to_int64(x), threads, alpha); break;
       case OPTION_PHI:
         res = phi(to_int64(x), a, threads); break;
       case OPTION_P2:
-        res = P2(x, threads); break;
+        res = P2(x, threads, alpha); break;
       case OPTION_S1:
-        res = S1(x, threads); break;
+        res = S1(x, threads, alpha); break;
       case OPTION_S2_EASY:
-        res = S2_easy(x, threads); break;
+        res = S2_easy(x, threads, alpha); break;
       case OPTION_S2_HARD:
-        res = S2_hard(x, threads); break;
+        res = S2_hard(x, threads, alpha); break;
       case OPTION_S2_TRIVIAL:
-        res = S2_trivial(x, threads); break;
+        res = S2_trivial(x, threads, alpha); break;
       case OPTION_AC:
-        res = AC(x, threads); break;
+        res = AC(x, threads, alpha); break;
       case OPTION_B:
-        res = B(x, threads); break;
+        res = B(x, threads, alpha); break;
       case OPTION_D:
-        res = D(x, threads); break;
+        res = D(x, threads, alpha); break;
       case OPTION_PHI0:
-        res = Phi0(x, threads); break;
+        res = Phi0(x, threads, alpha); break;
       case OPTION_SIGMA:
-        res = Sigma(x, threads); break;
+        res = Sigma(x, threads, alpha); break;
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_128:
-        res = pi_deleglise_rivat_128(x, threads); break;
+        res = pi_deleglise_rivat_128(x, threads, alpha); break;
       case OPTION_GOURDON_128:
-        res = pi_gourdon_128(x, threads); break;
+        res = pi_gourdon_128(x, threads, alpha); break;
       case OPTION_NTHPRIME_128:
-        res = nth_prime_128(x, threads); break;
+        res = nth_prime_128(x, threads, alpha); break;
 #endif
     }
 

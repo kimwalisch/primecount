@@ -88,6 +88,7 @@ struct CmdOptions
   int option = OPTION_DEFAULT;
   maxint_t x = -1;
   int64_t a = -1;
+  double alpha = -1;
   bool time = false;
 
   void setMainOption(OptionID optionID, const std::string& optStr);

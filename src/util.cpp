@@ -28,10 +28,6 @@ namespace {
 
 int status_precision_ = -1;
 
-/// Tuning factor used in the Lagarias-Miller-Odlyzko,
-/// Deleglise-Rivat and Gourdon algorithms.
-double alpha_ = -1;
-
 /// Recompute pi(x) with an alternative alpha tuning factor to
 /// verify the first result. This redundancy helps guard
 /// against potential bugs in primecount: if an error exists,
@@ -96,16 +92,6 @@ void set_double_check(bool enable)
   double_check_ = enable;
 }
 
-void set_alpha(double alpha)
-{
-  // If alpha < 1 then we compute a good
-  // alpha tuning factor at runtime.
-  if (alpha < 1.0)
-    alpha_ = -1;
-  else
-    alpha_ = truncate3(alpha);
-}
-
 /// Tuning factor used in the Lagarias-Miller-Odlyzko,
 /// Deleglise-Rivat and Gourdon algorithms.
 ///
@@ -129,9 +115,8 @@ double get_alpha(maxint_t x, int64_t y)
 /// a, b and c have been determined empirically.
 /// @see doc/alpha-factor-lmo.pdf
 ///
-double get_alpha_lmo(maxint_t x)
+double get_alpha_lmo(maxint_t x, double alpha)
 {
-  double alpha = alpha_;
   double x16 = (double) iroot<6>(x);
 
   // use default alpha if no command-line alpha provided
@@ -162,9 +147,8 @@ double get_alpha_lmo(maxint_t x)
 /// a, b, c and d have been determined empirically.
 /// @see doc/alpha-factor-dr.pdf
 ///
-double get_alpha_deleglise_rivat(maxint_t x)
+double get_alpha_deleglise_rivat(maxint_t x, double alpha)
 {
-  double alpha = alpha_;
   double x16 = (double) iroot<6>(x);
 
   // Use default alpha
@@ -210,9 +194,8 @@ double get_alpha_deleglise_rivat(maxint_t x)
 /// a, b, c and d have been determined empirically.
 /// @see doc/alpha-factor-gourdon.pdf
 ///
-double get_alpha_gourdon(maxint_t x)
+double get_alpha_gourdon(maxint_t x, double alpha)
 {
-  double alpha = alpha_;
   double x16 = (double) iroot<6>(x);
 
   // Use default alpha
