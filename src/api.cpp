@@ -72,7 +72,9 @@ pc_int128_t pi(pc_int128_t x)
 #endif
 }
 
-int64_t pi(int64_t x, int threads, double alpha)
+int64_t pi(int64_t x,
+           int threads,
+           double alpha)
 {
   // Compute pi(x) in O(1) for small values of x
   if (x <= PiTable::max_cached())
@@ -123,12 +125,16 @@ int64_t pi_cache(int64_t x, bool is_print)
   return PiTable::pi_cache(x);
 }
 
-int64_t pi_deleglise_rivat(int64_t x, int threads, double alpha)
+int64_t pi_deleglise_rivat(int64_t x,
+                           int threads,
+                           double alpha)
 {
   return pi_deleglise_rivat_64(x, threads, alpha);
 }
 
-int64_t pi_gourdon(int64_t x, int threads, double alpha)
+int64_t pi_gourdon(int64_t x,
+                   int threads,
+                   double alpha)
 {
   return pi_gourdon_64(x, threads, alpha);
 }
@@ -138,7 +144,9 @@ int64_t nth_prime(int64_t n)
   return nth_prime(n, get_num_threads());
 }
 
-int64_t nth_prime(int64_t n, int threads, double alpha)
+int64_t nth_prime(int64_t n,
+                  int threads,
+                  double alpha)
 {
   return nth_prime_64(n, threads, alpha);
 }
@@ -180,7 +188,9 @@ int128_t pi(int128_t x)
   return pi(x, get_num_threads());
 }
 
-int128_t pi(int128_t x, int threads, double alpha)
+int128_t pi(int128_t x,
+            int threads,
+            double alpha)
 {
   // Prevent 64-bit cast to random
   // integer if x <= -2^63.
@@ -194,7 +204,9 @@ int128_t pi(int128_t x, int threads, double alpha)
     return pi_gourdon_128(x, threads, alpha);
 }
 
-int128_t pi_deleglise_rivat(int128_t x, int threads, double alpha)
+int128_t pi_deleglise_rivat(int128_t x,
+                            int threads,
+                            double alpha)
 {
   // Prevent 64-bit cast to random
   // integer if x <= -2^63.
@@ -208,7 +220,9 @@ int128_t pi_deleglise_rivat(int128_t x, int threads, double alpha)
     return pi_deleglise_rivat_128(x, threads, alpha);
 }
 
-int128_t pi_gourdon(int128_t x, int threads, double alpha)
+int128_t pi_gourdon(int128_t x,
+                    int threads,
+                    double alpha)
 {
   // Prevent 64-bit cast to random
   // integer if x <= -2^63.
@@ -227,7 +241,9 @@ int128_t nth_prime(int128_t n)
   return nth_prime(n, get_num_threads());
 }
 
-int128_t nth_prime(int128_t n, int threads, double alpha)
+int128_t nth_prime(int128_t n,
+                   int threads,
+                   double alpha)
 {
   if_unlikely(n < 1)
     throw primecount_error("nth_prime(n): n must be >= 1");

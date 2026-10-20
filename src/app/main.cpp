@@ -125,7 +125,9 @@ int64_t to_int64(maxint_t x)
   return (int64_t) x;
 }
 
-maxint_t AC(maxint_t x, int threads, double alpha)
+maxint_t AC(maxint_t x,
+            int threads,
+            double alpha)
 {
   if (x < 1)
     return 0;
@@ -158,7 +160,9 @@ maxint_t AC(maxint_t x, int threads, double alpha)
     return AC(x, y, k, threads);
 }
 
-maxint_t B(maxint_t x, int threads, double alpha)
+maxint_t B(maxint_t x,
+           int threads,
+           double alpha)
 {
   if (x < 1)
     return 0;
@@ -189,7 +193,9 @@ maxint_t B(maxint_t x, int threads, double alpha)
     return B(x, y, threads);
 }
 
-maxint_t D(maxint_t x, int threads, double alpha)
+maxint_t D(maxint_t x,
+           int threads,
+           double alpha)
 {
   if (x < 1)
     return 0;
@@ -222,7 +228,9 @@ maxint_t D(maxint_t x, int threads, double alpha)
     return D(x, y, k, threads);
 }
 
-maxint_t Phi0(maxint_t x, int threads, double alpha)
+maxint_t Phi0(maxint_t x,
+              int threads,
+              double alpha)
 {
   if (x < 1)
     return 0;
@@ -255,7 +263,9 @@ maxint_t Phi0(maxint_t x, int threads, double alpha)
     return Phi0(x, y, k, threads);
 }
 
-maxint_t Sigma(maxint_t x, int threads, double alpha)
+maxint_t Sigma(maxint_t x,
+               int threads,
+               double alpha)
 {
   if (x < 1)
     return 0;
@@ -286,7 +296,9 @@ maxint_t Sigma(maxint_t x, int threads, double alpha)
     return Sigma(x, y, threads);
 }
 
-maxint_t P2(maxint_t x, int threads, double alpha)
+maxint_t P2(maxint_t x,
+            int threads,
+            double alpha)
 {
   if (x < 1)
     return 0;
@@ -313,7 +325,9 @@ maxint_t P2(maxint_t x, int threads, double alpha)
     return P2(x, y, a, threads);
 }
 
-maxint_t S1(maxint_t x, int threads, double alpha)
+maxint_t S1(maxint_t x,
+            int threads,
+            double alpha)
 {
   if (x < 1)
     return 0;
@@ -340,7 +354,9 @@ maxint_t S1(maxint_t x, int threads, double alpha)
     return S1(x, y, k, threads);
 }
 
-maxint_t S2_trivial(maxint_t x, int threads, double alpha)
+maxint_t S2_trivial(maxint_t x,
+                    int threads,
+                    double alpha)
 {
   if (x < 1)
     return 0;
@@ -368,7 +384,9 @@ maxint_t S2_trivial(maxint_t x, int threads, double alpha)
     return S2_trivial(x, y, xy, k, threads);
 }
 
-maxint_t S2_easy(maxint_t x, int threads, double alpha)
+maxint_t S2_easy(maxint_t x,
+                 int threads,
+                 double alpha)
 {
   if (x < 1)
     return 0;
@@ -396,7 +414,9 @@ maxint_t S2_easy(maxint_t x, int threads, double alpha)
     return S2_easy(x, y, xy, k, threads);
 }
 
-maxint_t S2_hard(maxint_t x, int threads, double alpha)
+maxint_t S2_hard(maxint_t x,
+                 int threads,
+                 double alpha)
 {
   if (x < 1)
     return 0;
