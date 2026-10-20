@@ -99,12 +99,12 @@ namespace primecount {
 /// Removes the (primes and) multiples of
 /// primes ≤ 71 from the sieve array.
 ///
-uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
+uint64_t Sieve::pre_sieve(uint64_t max_i, uint64_t low)
 {
   // PrimePi(5) = 3
   uint64_t primePi = 3;
 
-  if (c < 6)
+  if (max_i < 6)
     std::fill(sieve_.begin(), sieve_.end(), ~0ull);
   else
   {
@@ -118,7 +118,7 @@ uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
     {
       // Each pre_sieved_arrays[i] contains
       // exactly 2 sieving primes > 13.
-      if (c >= primePi + 2)
+      if (primePi + 2 <= max_i)
         primePi += 2;
       else
         return primePi;
