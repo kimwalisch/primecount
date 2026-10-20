@@ -1,4 +1,4 @@
-Changes in primecount-8.9, 2026-10-20
+Changes in primecount-9.0, 2026-10-20
 
 * AC_*.hpp: Remove redundant y bounds from the C1 formula.
 * Tests: Cover y = sqrt(x) and both FactorTable entry widths.
