@@ -11,6 +11,8 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <gourdon.hpp>
+#include <imath.hpp>
+#include <PhiTiny.hpp>
 #include <PiTable.hpp>
 
 #include <stdint.h>
@@ -86,6 +88,32 @@ int main()
       int128_t res3 = pi_gourdon_128(x, threads);
       std::cout << "pi_gourdon_128(" << x << ") = " << res3;
       check(res3 == res1);
+    #endif
+  }
+
+  // Test y = sqrt(x) for prime squares
+  const int64_t prime_squares[] = { 49, 1018081 };
+
+  for (int64_t x : prime_squares)
+  {
+    int64_t y = isqrt(x);
+    int64_t k = PhiTiny::get_k(iroot<4>(x));
+    int64_t expected = pi_meissel(x, threads);
+    int64_t res = AC(x, y, k, threads) - B(x, y, threads) +
+                  D(x, y, k, threads) + Phi0(x, y, k, threads) +
+                  Sigma(x, y, threads);
+
+    std::cout << "pi_gourdon_64(" << x << ", " << y << ") = " << res;
+    check(res == expected);
+
+    #ifdef HAVE_INT128_T
+      int128_t x128 = x;
+      int128_t res128 = AC(x128, y, k, threads) - B(x128, y, threads) +
+                        D(x128, y, k, threads) + Phi0(x128, y, k, threads) +
+                        Sigma(x128, y, threads);
+
+      std::cout << "pi_gourdon_128(" << x << ", " << y << ") = " << res128;
+      check(res128 == expected);
     #endif
   }
 

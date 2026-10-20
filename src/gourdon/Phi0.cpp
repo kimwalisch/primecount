@@ -7,10 +7,10 @@
 ///        page 3 of Gourdon's paper.
 ///
 ///        In Gourdon's paper Phi0 iterates over all square free
-///        numbers <= z whose largest prime factor <= y, with
-///        z = c * y. Since primecount uses c = 1, i.e. z = y, the
-///        computation of the ordinary leaves is identical to the
-///        Deleglise-Rivat algorithm (see S1.cpp).
+///        numbers <= z whose largest prime factor <= y. Since
+///        primecount uses z = y, the computation of the ordinary
+///        leaves is identical to the Deleglise-Rivat algorithm
+///        (see S1.cpp).
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
