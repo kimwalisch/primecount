@@ -240,7 +240,7 @@ int64_t pi_lmo_parallel(int64_t x,
     print("");
     print("=== pi_lmo_parallel(x) ===");
     print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-    print(x, y, xy, c, threads);
+    print(x, y, c, threads);
   }
 
   PiTable pi(y, threads);

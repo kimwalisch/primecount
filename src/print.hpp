@@ -37,7 +37,7 @@ bool is_print_combined_result();
 void print(string_view_t str);
 void print(string_view_t str, maxint_t res);
 void print(string_view_t str, maxint_t res, double time);
-void print(maxint_t x, int64_t y, int64_t xy, int64_t c, int threads);
+void print(maxint_t x, int64_t y, int64_t c, int threads);
 void print_vars(maxint_t x, int64_t y, int threads);
 void print_vars(maxint_t x, int64_t y, int64_t c, int threads);
 void print_seconds(double seconds);
