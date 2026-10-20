@@ -32,9 +32,9 @@ struct B_formula_params
 /// 3) The minimum alpha=1
 std::array<B_formula_params, 41> test_cases =
 {{
-  { 10, 2, 2 },
-  { 10, 2, 2 },
-  { 10, 2, 2 },
+  { 10, 3, 0 },
+  { 10, 3, 0 },
+  { 10, 3, 0 },
   { 100, 5, 6 },
   { 100, 8, 0 },
   { 100, 5, 6 },

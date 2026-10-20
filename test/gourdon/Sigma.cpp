@@ -32,9 +32,9 @@ struct Sigma_formula_params
 /// 3) The minimum alpha=1
 std::array<Sigma_formula_params, 41> test_cases =
 {{
-  { 10, 2, 1 },
-  { 10, 2, 1 },
-  { 10, 2, 1 },
+  { 10, 3, 2 },
+  { 10, 3, 2 },
+  { 10, 3, 2 },
   { 100, 5, 5 },
   { 100, 8, 4 },
   { 100, 5, 5 },

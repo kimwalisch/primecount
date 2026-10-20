@@ -33,9 +33,9 @@ struct AC_formula_params
 /// 3) The maximum alpha
 std::array<AC_formula_params, 43> test_cases =
 {{
-  { 10, 2, 0, 0 },
-  { 10, 2, 0, 0 },
-  { 10, 2, 0, 0 },
+  { 10, 3, 0, 0 },
+  { 10, 3, 0, 0 },
+  { 10, 3, 0, 0 },
   { 100, 5, 2, 0 },
   { 100, 5, 2, 0 },
   { 100, 8, 2, 0 },

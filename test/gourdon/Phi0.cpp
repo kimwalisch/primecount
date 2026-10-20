@@ -33,9 +33,9 @@ struct Phi0_formula_params
 /// 3) The maximum alpha
 std::array<Phi0_formula_params, 39> test_cases =
 {{
-  { 10, 2, 0, 5 },
-  { 10, 2, 0, 5 },
-  { 10, 2, 0, 5 },
+  { 10, 3, 0, 2 },
+  { 10, 3, 0, 2 },
+  { 10, 3, 0, 2 },
   { 100, 5, 2, 26 },
   { 100, 5, 2, 26 },
   { 100, 8, 2, 21 },
