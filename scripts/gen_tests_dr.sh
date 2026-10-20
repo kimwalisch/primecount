@@ -10,7 +10,7 @@ do
         res=$(./primecount 1e$i --$formula)
         x=$(./primecount 1e$i --$formula -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula -s | grep '^y =' | cut -f3 -d' ')
-        z=$(./primecount 1e$i --$formula -s | grep '^z =' | cut -f3 -d' ')
+        xy=$(./primecount 1e$i --$formula -s | grep '^xy =' | cut -f3 -d' ')
         c=$(./primecount 1e$i --$formula -s | grep '^c =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i -d -s | grep "${formula//-/_} = $res\$")
@@ -21,12 +21,12 @@ do
             exit 1
         fi
 
-        echo "{ ${x}LL, ${y}, ${z}, ${c}, ${res}LL },"
+        echo "{ ${x}, ${y}, ${xy}, ${c}, ${res} },"
 
         res=$(./primecount 1e$i --$formula --alpha=1)
         x=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^y =' | cut -f3 -d' ')
-        z=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^z =' | cut -f3 -d' ')
+        xy=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^xy =' | cut -f3 -d' ')
         c=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^c =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i --alpha=1 -d -s | grep "${formula//-/_} = $res\$")
@@ -37,12 +37,12 @@ do
             exit 1
         fi
 
-        echo "{ ${x}LL, ${y}, ${z}, ${c}, ${res}LL },"
+        echo "{ ${x}, ${y}, ${xy}, ${c}, ${res} },"
 
         res=$(./primecount 1e$i --$formula --alpha=10000000)
         x=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^y =' | cut -f3 -d' ')
-        z=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^z =' | cut -f3 -d' ')
+        xy=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^xy =' | cut -f3 -d' ')
         c=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^c =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i --alpha=10000000 -d -s | grep "${formula//-/_} = $res\$")
@@ -53,7 +53,7 @@ do
             exit 1
         fi
 
-        echo "{ ${x}LL, ${y}, ${z}, ${c}, ${res}LL },"
+        echo "{ ${x}, ${y}, ${xy}, ${c}, ${res} },"
     done
 
     # A few larger computations using default alpha
@@ -62,7 +62,7 @@ do
         res=$(./primecount 1e$i --$formula)
         x=$(./primecount 1e$i --$formula -s | grep '^x =' | cut -f3 -d' ')
         y=$(./primecount 1e$i --$formula -s | grep '^y =' | cut -f3 -d' ')
-        z=$(./primecount 1e$i --$formula -s | grep '^z =' | cut -f3 -d' ')
+        xy=$(./primecount 1e$i --$formula -s | grep '^xy =' | cut -f3 -d' ')
         c=$(./primecount 1e$i --$formula -s | grep '^c =' | cut -f3 -d' ')
 
         verify=$(./primecount 1e$i -d -s | grep "= $res\$")
@@ -73,7 +73,7 @@ do
             exit 1
         fi
 
-        echo "{ ${x}LL, ${y}, ${z}, ${c}, ${res}LL },"
+        echo "{ ${x}, ${y}, ${xy}, ${c}, ${res} },"
     done
 
     echo ""

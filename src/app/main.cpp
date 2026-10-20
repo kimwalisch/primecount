@@ -361,16 +361,16 @@ maxint_t S2_trivial(maxint_t x, int threads)
     throw primecount_error("S2_trivial(x): x is too large");
 #endif
 
-  int64_t z = (int64_t) (x / y);
+  int64_t xy = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
 
   if (is_print())
     set_print_variables(true);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return S2_trivial((int64_t) x, y, z, c, threads);
+    return S2_trivial((int64_t) x, y, xy, c, threads);
   else
-    return S2_trivial(x, y, z, c, threads);
+    return S2_trivial(x, y, xy, c, threads);
 }
 
 maxint_t S2_easy(maxint_t x, int threads)
@@ -389,16 +389,16 @@ maxint_t S2_easy(maxint_t x, int threads)
     throw primecount_error("S2_easy(x): x is too large");
 #endif
 
-  int64_t z = (int64_t) (x / y);
+  int64_t xy = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
 
   if (is_print())
     set_print_variables(true);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return S2_easy((int64_t) x, y, z, c, threads);
+    return S2_easy((int64_t) x, y, xy, c, threads);
   else
-    return S2_easy(x, y, z, c, threads);
+    return S2_easy(x, y, xy, c, threads);
 }
 
 maxint_t S2_hard(maxint_t x, int threads)
@@ -417,16 +417,16 @@ maxint_t S2_hard(maxint_t x, int threads)
     throw primecount_error("S2_hard(x): x is too large");
 #endif
 
-  int64_t z = (int64_t) (x / y);
+  int64_t xy = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
 
   if (is_print())
     set_print_variables(true);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return S2_hard((int64_t) x, y, z, c, threads);
+    return S2_hard((int64_t) x, y, xy, c, threads);
   else
-    return S2_hard(x, y, z, c, threads);
+    return S2_hard(x, y, xy, c, threads);
 }
 
 } // namespace

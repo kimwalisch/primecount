@@ -46,7 +46,7 @@ int main()
     double alpha = get_alpha_deleglise_rivat(x);
     int64_t y = (int64_t) (alpha * iroot<3>(x));
     int64_t pi_y = pi_noprint(y, threads);
-    int64_t z = x / y;
+    int64_t xy = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;
 
@@ -62,9 +62,9 @@ int main()
 
     std::cout << "S2(" << x << ", " << y << ") = " << s2;
 
-    check(s2 == S2_trivial(x, y, z, c, threads) +
-                S2_easy(x, y, z, c, threads) +
-                S2_hard(x, y, z, c, threads));
+    check(s2 == S2_trivial(x, y, xy, c, threads) +
+                S2_easy(x, y, xy, c, threads) +
+                S2_hard(x, y, xy, c, threads));
   }
 
   // test random x
@@ -74,7 +74,7 @@ int main()
     double alpha = get_alpha_deleglise_rivat(x);
     int64_t y = (int64_t) (alpha * iroot<3>(x));
     int64_t pi_y = pi_noprint(y, threads);
-    int64_t z = x / y;
+    int64_t xy = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;
 
@@ -90,9 +90,9 @@ int main()
 
     std::cout << "S2(" << x << ", " << y << ") = " << s2;
 
-    check(s2 == S2_trivial(x, y, z, c, threads) +
-                S2_easy(x, y, z, c, threads) +
-                S2_hard(x, y, z, c, threads));
+    check(s2 == S2_trivial(x, y, xy, c, threads) +
+                S2_easy(x, y, xy, c, threads) +
+                S2_hard(x, y, xy, c, threads));
   }
 
   std::cout << std::endl;

@@ -215,12 +215,12 @@ void print(string_view_t str, maxint_t res, double time)
 }
 
 /// Used by pi_lmo(x), pi_deleglise_rivat(x)
-void print(maxint_t x, int64_t y, int64_t z, int64_t c, int threads)
+void print(maxint_t x, int64_t y, int64_t xy, int64_t c, int threads)
 {
   double alpha = get_alpha(x, y);
   std::cout << "x = " << x << std::endl;
   std::cout << "y = " << y << std::endl;
-  std::cout << "z = " << z << std::endl;
+  std::cout << "xy = " << xy << std::endl;
   std::cout << "c = " << c << std::endl;
   std::cout << "alpha = " << to_string(alpha, 3) << std::endl;
   print_threads(threads);
@@ -231,11 +231,11 @@ void print_vars(maxint_t x, int64_t y, int threads)
 {
   if (is_print_variables())
   {
-    maxint_t z = x / y;
+    maxint_t xy = x / y;
     double alpha = get_alpha(x, y);
     std::cout << "x = " << x << std::endl;
     std::cout << "y = " << y << std::endl;
-    std::cout << "z = " << z << std::endl;
+    std::cout << "xy = " << xy << std::endl;
     std::cout << "alpha = " << to_string(alpha, 3) << std::endl;
     print_threads(threads);
     std::cout << std::endl;
@@ -247,8 +247,8 @@ void print_vars(maxint_t x, int64_t y, int64_t c, int threads)
 {
   if (is_print_variables())
   {
-    int64_t z = (int64_t)(x / y);
-    print(x, y, z, c, threads);
+    int64_t xy = (int64_t)(x / y);
+    print(x, y, xy, c, threads);
     std::cout << std::endl;
   }
 }

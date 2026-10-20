@@ -49,7 +49,7 @@ int main()
     int64_t x = i;
     int64_t y = iroot<3>(x);
     int64_t pi_y = pi_noprint(y, threads);
-    int64_t z = x / y;
+    int64_t xy = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;
 
@@ -64,7 +64,7 @@ int main()
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
     std::cout << "S2_hard(" << x << ", " << y << ") = " << s2;
-    check(s2 == S2_hard(x, y, z, c, threads));
+    check(s2 == S2_hard(x, y, xy, c, threads));
   }
 
   // test random x
@@ -73,7 +73,7 @@ int main()
     int64_t x = dist(gen);
     int64_t y = iroot<3>(x);
     int64_t pi_y = pi_noprint(y, threads);
-    int64_t z = x / y;
+    int64_t xy = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;
 
@@ -88,7 +88,7 @@ int main()
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
     std::cout << "S2_hard(" << x << ", " << y << ") = " << s2;
-    check(s2 == S2_hard(x, y, z, c, threads));
+    check(s2 == S2_hard(x, y, xy, c, threads));
   }
 
   std::cout << std::endl;

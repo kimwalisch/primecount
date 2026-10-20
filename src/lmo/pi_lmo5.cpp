@@ -164,7 +164,7 @@ int64_t pi_lmo5(int64_t x, bool is_print)
   double alpha = get_alpha_lmo(x);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
-  int64_t z = x / y;
+  int64_t xy = x / y;
   int64_t c = PhiTiny::get_c(y);
 
   if (is_print)
@@ -172,7 +172,7 @@ int64_t pi_lmo5(int64_t x, bool is_print)
     print("");
     print("=== pi_lmo5(x) ===");
     print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-    print(x, y, z, c, threads);
+    print(x, y, xy, c, threads);
   }
 
   PiTable pi(y, /* threads = */ 1);
