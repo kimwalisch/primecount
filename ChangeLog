@@ -1,5 +1,7 @@
 Changes in primecount-8.9, 2026-10-20
 
+* pi_gourdon.cpp: Allow y = x^(1/2) in Gourdon's algorithm, simplify y bounds.
+* util.cpp: Simplify get_x_star_gourdon(), round down x / y^2.
 * Use phi(x, k) instead of phi(x, c) in all prime counting algorithms.
 * print.cpp: Don't print z = x / y in the --status output.
 * Use xy = x / y instead of z = x / y in the LMO and Deleglise-Rivat algorithms.
