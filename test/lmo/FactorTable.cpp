@@ -69,6 +69,9 @@ int main()
   for (std::size_t i = 1; i < primes.size(); i++)
     prime_indexes[primes[i]] = (uint32_t) i;
 
+  // FactorTable<uint16_t>::max() requires p(32767) = 386083
+  check(primes[32767] == 386083);
+
   FactorTable<uint16_t> factorTable16(max, threads);
   FactorTable<uint32_t> factorTable32(max, threads);
   int64_t limit = factorTable16.first_coprime();
