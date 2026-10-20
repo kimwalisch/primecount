@@ -131,9 +131,11 @@ maxint_t AC(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_gourdon(x);
-  int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
+  int64_t x13 = iroot<3>(x);
+  int64_t x14 = iroot<4>(x);
   int64_t y = (int64_t)(x13 * alpha);
+  int64_t k = PhiTiny::get_k(x14);
 
   // x^(1/3) < y < x^(1/2)
   y = std::max(y, x13 + 1);
@@ -147,8 +149,6 @@ maxint_t AC(maxint_t x, int threads)
   if (x > (int128_t(y) << 62))
     throw primecount_error("AC(x): x is too large");
 #endif
-
-  int64_t k = PhiTiny::get_k(iroot<4>(x));
 
   if (is_print())
     set_print_variables(true);
@@ -197,9 +197,11 @@ maxint_t D(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_gourdon(x);
-  int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
+  int64_t x13 = iroot<3>(x);
+  int64_t x14 = iroot<4>(x);
   int64_t y = (int64_t)(x13 * alpha);
+  int64_t k = PhiTiny::get_k(x14);
 
   // x^(1/3) < y < x^(1/2)
   y = std::max(y, x13 + 1);
@@ -213,8 +215,6 @@ maxint_t D(maxint_t x, int threads)
   if (x > (int128_t(y) << 62))
     throw primecount_error("D(x): x is too large");
 #endif
-
-  int64_t k = PhiTiny::get_k(iroot<4>(x));
 
   if (is_print())
     set_print_variables(true);
@@ -231,9 +231,11 @@ maxint_t Phi0(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_gourdon(x);
-  int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
+  int64_t x13 = iroot<3>(x);
+  int64_t x14 = iroot<4>(x);
   int64_t y = (int64_t)(x13 * alpha);
+  int64_t k = PhiTiny::get_k(x14);
 
   // x^(1/3) < y < x^(1/2)
   y = std::max(y, x13 + 1);
@@ -247,8 +249,6 @@ maxint_t Phi0(maxint_t x, int threads)
   if (x > (int128_t(y) << 62))
     throw primecount_error("Phi0(x): x is too large");
 #endif
-
-  int64_t k = PhiTiny::get_k(iroot<4>(x));
 
   if (is_print())
     set_print_variables(true);
