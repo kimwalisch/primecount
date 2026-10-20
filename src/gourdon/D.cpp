@@ -166,7 +166,7 @@ T D_OpenMP(T x,
     while (loadBalancer.get_work(thread))
     {
       thread.start_time = get_time();
-      thread.sum = D_thread<T>(x, x_star, xy, y, k, primes, pi, factor, thread);
+      thread.sum = D_thread<T>(x, y, xy, k, x_star, primes, pi, factor, thread);
       thread.stop_time = get_time();
       sum += thread.sum;
     }

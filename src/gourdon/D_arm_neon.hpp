@@ -100,10 +100,10 @@ ALWAYS_INLINE uint32_t mask_count8_arm_neon(const uint32_t* factor_table,
 ///
 template <typename T, typename Primes, typename FactorTable>
 T D_thread_arm_neon(T x,
-                    int64_t x_star,
-                    int64_t xy,
                     int64_t y,
+                    int64_t xy,
                     int64_t k,
+                    int64_t x_star,
                     const Primes& primes,
                     const PiTable& pi,
                     const FactorTable& factor,

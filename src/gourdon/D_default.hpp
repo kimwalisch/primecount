@@ -52,10 +52,10 @@ using namespace primecount;
 ///
 template <typename T, typename Primes, typename FactorTable>
 T D_thread_default(T x,
-                   int64_t x_star,
-                   int64_t xy,
                    int64_t y,
+                   int64_t xy,
                    int64_t k,
+                   int64_t x_star,
                    const Primes& primes,
                    const PiTable& pi,
                    const FactorTable& factor,

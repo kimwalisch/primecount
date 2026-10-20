@@ -146,10 +146,10 @@ template <typename T, typename Primes, typename FactorTable>
   PRIMECOUNT_TARGET_ENTRY("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 #endif
 T D_thread_avx512(T x,
-                  int64_t x_star,
-                  int64_t xy,
                   int64_t y,
+                  int64_t xy,
                   int64_t k,
+                  int64_t x_star,
                   const Primes& primes,
                   const PiTable& pi,
                   const FactorTable& factor,
