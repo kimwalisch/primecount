@@ -30,8 +30,9 @@
 ///        sum of the ordinary leaves S1(x, a) in the
 ///        Lagarias-Miller-Odlyzko and Deleglise-Rivat algorithms.
 ///        The values above allow to replace the 1st if statement
-///        below used in the S1(x, a) and S2(x, a) formulas by the
-///        2nd new if statement which is obviously faster.
+///        below, used in the S2_hard (Deleglise-Rivat) and
+///        D (Gourdon) formulas, by the 2nd new if statement which
+///        is obviously faster.
 ///
 ///        * Old: if (mu[n] != 0 && lpf[n] > prime)
 ///        * New: if (factor[n] > 2*pi(prime) + 1)
