@@ -42,6 +42,10 @@ inline constexpr uint64_t max_a()
   return 8;
 }
 
+/// Xavier Gourdon's algorithm calls get_k(x^(1/4)) to
+/// satisfy k <= PrimePi[min(x_star, sqrt(x / y))], which
+/// holds since x_star >= x^(1/4) and y <= x^(1/2).
+///
 inline uint64_t get_k(uint64_t y)
 {
   if (y < pi.size())
