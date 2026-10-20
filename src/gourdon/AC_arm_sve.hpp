@@ -142,7 +142,7 @@ T A_arm_sve(T xlow,
 /// x / (primes[b] * m) <= y
 /// low <= x / (primes[b] * m) < high
 ///
-/// m is either a prime <= y or a product of 2 distinct primes.
+/// m is either a prime or a product of 2 distinct primes.
 /// In both cases m is coprime to the first b primes and m <= y.
 /// Since each prime factor of m is > (x / y)^(1/3) and y <= sqrt(x),
 /// m cannot contain more than 2 prime factors.
@@ -173,25 +173,19 @@ T C1_arm_sve(T xlow,
     return 0;
 
   // m = primes[i]
-  uint64_t max_prime = min(y, max_m);
+  uint64_t min_i = pi[min_m] + 1;
+  uint64_t max_i = pi[max_m];
 
-  if (min_m < max_prime)
-  {
-    uint64_t min_i = pi[min_m] + 1;
-    uint64_t max_i = pi[max_prime];
-
-    // for (i = min_i; i <= max_i; i++)
-    //   sum -= segmentedPi[xp / primes[i]] - b + 2;
-    sum -= sum_pi_arm_sve<T, 1>(xp, min_i, max_i, b, primes, segmentedPi);
-  }
+  // for (i = min_i; i <= max_i; i++)
+  //   sum -= segmentedPi[xp / primes[i]] - b + 2;
+  sum -= sum_pi_arm_sve<T, 1>(xp, min_i, max_i, b, primes, segmentedPi);
 
   // m = primes[i] * primes[j]
-  uint64_t max_q = min(y, isqrt(max_m));
-  uint64_t min_q = max(prime, min_m / y);
+  uint64_t max_q = isqrt(max_m);
 
-  if (min_q < max_q)
+  if (prime < max_q)
   {
-    uint64_t min_q_i = pi[min_q] + 1;
+    uint64_t min_q_i = b + 1;
     uint64_t max_q_i = pi[max_q];
 
     NO_UNROLL_LOOP
@@ -199,7 +193,7 @@ T C1_arm_sve(T xlow,
     {
       uint64_t q = primes[i];
       uint64_t min_r = max(q, min_m / q);
-      uint64_t max_r = min(y, max_m / q);
+      uint64_t max_r = max_m / q;
 
       if (min_r >= max_r)
         continue;
