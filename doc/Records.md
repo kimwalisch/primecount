@@ -26,17 +26,17 @@ to hardware errors and/or bugs in primecount.
 
 To verify a $\pi(x)$ computation, you compute $\pi(x)$ twice. But for the second
 run you use the `--double-check` option. The `--double-check` option enables the
-use of alternative alpha tuning factors, ensuring that all internal bounds in
+use of an alternative alpha tuning factor, ensuring that all internal bounds in
 the second computation differ slightly from the first run. This redundancy helps
 guard against potential bugs in primecount: if an error exists, it is highly
 unlikely that both $\pi(x)$ computations would produce the same (incorrect)
 result.
 
 ```bash
-# First pi(x) computation using default alpha tuning factors
+# First pi(x) computation using the default alpha tuning factor
 $ primecount 1e20 --status
 
-# Second pi(x) computation using alternative alpha tuning factors
+# Second pi(x) computation using an alternative alpha tuning factor
 $ primecount 1e20 --status --double-check
 ```
 

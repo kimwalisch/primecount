@@ -32,7 +32,7 @@ int status_precision_ = -1;
 /// Deleglise-Rivat and Gourdon algorithms.
 double alpha_ = -1;
 
-/// Recompute pi(x) with alternative alpha tuning factor(s) to
+/// Recompute pi(x) with an alternative alpha tuning factor to
 /// verify the first result. This redundancy helps guard
 /// against potential bugs in primecount: if an error exists,
 /// it is highly unlikely that both pi(x) computations would
@@ -145,8 +145,8 @@ double get_alpha_lmo(maxint_t x)
     alpha = a * logx2 + b * logx + c;
   }
 
-  // Recompute pi(x) with alternative alpha tuning
-  // factor(s) to verify the first result.
+  // Recompute pi(x) with an alternative alpha tuning
+  // factor to verify the first result.
   if (double_check_)
     alpha *= 0.97;
 
@@ -193,8 +193,8 @@ double get_alpha_deleglise_rivat(maxint_t x)
     }
   }
 
-  // Recompute pi(x) with alternative alpha tuning
-  // factor(s) to verify the first result.
+  // Recompute pi(x) with an alternative alpha tuning
+  // factor to verify the first result.
   if (double_check_)
     alpha *= 0.97;
 
@@ -241,8 +241,8 @@ double get_alpha_gourdon(maxint_t x)
     }
   }
 
-  // Recompute pi(x) with alternative alpha tuning
-  // factor(s) to verify the first result.
+  // Recompute pi(x) with an alternative alpha tuning
+  // factor to verify the first result.
   if (double_check_)
     alpha *= 0.97;
 
