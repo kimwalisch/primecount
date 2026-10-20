@@ -1,16 +1,14 @@
 ///
 /// @file  Phi0.cpp
 /// @brief Calculate the contribution of the ordinary leaves in
-///        Xavier Gourdon's prime counting algorithm. Note that the
-///        Phi0 formula on the 7th page of Gourdon's paper is not
-///        correct, however the correct Phi0 formula can be found on
-///        page 3 of Gourdon's paper.
-///
-///        In Gourdon's paper Phi0 iterates over all square free
-///        numbers <= z whose largest prime factor <= y. Since
-///        primecount uses z = y, the computation of the ordinary
-///        leaves is identical to the Deleglise-Rivat algorithm
-///        (see S1.cpp).
+///        Xavier Gourdon's prime counting algorithm. The Phi0
+///        formula on pages 6 and 7 of Gourdon's paper sums over
+///        the square free numbers n <= y, which is only correct
+///        for z = y. The general Phi0 formula on page 3 sums over
+///        the square free numbers n <= z with prime factors <= y.
+///        Since primecount uses z = y, both formulas coincide and
+///        the computation of the ordinary leaves is identical to
+///        the Deleglise-Rivat algorithm (see S1.cpp).
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -62,7 +60,7 @@ T Phi0_thread(T x,
 }
 
 /// Parallel computation of the ordinary leaves.
-/// Run time: O(y)
+/// Run time: O(y * log(log(y)))
 /// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
