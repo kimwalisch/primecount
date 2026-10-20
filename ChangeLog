@@ -1,5 +1,6 @@
 Changes in primecount-8.9, 2026-10-20
 
+* AC_*.hpp: Remove redundant y bounds from the C1 formula.
 * Tests: Cover y = sqrt(x) and both FactorTable entry widths.
 * pi_gourdon.cpp: Allow y = x^(1/2) in Gourdon's algorithm, simplify y bounds.
 * util.cpp: Simplify get_x_star_gourdon(), round down x / y^2.
