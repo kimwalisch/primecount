@@ -1,5 +1,6 @@
 Changes in primecount-9.0, 2026-10-21
 
+* D.cpp: Reduce the prime count lookup table and prime vector sizes.
 * AC.cpp: Limit the prime count lookup table and prime vector to y.
 * test.cpp: Support --alpha in --test, run tests after parsing all options.
 * Pass alpha as function parameter, --alpha no longer affects nested pi(x) computations.
