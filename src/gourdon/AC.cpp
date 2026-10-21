@@ -16,9 +16,7 @@
 #include <primecount-internal.hpp>
 #include <cpu_arch_macros.hpp>
 #include <gourdon.hpp>
-#include <imath.hpp>
 #include <int128_t.hpp>
-#include <min.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
 
@@ -79,7 +77,6 @@ namespace primecount {
 
 int64_t AC(int64_t x,
            int64_t y,
-           int64_t z,
            int64_t k,
            int threads,
            bool is_print)
@@ -91,23 +88,20 @@ int64_t AC(int64_t x,
     print("");
     print("=== AC(x, y) ===");
     print(AC_algo_name());
-    print_gourdon_vars(x, y, z, k, threads);
+    print_gourdon_vars(x, y, k, threads);
     time = get_time();
   }
 
   int64_t x_star = get_x_star_gourdon(x, y);
-  int64_t max_c_prime = y;
-  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
-  int64_t max_prime = max(max_a_prime, max_c_prime);
 
   // The A and C algorithms use the large PiTable only
   // for initialization. The inner-most loops of those
   // algorithms use the small SegmentedPiTable instead
   // which fits into the CPU's cache.
-  PiTable pi(max_prime, threads);
+  PiTable pi(y, threads);
 
-  auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-  int64_t sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, pi, primes, threads, is_print);
+  auto primes = pi.get_primes<uint32_t>(y, threads);
+  int64_t sum = AC_OpenMP((uint64_t) x, y, k, x_star, pi, primes, threads, is_print);
 
   if (is_print)
     print("A + C", sum, time);
@@ -119,7 +113,6 @@ int64_t AC(int64_t x,
 
 int128_t AC(int128_t x,
             int64_t y,
-            int64_t z,
             int64_t k,
             int threads,
             bool is_print)
@@ -131,32 +124,29 @@ int128_t AC(int128_t x,
     print("");
     print("=== AC(x, y) ===");
     print(AC_algo_name());
-    print_gourdon_vars(x, y, z, k, threads);
+    print_gourdon_vars(x, y, k, threads);
     time = get_time();
   }
 
   int64_t x_star = get_x_star_gourdon(x, y);
-  int64_t max_c_prime = y;
-  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
-  int64_t max_prime = max(max_a_prime, max_c_prime);
 
   // The A and C algorithms use the large PiTable only
   // for initialization. The inner-most loops of those
   // algorithms use the small SegmentedPiTable instead
   // which fits into the CPU's cache.
-  PiTable pi(max_prime, threads);
+  PiTable pi(y, threads);
   int128_t sum;
 
   // uses less memory
-  if (max_prime <= pstd::numeric_limits<uint32_t>::max())
+  if (y <= pstd::numeric_limits<uint32_t>::max())
   {
-    auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, pi, primes, threads, is_print);
+    auto primes = pi.get_primes<uint32_t>(y, threads);
+    sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
   else
   {
-    auto primes = pi.get_primes<int64_t>(max_prime, threads);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, pi, primes, threads, is_print);
+    auto primes = pi.get_primes<int64_t>(y, threads);
+    sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
 
   if (is_print)

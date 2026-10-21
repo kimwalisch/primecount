@@ -46,8 +46,8 @@ namespace {
 template <typename T, typename Primes>
 T S2_easy_OpenMP(T x,
                  int64_t y,
-                 int64_t z,
-                 int64_t c,
+                 int64_t xy,
+                 int64_t k,
                  const PiTable& pi,
                  const Primes& primes,
                  int threads,
@@ -59,14 +59,14 @@ T S2_easy_OpenMP(T x,
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t thread_threshold = 1000;
-  int max_threads = (int) std::pow(z, 1 / 4.0);
+  int max_threads = (int) std::pow(xy, 1 / 4.0);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
 
   StatusS2 status(x, y, is_print);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
-  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(c, pi_sqrty) + 1);
+  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_sqrty) + 1);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
   #pragma omp parallel num_threads(threads) reduction(+: sum)
@@ -76,7 +76,7 @@ T S2_easy_OpenMP(T x,
     T xp = x / prime;
     int64_t min_trivial = min(xp / prime, y);
     int64_t min_clustered = (int64_t) isqrt(xp);
-    int64_t min_sparse = z / prime;
+    int64_t min_sparse = xy / prime;
 
     min_clustered = in_between(prime, min_clustered, y);
     min_sparse = in_between(prime, min_sparse, y);
@@ -93,7 +93,7 @@ T S2_easy_OpenMP(T x,
       // Find all clustered easy leaves where
       // successive leaves are identical.
       // pq = primes[b] * primes[i]
-      // Which satisfy: pq > z && x / pq <= y
+      // Which satisfy: pq > x / y && x / pq <= y
       // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
       //
       // The clustered easy leaves algorithm has poor instruction
@@ -135,7 +135,7 @@ T S2_easy_OpenMP(T x,
     // Find all sparse easy leaves where
     // successive leaves are different.
     // pq = primes[b] * primes[i]
-    // Which satisfy: pq > z && x / pq <= y
+    // Which satisfy: pq > x / y && x / pq <= y
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
     for (; i > pi_min_sparse; i--)
     {
@@ -168,7 +168,7 @@ template <typename T,
           typename LibdividePrimes>
 T S2_easy_64(T xp128,
              uint64_t y,
-             uint64_t z,
+             uint64_t xy,
              uint64_t b,
              uint64_t prime,
              const LibdividePrimes& primes,
@@ -177,7 +177,7 @@ T S2_easy_64(T xp128,
   uint64_t xp = (uint64_t) xp128;
   uint64_t min_trivial = min(xp / prime, y);
   uint64_t min_clustered = isqrt(xp);
-  uint64_t min_sparse = z / prime;
+  uint64_t min_sparse = xy / prime;
   min_clustered = in_between(prime, min_clustered, y);
   min_sparse = in_between(prime, min_sparse, y);
   uint64_t i = pi[min_trivial];
@@ -194,7 +194,7 @@ T S2_easy_64(T xp128,
     // Find all clustered easy leaves where
     // successive leaves are identical.
     // pq = primes[b] * primes[i]
-    // Which satisfy: pq > z && x / pq <= y
+    // Which satisfy: pq > x / y && x / pq <= y
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
     //
     // The clustered easy leaves algorithm has poor instruction
@@ -236,7 +236,7 @@ T S2_easy_64(T xp128,
   // Find all sparse easy leaves where
   // successive leaves are different.
   // pq = primes[b] * primes[i]
-  // Which satisfy: pq > z && x / pq <= y
+  // Which satisfy: pq > x / y && x / pq <= y
   // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
   for (; i > pi_min_sparse; i--)
   {
@@ -252,7 +252,7 @@ template <typename T,
           typename Primes>
 T S2_easy_128(T xp,
               uint64_t y,
-              uint64_t z,
+              uint64_t xy,
               uint64_t b,
               uint64_t prime,
               const Primes& primes,
@@ -260,7 +260,7 @@ T S2_easy_128(T xp,
 {
   uint64_t min_trivial = min(xp / prime, y);
   uint64_t min_clustered = (uint64_t) isqrt(xp);
-  uint64_t min_sparse = z / prime;
+  uint64_t min_sparse = xy / prime;
   min_clustered = in_between(prime, min_clustered, y);
   min_sparse = in_between(prime, min_sparse, y);
   uint64_t i = pi[min_trivial];
@@ -277,7 +277,7 @@ T S2_easy_128(T xp,
     // Find all clustered easy leaves where
     // successive leaves are identical.
     // pq = primes[b] * primes[i]
-    // Which satisfy: pq > z && x / pq <= y
+    // Which satisfy: pq > x / y && x / pq <= y
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
     //
     // The clustered easy leaves algorithm has poor instruction
@@ -319,7 +319,7 @@ T S2_easy_128(T xp,
   // Find all sparse easy leaves where
   // successive leaves are different.
   // pq = primes[b] * primes[i]
-  // Which satisfy: pq > z && x / pq <= y
+  // Which satisfy: pq > x / y && x / pq <= y
   // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
   for (; i > pi_min_sparse; i--)
   {
@@ -337,8 +337,8 @@ template <typename T,
           typename Primes>
 T S2_easy_OpenMP(T x,
                  int64_t y,
-                 int64_t z,
-                 int64_t c,
+                 int64_t xy,
+                 int64_t k,
                  const PiTable& pi,
                  const Primes& primes,
                  int threads,
@@ -356,14 +356,14 @@ T S2_easy_OpenMP(T x,
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t thread_threshold = 1000;
-  int max_threads = (int) std::pow(z, 1 / 4.0);
+  int max_threads = (int) std::pow(xy, 1 / 4.0);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
 
   StatusS2 status(x, y, is_print);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
-  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(c, pi_sqrty) + 1);
+  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_sqrty) + 1);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
   #pragma omp parallel num_threads(threads) reduction(+: sum)
@@ -373,9 +373,9 @@ T S2_easy_OpenMP(T x,
     T xp = x / prime;
 
     if (xp <= pstd::numeric_limits<uint64_t>::max())
-      sum += S2_easy_64(xp, y, z, b, prime, lprimes, pi);
+      sum += S2_easy_64(xp, y, xy, b, prime, lprimes, pi);
     else
-      sum += S2_easy_128(xp, y, z, b, prime, primes, pi);
+      sum += S2_easy_128(xp, y, xy, b, prime, primes, pi);
 
     #if defined(_OPENMP) && _OPENMP >= 202011
       #pragma omp masked
@@ -406,8 +406,8 @@ namespace primecount {
 
 int64_t S2_easy(int64_t x,
                 int64_t y,
-                int64_t z,
-                int64_t c,
+                int64_t xy,
+                int64_t k,
                 int threads,
                 bool is_print)
 {
@@ -418,13 +418,13 @@ int64_t S2_easy(int64_t x,
     print("");
     print("=== S2_easy(x, y) ===");
     print_algo_name();
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
   PiTable pi(y, threads);
   auto primes = pi.get_primes<uint32_t>(y, threads);
-  int64_t sum = S2_easy_OpenMP((uint64_t) x, y, z, c, pi, primes, threads, is_print);
+  int64_t sum = S2_easy_OpenMP((uint64_t) x, y, xy, k, pi, primes, threads, is_print);
 
   if (is_print)
     print("S2_easy", sum, time);
@@ -436,8 +436,8 @@ int64_t S2_easy(int64_t x,
 
 int128_t S2_easy(int128_t x,
                  int64_t y,
-                 int64_t z,
-                 int64_t c,
+                 int64_t xy,
+                 int64_t k,
                  int threads,
                  bool is_print)
 {
@@ -448,7 +448,7 @@ int128_t S2_easy(int128_t x,
     print("");
     print("=== S2_easy(x, y) ===");
     print_algo_name();
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
@@ -459,12 +459,12 @@ int128_t S2_easy(int128_t x,
   if (y <= pstd::numeric_limits<uint32_t>::max())
   {
     auto primes = pi.get_primes<uint32_t>(y, threads);
-    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, pi, primes, threads, is_print);
+    sum = S2_easy_OpenMP((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
   }
   else
   {
     auto primes = pi.get_primes<int64_t>(y, threads);
-    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, pi, primes, threads, is_print);
+    sum = S2_easy_OpenMP((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
   }
 
   if (is_print)

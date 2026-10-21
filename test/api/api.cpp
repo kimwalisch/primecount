@@ -135,21 +135,17 @@ int main()
     check(get_num_threads() == 2);
   }
 
-  std::pair<double, double> alphas1 = get_alpha_gourdon(1ull << 50);
+  double alpha1 = get_alpha_gourdon(1ull << 50);
 
   set_double_check(true);
-  std::pair<double, double> alphas2 = get_alpha_gourdon(1ull << 50);
-  std::cout << "set_double_check(true) alpha_y: " << alphas2.first;
-  check(alphas2.first != alphas1.first);
-  std::cout << "set_double_check(true) alpha_z: " << alphas2.second;
-  check(alphas2.second != alphas1.second);
+  double alpha2 = get_alpha_gourdon(1ull << 50);
+  std::cout << "set_double_check(true) alpha: " << alpha2;
+  check(alpha2 != alpha1);
 
   set_double_check(false);
-  std::pair<double, double> alphas3 = get_alpha_gourdon(1ull << 50);
-  std::cout << "set_double_check(false) alpha_y: " << alphas3.first;
-  check(alphas3.first == alphas1.first);
-  std::cout << "set_double_check(false) alpha_z: " << alphas3.second;
-  check(alphas3.second == alphas1.second);
+  double alpha3 = get_alpha_gourdon(1ull << 50);
+  std::cout << "set_double_check(false) alpha: " << alpha3;
+  check(alpha3 == alpha1);
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;

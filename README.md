@@ -93,8 +93,8 @@ Count the number of primes less than or equal to x (<= 10^31).
 Options:
 
   -d, --deleglise-rivat        Count primes using the Deleglise-Rivat algorithm
-      --double-check           Recompute pi(x) with alternative alpha tuning
-                               factor(s) to verify the first result.
+      --double-check           Recompute pi(x) with an alternative alpha tuning
+                               factor to verify the first result.
   -g, --gourdon                Count primes using Xavier Gourdon's algorithm.
                                This is the default algorithm.
   -l, --legendre               Count primes using Legendre's formula
@@ -136,8 +136,7 @@ Advanced options for the Deleglise-Rivat algorithm:
 
 Advanced options for Xavier Gourdon's algorithm:
 
-      --alpha-y=NUM            Set tuning factor: y = x^(1/3) * alpha_y
-      --alpha-z=NUM            Set tuning factor: z = y * alpha_z
+  -a, --alpha=NUM              Set tuning factor: y = x^(1/3) * alpha
       --AC                     Compute the A + C formulas
       --B                      Compute the B formula
       --D                      Compute the D formula

@@ -39,7 +39,7 @@ template <int MU, typename T, typename vect>
 T S1_thread(T x,
             int64_t y,
             uint64_t b,
-            int64_t c,
+            int64_t k,
             T square_free,
             const vect& primes)
 {
@@ -49,8 +49,8 @@ T S1_thread(T x,
   {
     T next = square_free * primes[b];
     if (next > y) break;
-    s1 += MU * phi_tiny(x / next, c);
-    s1 += S1_thread<-MU>(x, y, b, c, next, primes);
+    s1 += MU * phi_tiny(x / next, k);
+    s1 += S1_thread<-MU>(x, y, b, k, next, primes);
   }
 
   return s1;
@@ -63,7 +63,7 @@ T S1_thread(T x,
 template <typename X, typename Y>
 X S1_OpenMP(X x,
             Y y,
-            int64_t c,
+            int64_t k,
             int threads)
 {
   // These load balancing settings work well on my
@@ -73,13 +73,13 @@ X S1_OpenMP(X x,
 
   auto primes = generate_primes<Y>(y);
   int64_t pi_y = primes.size() - 1;
-  X s1 = phi_tiny(x, c);
+  X s1 = phi_tiny(x, k);
 
   #pragma omp parallel for num_threads(threads) schedule(static, 1) reduction (+: s1)
-  for (int64_t b = c + 1; b <= pi_y; b++)
+  for (int64_t b = k + 1; b <= pi_y; b++)
   {
-    s1 -= phi_tiny(x / primes[b], c);
-    s1 += S1_thread<1>(x, y, b, c, (X) primes[b], primes);
+    s1 -= phi_tiny(x / primes[b], k);
+    s1 += S1_thread<1>(x, y, b, k, (X) primes[b], primes);
   }
 
   return s1;
@@ -91,7 +91,7 @@ namespace primecount {
 
 int64_t S1(int64_t x,
            int64_t y,
-           int64_t c,
+           int64_t k,
            int threads,
            bool is_print)
 {
@@ -101,11 +101,11 @@ int64_t S1(int64_t x,
   {
     print("");
     print("=== S1(x, y) ===");
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
-  int64_t s1 = S1_OpenMP(x, (uint32_t) y, c, threads);
+  int64_t s1 = S1_OpenMP(x, (uint32_t) y, k, threads);
 
   if (is_print)
     print("S1", s1, time);
@@ -117,7 +117,7 @@ int64_t S1(int64_t x,
 
 int128_t S1(int128_t x,
             int64_t y,
-            int64_t c,
+            int64_t k,
             int threads,
             bool is_print)
 {
@@ -127,7 +127,7 @@ int128_t S1(int128_t x,
   {
     print("");
     print("=== S1(x, y) ===");
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
@@ -135,9 +135,9 @@ int128_t S1(int128_t x,
 
   // uses less memory
   if (y <= pstd::numeric_limits<uint32_t>::max())
-    s1 = S1_OpenMP(x, (uint32_t) y, c, threads);
+    s1 = S1_OpenMP(x, (uint32_t) y, k, threads);
   else
-    s1 = S1_OpenMP(x, y, c, threads);
+    s1 = S1_OpenMP(x, y, k, threads);
 
   if (is_print)
     print("S1", s1, time);

@@ -64,12 +64,12 @@ public:
   }
 
   template <typename T>
-  void pre_sieve(const Vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
+  void pre_sieve(const Vector<T>& primes, uint64_t max_i, uint64_t low, uint64_t high)
   {
-    uint64_t primePi = pre_sieve(c, low);
+    uint64_t primePi = pre_sieve(max_i, low);
     resize_sieve(low, high);
 
-    for (uint64_t i = primePi + 1; i <= c; i++)
+    for (uint64_t i = primePi + 1; i <= max_i; i++)
       cross_off(primes[i], i);
   }
 
@@ -104,7 +104,7 @@ private:
   void allocate_counter(uint64_t low);
   void reset_counter();
   void resize_sieve(uint64_t low, uint64_t high);
-  uint64_t pre_sieve(uint64_t c, uint64_t low);
+  uint64_t pre_sieve(uint64_t max_i, uint64_t low);
   uint64_t segment_size() const;
   static const Array<uint64_t, 240> unset_smaller;
   static const Array<uint64_t, 240> unset_larger;

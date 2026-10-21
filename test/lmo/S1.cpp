@@ -42,7 +42,7 @@ int main()
   {
     int64_t x = dist(gen);
     int64_t y = iroot<3>(x);
-    int64_t c = PhiTiny::get_c(y);
+    int64_t k = PhiTiny::get_k(y);
     int64_t s1 = 0;
 
     auto primes = generate_primes<uint32_t>(y);
@@ -51,11 +51,11 @@ int main()
 
     // ordinary leaves
     for (int64_t n = 1; n <= y; n++)
-      if (lpf[n] > primes[c])
-        s1 += mu[n] * phi_tiny(x / n, c);
+      if (lpf[n] > primes[k])
+        s1 += mu[n] * phi_tiny(x / n, k);
 
     std::cout << "S1(" << x << ", " << y << ") = " << s1;
-    check(s1 == S1(x, y, c, threads));
+    check(s1 == S1(x, y, k, threads));
   }
 
   std::cout << std::endl;

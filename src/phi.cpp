@@ -117,24 +117,24 @@ public:
       return phi_cache(x, a) * SIGN;
 
     int64_t sum;
-    int64_t c = PhiTiny::max_a();
-    int64_t larger_c = min(max_a_cached_, a);
-    larger_c = max(c, larger_c);
-    ASSERT(c < a);
+    int64_t k = PhiTiny::max_a();
+    int64_t larger_k = min(max_a_cached_, a);
+    larger_k = max(k, larger_k);
+    ASSERT(k < a);
 
-    // Usually our algorithm starts at c because phi(x, c) can be
-    // computed in O(1) time using phi_tiny(x, c). However, if a
-    // larger value of c is cached, then it is better to start at that
-    // value, since phi_cache(x, larger_c) also takes O(1) time.
-    if (is_cached(x, larger_c))
-      sum = phi_cache(x, (c = larger_c)) * SIGN;
+    // Usually our algorithm starts at k because phi(x, k) can be
+    // computed in O(1) time using phi_tiny(x, k). However, if a
+    // larger value of k is cached, then it is better to start at that
+    // value, since phi_cache(x, larger_k) also takes O(1) time.
+    if (is_cached(x, larger_k))
+      sum = phi_cache(x, (k = larger_k)) * SIGN;
     else
-      sum = phi_tiny(x, c) * SIGN;
+      sum = phi_tiny(x, k) * SIGN;
 
     int64_t sqrtx = isqrt(x);
     int64_t i;
 
-    for (i = c + 1; i <= a; i++)
+    for (i = k + 1; i <= a; i++)
     {
       // phi(x / prime[i], i - 1) = 1 if x / prime[i] <= prime[i-1].
       // However we can do slightly better:
@@ -375,8 +375,8 @@ int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
     return phi_pix(x, a, threads);
 
   auto primes = pi.get_n_primes<uint32_t>(a);
-  int64_t c = min(PhiTiny::max_a(), a);
-  int64_t sum = phi_tiny(x, c);
+  int64_t k = min(PhiTiny::max_a(), a);
+  int64_t sum = phi_tiny(x, k);
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -392,7 +392,7 @@ int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
     PhiCache cache(x, a, primes, pi);
 
     #pragma omp for nowait schedule(dynamic, 16)
-    for (int64_t i = c + 1; i <= a; i++)
+    for (int64_t i = k + 1; i <= a; i++)
       sum += cache.phi<-1>(x / primes[i], i - 1);
   }
 

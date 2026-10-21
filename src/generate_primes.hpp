@@ -44,11 +44,6 @@ generate_primes(int64_t max)
 /// Returns a vector with Möbius function values
 Vector<int8_t> generate_moebius(int64_t max, const Vector<uint32_t>& primes);
 
-/// Returns a vector with the largest prime
-/// factors of the integers <= max.
-///
-Vector<uint32_t> generate_mpf(int64_t max, const Vector<uint32_t>& primes);
-
 /// Returns a vector with the least prime
 /// factors of the integers <= max.
 ///

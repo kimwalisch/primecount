@@ -16,9 +16,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "8.9"
-#define PRIMECOUNT_VERSION_MAJOR 8
-#define PRIMECOUNT_VERSION_MINOR 9
+#define PRIMECOUNT_VERSION "9.0"
+#define PRIMECOUNT_VERSION_MAJOR 9
+#define PRIMECOUNT_VERSION_MINOR 0
 
 #ifdef __cplusplus
 extern "C" {
@@ -113,7 +113,7 @@ int primecount_get_num_threads(void);
 void primecount_set_num_threads(int num_threads);
 
 /*
- * Recompute pi(x) with alternative alpha tuning factor(s) to
+ * Recompute pi(x) with an alternative alpha tuning factor to
  * verify the first result. This redundancy helps guard 
  * against potential bugs in primecount: if an error exists,
  * it is highly unlikely that both pi(x) computations would

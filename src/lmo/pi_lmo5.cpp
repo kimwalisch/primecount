@@ -15,7 +15,7 @@
 ///
 ///        Lagarias-Miller-Odlyzko formula:
 ///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
-///        with y = x^(1/3), a = pi(y)
+///        with y = alpha * x^(1/3), a = pi(y)
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -44,7 +44,7 @@ namespace {
 /// Calculate the contribution of the special leaves
 int64_t S2(int64_t x,
            int64_t y,
-           int64_t c,
+           int64_t k,
            const PiTable& pi,
            const Vector<uint32_t>& primes,
            const Vector<uint32_t>& lpf,
@@ -80,11 +80,11 @@ int64_t S2(int64_t x,
     int64_t high = min(low + segment_size, limit);
     int64_t low1 = max(low, 1);
 
-    sieve.pre_sieve(primes, c, low, high);
+    sieve.pre_sieve(primes, k, low, high);
     sieve.init_counter(low, high);
-    int64_t b = c + 1;
+    int64_t b = k + 1;
 
-    // For c + 1 <= b <= pi_sqrty
+    // For k + 1 <= b <= pi_sqrty
     // Find all special leaves in the current segment that are
     // composed of a prime and a square free number:
     // low <= x / (primes[b] * m) < high
@@ -155,24 +155,25 @@ namespace primecount {
 /// Run time: O(x^(2/3) / log x)
 /// Memory usage: O(x^(1/3) * (log x)^2)
 ///
-int64_t pi_lmo5(int64_t x, bool is_print)
+int64_t pi_lmo5(int64_t x,
+                double alpha,
+                bool is_print)
 {
   if (x < 2)
     return 0;
 
   int threads = 1;
-  double alpha = get_alpha_lmo(x);
+  alpha = get_alpha_lmo(x, alpha);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
-  int64_t z = x / y;
-  int64_t c = PhiTiny::get_c(y);
+  int64_t k = PhiTiny::get_k(y);
 
   if (is_print)
   {
     print("");
     print("=== pi_lmo5(x) ===");
     print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-    print(x, y, z, c, threads);
+    print(x, y, k, threads);
   }
 
   PiTable pi(y, /* threads = */ 1);
@@ -182,8 +183,8 @@ int64_t pi_lmo5(int64_t x, bool is_print)
 
   int64_t pi_y = pi[y];
   int64_t p2 = P2(x, y, pi_y, threads);
-  int64_t s1 = S1(x, y, c, threads, is_print);
-  int64_t s2 = S2(x, y, c, pi, primes, lpf, mu, is_print);
+  int64_t s1 = S1(x, y, k, threads, is_print);
+  int64_t s2 = S2(x, y, k, pi, primes, lpf, mu, is_print);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

@@ -49,8 +49,8 @@ int main()
     int64_t x = i;
     int64_t y = iroot<3>(x);
     int64_t pi_y = pi_noprint(y, threads);
-    int64_t z = x / y;
-    int64_t c = PhiTiny::get_c(y);
+    int64_t xy = x / y;
+    int64_t k = PhiTiny::get_k(y);
     int64_t s2 = 0;
 
     auto primes = generate_primes<uint32_t>(y);
@@ -58,13 +58,13 @@ int main()
     auto mu = generate_moebius(y, primes);
 
     // special leaves
-    for (int64_t b = c + 1; b < pi_y; b++)
+    for (int64_t b = k + 1; b < pi_y; b++)
       for (int64_t m = (y / primes[b]) + 1; m <= y; m++)
         if (lpf[m] > primes[b])
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
     std::cout << "S2_hard(" << x << ", " << y << ") = " << s2;
-    check(s2 == S2_hard(x, y, z, c, threads));
+    check(s2 == S2_hard(x, y, xy, k, threads));
   }
 
   // test random x
@@ -73,8 +73,8 @@ int main()
     int64_t x = dist(gen);
     int64_t y = iroot<3>(x);
     int64_t pi_y = pi_noprint(y, threads);
-    int64_t z = x / y;
-    int64_t c = PhiTiny::get_c(y);
+    int64_t xy = x / y;
+    int64_t k = PhiTiny::get_k(y);
     int64_t s2 = 0;
 
     auto primes = generate_primes<uint32_t>(y);
@@ -82,13 +82,13 @@ int main()
     auto mu = generate_moebius(y, primes);
 
     // special leaves
-    for (int64_t b = c + 1; b < pi_y; b++)
+    for (int64_t b = k + 1; b < pi_y; b++)
       for (int64_t m = (y / primes[b]) + 1; m <= y; m++)
         if (lpf[m] > primes[b])
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
     std::cout << "S2_hard(" << x << ", " << y << ") = " << s2;
-    check(s2 == S2_hard(x, y, z, c, threads));
+    check(s2 == S2_hard(x, y, xy, k, threads));
   }
 
   std::cout << std::endl;

@@ -9,7 +9,7 @@
 ///
 ///         How to add a new command-line option:
 ///
-///         1) Add a new option enum in CmdOptions.h.
+///         1) Add a new option enum in CmdOptions.hpp.
 ///         2) Add your option to parseOptions() in CmdOptions.cpp.
 ///         3) Add your option to main() in main.cpp.
 ///         4) Document your option in help.cpp (--help option summary)
@@ -232,8 +232,8 @@ double getAlpha(const Option& opt)
 namespace primecount {
 
 void help(int exitCode);
+void test(double alpha);
 void version();
-void test();
 
 void CmdOptions::setMainOption(OptionID optionID,
                                const std::string& optStr)
@@ -268,8 +268,6 @@ CmdOptions parseOptions(int argc, char** argv)
   {
     { "-a", std::make_pair(OPTION_ALPHA, REQUIRED_PARAM) },
     { "--alpha", std::make_pair(OPTION_ALPHA, REQUIRED_PARAM) },
-    { "--alpha-y", std::make_pair(OPTION_ALPHA_Y, REQUIRED_PARAM) },
-    { "--alpha-z", std::make_pair(OPTION_ALPHA_Z, REQUIRED_PARAM) },
     { "-d", std::make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
     { "--deleglise-rivat", std::make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
     { "--deleglise-rivat-64", std::make_pair(OPTION_DELEGLISE_RIVAT_64, NO_PARAM) },
@@ -341,20 +339,23 @@ CmdOptions parseOptions(int argc, char** argv)
 
     switch (optionID)
     {
-      case OPTION_ALPHA:        set_alpha(getAlpha(opt)); break;
-      case OPTION_ALPHA_Y:      set_alpha_y(getAlpha(opt)); break;
-      case OPTION_ALPHA_Z:      set_alpha_z(getAlpha(opt)); break;
+      case OPTION_ALPHA:        opts.alpha = getAlpha(opt); break;
       case OPTION_DOUBLE_CHECK: set_double_check(true); break;
       case OPTION_HELP:         help(/* exitCode */ 0); break;
       case OPTION_NUMBER:       numbers.push_back(getVal<maxint_t>(opt)); break;
       case OPTION_STATUS:       opts.optionStatus(opt); break;
-      case OPTION_TEST:         test(); break;
       case OPTION_THREADS:      set_num_threads(getVal<int>(opt)); break;
       case OPTION_TIME:         opts.time = true; break;
       case OPTION_VERSION:      version(); break;
       default:                  opts.setMainOption(optionID, opt.str);
     }
   }
+
+  // test() runs all tests and exits.
+  // Run the tests after all options have been parsed,
+  // so that e.g. --alpha and --threads are applied.
+  if (opts.option == OPTION_TEST)
+    test(opts.alpha);
 
   if (opts.option == OPTION_PHI)
   {

@@ -8,7 +8,7 @@
 ///         phi(x / n, b - 1) = 1
 ///         with n = primes[b] * primes[l]
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -49,13 +49,13 @@ int main()
     int64_t x13 = iroot<3>(x);
     double alpha = get_alpha_deleglise_rivat(x);
     int64_t y = (int64_t)(x13 * alpha);
-    int64_t z = x / y;
-    int64_t c = PhiTiny::get_c(y);
+    int64_t xy = x / y;
+    int64_t k = PhiTiny::get_k(y);
     int64_t s2_trivial = 0;
 
     auto primes = generate_primes<int64_t>(y);
 
-    for (size_t b = c + 1; b < primes.size(); b++)
+    for (size_t b = k + 1; b < primes.size(); b++)
     {
       for (size_t l = b + 1; l < primes.size(); l++)
       {
@@ -69,7 +69,7 @@ int main()
     }
 
     std::cout << "S2_trivial(" << x << ", " << y << ") = " << s2_trivial;
-    check(s2_trivial == S2_trivial(x, y, z, c, threads));
+    check(s2_trivial == S2_trivial(x, y, xy, k, threads));
   }
 
   std::cout << std::endl;

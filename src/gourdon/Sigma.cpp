@@ -6,7 +6,7 @@
 ///        have a runtime complexity of O(y) and hence it does not
 ///        make much sense to use multi-threading.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -110,7 +110,7 @@ int64_t Sigma(int64_t x,
   {
     print("");
     print("=== Sigma(x, y) ===");
-    print_gourdon_vars(x, y, threads);
+    print_vars(x, y, threads);
     time = get_time();
   }
 
@@ -151,7 +151,7 @@ int128_t Sigma(int128_t x,
   {
     print("");
     print("=== Sigma(x, y) ===");
-    print_gourdon_vars(x, y, threads);
+    print_vars(x, y, threads);
     time = get_time();
   }
 

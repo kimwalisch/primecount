@@ -48,8 +48,7 @@ int main()
 
       for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
       {
-        set_alpha(alpha);
-        int64_t res2 = pi_lmo_parallel(x, threads);
+        int64_t res2 = pi_lmo_parallel(x, threads, alpha);
         std::cout << "alpha = " << alpha << ", pi_lmo_parallel(" << x << ") = " << res2;
         check(res2 == res1);
       }
@@ -72,8 +71,7 @@ int main()
 
       for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
       {
-        set_alpha(alpha);
-        int64_t res2 = pi_lmo_parallel(x, threads);
+        int64_t res2 = pi_lmo_parallel(x, threads, alpha);
         std::cout << "alpha = " << alpha << ", pi_lmo_parallel(" << x << ") = " << res2;
         check(res2 == res1);
       }
@@ -88,8 +86,7 @@ int main()
 
     for (double alpha : alphas)
     {
-      set_alpha(alpha);
-      int64_t res2 = pi_lmo_parallel(x, threads);
+      int64_t res2 = pi_lmo_parallel(x, threads, alpha);
       std::cout << "alpha = " << alpha << ", pi_lmo_parallel(" << x << ") = " << res2;
       check(res2 == res1);
     }

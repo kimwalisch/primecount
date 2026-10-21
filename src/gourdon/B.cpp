@@ -124,7 +124,7 @@ int64_t B(int64_t x,
   {
     print("");
     print("=== B(x, y) ===");
-    print_gourdon_vars(x, y, threads);
+    print_vars(x, y, threads);
     time = get_time();
   }
 
@@ -149,7 +149,7 @@ int128_t B(int128_t x,
   {
     print("");
     print("=== B(x, y) ===");
-    print_gourdon_vars(x, y, threads);
+    print_vars(x, y, threads);
     time = get_time();
   }
 

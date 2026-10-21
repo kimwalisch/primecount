@@ -4,7 +4,7 @@
 ///         S2_easy(x, y) used in the Lagarias-Miller-Odlyzko
 ///         and Deleglise-Rivat prime counting algorithms.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -54,16 +54,16 @@ int main()
       double alpha = get_alpha_deleglise_rivat(x);
       int64_t x13 = iroot<3>(x);
       int64_t y = (int64_t) (alpha * x13);
-      int64_t z = x / y;
-      int64_t c = PhiTiny::get_c(y);
+      int64_t xy = x / y;
+      int64_t k = PhiTiny::get_k(y);
       int64_t pi_sqrty = pi[isqrt(y)];
       int64_t pi_x13 = pi[x13];
       int64_t s2_easy = 0;
 
-      for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+      for (int64_t b = max(k, pi_sqrty) + 1; b <= pi_x13; b++)
       {
         int64_t min_trivial = min(x / (primes[b] * primes[b]), y);
-        int64_t min_sparse = max(z / primes[b], primes[b]);
+        int64_t min_sparse = max(xy / primes[b], primes[b]);
         int64_t l = pi[min_trivial];
 
         for (; primes[l] > min_sparse; l--)
@@ -71,7 +71,7 @@ int main()
       }
 
       std::cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
-      check(s2_easy == S2_easy(x, y, z, c, threads));
+      check(s2_easy == S2_easy(x, y, xy, k, threads));
     }
   }
 
@@ -95,16 +95,16 @@ int main()
       double alpha = get_alpha_deleglise_rivat(x);
       int64_t x13 = iroot<3>(x);
       int64_t y = (int64_t) (alpha * x13);
-      int64_t z = x / y;
-      int64_t c = PhiTiny::get_c(y);
+      int64_t xy = x / y;
+      int64_t k = PhiTiny::get_k(y);
       int64_t pi_sqrty = pi[isqrt(y)];
       int64_t pi_x13 = pi[x13];
       int64_t s2_easy = 0;
 
-      for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+      for (int64_t b = max(k, pi_sqrty) + 1; b <= pi_x13; b++)
       {
         int64_t min_trivial = min(x / (primes[b] * primes[b]), y);
-        int64_t min_sparse = max(z / primes[b], primes[b]);
+        int64_t min_sparse = max(xy / primes[b], primes[b]);
         int64_t l = pi[min_trivial];
 
         for (; primes[l] > min_sparse; l--)
@@ -112,7 +112,7 @@ int main()
       }
 
       std::cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
-      check(s2_easy == S2_easy(x, y, z, c, threads));
+      check(s2_easy == S2_easy(x, y, xy, k, threads));
     }
   }
 

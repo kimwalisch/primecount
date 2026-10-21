@@ -20,8 +20,6 @@ namespace primecount {
 enum OptionID
 {
   OPTION_ALPHA,
-  OPTION_ALPHA_Y,
-  OPTION_ALPHA_Z,
   OPTION_DEFAULT,
   OPTION_DELEGLISE_RIVAT,
   OPTION_DELEGLISE_RIVAT_64,
@@ -90,6 +88,7 @@ struct CmdOptions
   int option = OPTION_DEFAULT;
   maxint_t x = -1;
   int64_t a = -1;
+  double alpha = -1;
   bool time = false;
 
   void setMainOption(OptionID optionID, const std::string& optStr);

@@ -23,23 +23,12 @@
 #include <sstream>
 #include <string>
 #include <stdint.h>
-#include <utility>
 
 namespace {
 
 int status_precision_ = -1;
 
-/// Tuning factor used in the Lagarias-Miller-Odlyzko
-/// and Deleglise-Rivat algorithms.
-double alpha_ = -1;
-
-/// Tuning factor used in Xavier Gourdon's algorithm
-double alpha_y_ = -1;
-
-/// Tuning factor used in Xavier Gourdon's algorithm
-double alpha_z_ = -1;
-
-/// Recompute pi(x) with alternative alpha tuning factor(s) to
+/// Recompute pi(x) with an alternative alpha tuning factor to
 /// verify the first result. This redundancy helps guard
 /// against potential bugs in primecount: if an error exists,
 /// it is highly unlikely that both pi(x) computations would
@@ -103,38 +92,8 @@ void set_double_check(bool enable)
   double_check_ = enable;
 }
 
-void set_alpha(double alpha)
-{
-  // If alpha < 1 then we compute a good
-  // alpha tuning factor at runtime.
-  if (alpha < 1.0)
-    alpha_ = -1;
-  else
-    alpha_ = truncate3(alpha);
-}
-
-void set_alpha_y(double alpha_y)
-{
-  // If alpha_y < 1 then we compute a good
-  // alpha tuning factor at runtime.
-  if (alpha_y < 1.0)
-    alpha_y_ = -1;
-  else
-    alpha_y_ = truncate3(alpha_y);
-}
-
-void set_alpha_z(double alpha_z)
-{
-  // If alpha_z < 1 then we compute a good
-  // alpha tuning factor at runtime.
-  if (alpha_z < 1.0)
-    alpha_z_ = -1;
-  else
-    alpha_z_ = truncate3(alpha_z);
-}
-
-/// Tuning factor used in the Lagarias-Miller-Odlyzko
-/// and Deleglise-Rivat algorithms.
+/// Tuning factor used in the Lagarias-Miller-Odlyzko,
+/// Deleglise-Rivat and Gourdon algorithms.
 ///
 double get_alpha(maxint_t x, int64_t y)
 {
@@ -151,45 +110,13 @@ double get_alpha(maxint_t x, int64_t y)
   return alpha;
 }
 
-/// Tuning factor used in Xavier Gourdon's algorithm.
-double get_alpha_y(maxint_t x, int64_t y)
-{
-  // y = x13 * alpha_y, thus alpha = y / x13
-  double x13 = (double) iroot<3>(x);
-  double alpha_y = (double) y / x13;
-  double max_alpha_y = (double) y;
-  int64_t verify_y = (int64_t)(x13 * alpha_y);
-
-  // Prevent x^(1/3) * alpha_y = 23.99999...
-  if (verify_y < y)
-    alpha_y = std::nextafter(alpha_y, max_alpha_y);
-
-  return alpha_y;
-}
-
-/// Tuning factor used in Xavier Gourdon's algorithm.
-double get_alpha_z(int64_t y, int64_t z)
-{
-  // z = y * alpha_z, thus alpha_z = z / y
-  double alpha_z = (double) z / y;
-  double max_alpha_z = (double) z;
-  int64_t verify_z = (int64_t)(y * alpha_z);
-
-  // Prevent y * alpha_z = 23.99999...
-  if (verify_z < z)
-    alpha_z = std::nextafter(alpha_z, max_alpha_z);
-
-  return alpha_z;
-}
-
 /// Get the Lagarias-Miller-Odlyzko alpha tuning factor.
 /// alpha = a log(x)^2 + b log(x) + c
 /// a, b and c have been determined empirically.
 /// @see doc/alpha-factor-lmo.pdf
 ///
-double get_alpha_lmo(maxint_t x)
+double get_alpha_lmo(maxint_t x, double alpha)
 {
-  double alpha = alpha_;
   double x16 = (double) iroot<6>(x);
 
   // use default alpha if no command-line alpha provided
@@ -203,8 +130,8 @@ double get_alpha_lmo(maxint_t x)
     alpha = a * logx2 + b * logx + c;
   }
 
-  // Recompute pi(x) with alternative alpha tuning
-  // factor(s) to verify the first result.
+  // Recompute pi(x) with an alternative alpha tuning
+  // factor to verify the first result.
   if (double_check_)
     alpha *= 0.97;
 
@@ -220,9 +147,8 @@ double get_alpha_lmo(maxint_t x)
 /// a, b, c and d have been determined empirically.
 /// @see doc/alpha-factor-dr.pdf
 ///
-double get_alpha_deleglise_rivat(maxint_t x)
+double get_alpha_deleglise_rivat(maxint_t x, double alpha)
 {
-  double alpha = alpha_;
   double x16 = (double) iroot<6>(x);
 
   // Use default alpha
@@ -251,8 +177,8 @@ double get_alpha_deleglise_rivat(maxint_t x)
     }
   }
 
-  // Recompute pi(x) with alternative alpha tuning
-  // factor(s) to verify the first result.
+  // Recompute pi(x) with an alternative alpha tuning
+  // factor to verify the first result.
   if (double_check_)
     alpha *= 0.97;
 
@@ -263,124 +189,73 @@ double get_alpha_deleglise_rivat(maxint_t x)
   return in_between(1, alpha, x16);
 }
 
-/// In Xavier Gourdon's algorithm there are 2 alpha tuning
-/// factors. The alpha_y tuning factor should grow like
-/// O(log(x)^3) and the alpha_z tuning factor is a small
-/// constant. Both alpha_y and alpha_z should be determined
-/// experimentally by running benchmarks.
+/// Get the Xavier Gourdon alpha tuning factor.
+/// alpha = a log(x)^3 + b log(x)^2 + c log(x) + d
+/// a, b, c and d have been determined empirically.
 /// @see doc/alpha-factor-gourdon.pdf
 ///
-/// y = x^(1/3) * alpha_y, with alpha_y >= 1.
-/// z = y * alpha_z, with alpha_z >= 1.
-/// alpha_y * alpha_z <= x^(1/6)
-///
-std::pair<double, double> get_alpha_gourdon(maxint_t x)
+double get_alpha_gourdon(maxint_t x, double alpha)
 {
-  double alpha_y = alpha_y_;
-  double alpha_z = alpha_z_;
   double x16 = (double) iroot<6>(x);
-  double logx = std::log((double) x);
-  double alpha_yz;
 
-  // For x <= 10^11 our default formula does not
-  // generate good alpha values. Hence we use
-  // another formula optimized for small values.
-  if (x <= 1e11)
+  // Use default alpha
+  if (alpha < 1)
   {
-    double a = 0.078173;
-    double b = 1;
-    alpha_yz = a * logx + b;
-  }
-  else
-  {
-    double a = 0.007888745747017503;
-    double b = -0.7610431057184933;
-    double c = 25.74106177417062;
-    double d = -288.9823576050215;
-    double logx2 = logx * logx;
-    double logx3 = logx * logx * logx;
-    alpha_yz = a * logx3 + b * logx2 + c * logx + d;
-  }
-
-  // Use default alpha_z
-  if (alpha_z < 1)
-  {
-    // y = x^(1/3) * alpha_y
-    // z = y * alpha_z
-    //
-    // alpha_y should grow like O(log(x)^3) just like in the
-    // Deleglise-Rivat algorithm whereas alpha_z is a small tuning
-    // factor usually within [1, 4]. alpha_z corresponds to the c
-    // constant in Gourdon's paper. The alpha_y and alpha_z tuning
-    // factors are used to balance the work between the A, B, C and
-    // D formulas. The algorithm is theoretically most efficient
-    // (i.e. uses the fewest instructions) if y == z, hence if
-    // alpha_z = 1. When using the default alpha_y, increasing
-    // alpha_z automatically decreases alpha_y. This speeds up the
-    // A, C and D formulas at the expense of a longer running B
-    // formula.
-    alpha_z = 1.0;
-
-    // alpha_z should be significantly smaller than alpha_y
-    alpha_z = in_between(1, alpha_yz / 5, alpha_z);
+    // For x <= 10^11 our default formula does not
+    // generate good alpha values. Hence we use
+    // another formula optimized for small values.
+    if (x <= 1e11)
+    {
+      double a = 0.078173;
+      double b = 1;
+      double logx = std::log((double) x);
+      alpha = a * logx + b;
+    }
+    else
+    {
+      double a = 0.007888745747017503;
+      double b = -0.7610431057184933;
+      double c = 25.74106177417062;
+      double d = -288.9823576050215;
+      double logx = std::log((double) x);
+      double logx2 = logx * logx;
+      double logx3 = logx * logx * logx;
+      alpha = a * logx3 + b * logx2 + c * logx + d;
+    }
   }
 
-  // --double-check option for second pi(x) computation
+  // Recompute pi(x) with an alternative alpha tuning
+  // factor to verify the first result.
   if (double_check_)
-  {
-    alpha_z = max(1.0, alpha_z * 1.02);
-    alpha_yz = max(1.0, alpha_yz * 0.97);
-  }
-
-  // Use default alpha_y
-  if (alpha_y < 1)
-    alpha_y = alpha_yz / alpha_z;
+    alpha *= 0.97;
 
   // Preserve 3 digits after decimal point
-  alpha_y = in_between(1, alpha_y, x16);
-  alpha_y = truncate3(alpha_y);
-  alpha_z = truncate3(alpha_z);
+  alpha = in_between(1, alpha, x16);
+  alpha = truncate3(alpha);
 
-  // Ensure alpha_y * alpha_z <= x^(1/6)
-  alpha_y = in_between(1, alpha_y, x16);
-  double max_alpha_z = max(1.0, x16 / alpha_y);
-  alpha_z = in_between(1, alpha_z, max_alpha_z);
-
-  return std::make_pair(alpha_y, alpha_z);
+  return in_between(1, alpha, x16);
 }
 
 /// x_star = max(x^(1/4), x / y^2)
 ///
-/// After my implementation of Xavier Gourdon's algorithm worked for
-/// the first time there were still many miscalculations mainly for
-/// small numbers < 10^6. By debugging I found that most errors were
-/// related to the Sigma formulas (Σ0 - Σ6) and the x_star variable
-/// was responsible for most errors. For some unknown reason the
-/// bounds from Xavier's paper (max(x^(1/4), x / y^2)) don't seem to
-/// be enough. By trial and error I figured out a few more bounds that
-/// fix all miscalculations in my implementation.
+/// Gourdon's formulas require x_star <= (x / y)^(1/2):
+/// Sigma5 and parts of Sigma2 sum over the primes
+/// (x / y)^(1/2) < p <= x^(1/3) independently of x_star, whereas
+/// the A, C, Sigma3, Sigma4, Sigma6 formulas and the other
+/// parts of Sigma2 depend on x_star. For x^(1/3) < y <= x^(1/2)
+/// this bound holds if x / y^2 is rounded down.
 ///
 int64_t get_x_star_gourdon(maxint_t x, int64_t y)
 {
-  // For some unknown reason it is necessary
-  // to round up (x / y^2). Without rounding up
-  // there are many miscalculations below 2000
-  // in my implementation.
-  y = max(y, (int64_t) 1);
+  y = max(y, 1);
   maxint_t yy = (maxint_t) y * y;
-  maxint_t x_div_yy = ceil_div(x, yy);
+  int64_t x14 = iroot<4>(x);
+  int64_t x_star = max(x / yy, x14);
 
-  int64_t x_star = (int64_t) max(iroot<4>(x), x_div_yy);
-  int64_t sqrt_xy = (int64_t) isqrt(x / y);
-
-  // x_star <= y
-  // x_star <= (x / y)^(1/2)
-  // The bounds above are missing in Xavier Gourdon's
-  // paper. Without these bounds many of the 7 Sigma
-  // formulas (Σ0 - Σ6) return incorrect results for
-  // numbers below 10^6.
+  // x_star <= y holds if y >= x^(1/3), but for x = 2 and 3
+  // we use y = 1. Without this bound x_star > y would cause
+  // out of bounds PiTable accesses in AC and Sigma.
   x_star = min(x_star, y);
-  x_star = min(x_star, sqrt_xy);
   x_star = max(x_star, 1);
 
   return x_star;

@@ -215,13 +215,12 @@ void print(string_view_t str, maxint_t res, double time)
 }
 
 /// Used by pi_lmo(x), pi_deleglise_rivat(x)
-void print(maxint_t x, int64_t y, int64_t z, int64_t c, int threads)
+void print(maxint_t x, int64_t y, int64_t k, int threads)
 {
   double alpha = get_alpha(x, y);
   std::cout << "x = " << x << std::endl;
   std::cout << "y = " << y << std::endl;
-  std::cout << "z = " << z << std::endl;
-  std::cout << "c = " << c << std::endl;
+  std::cout << "k = " << k << std::endl;
   std::cout << "alpha = " << to_string(alpha, 3) << std::endl;
   print_threads(threads);
 }
@@ -231,11 +230,9 @@ void print_vars(maxint_t x, int64_t y, int threads)
 {
   if (is_print_variables())
   {
-    maxint_t z = x / y;
     double alpha = get_alpha(x, y);
     std::cout << "x = " << x << std::endl;
     std::cout << "y = " << y << std::endl;
-    std::cout << "z = " << z << std::endl;
     std::cout << "alpha = " << to_string(alpha, 3) << std::endl;
     print_threads(threads);
     std::cout << std::endl;
@@ -243,54 +240,36 @@ void print_vars(maxint_t x, int64_t y, int threads)
 }
 
 /// Only enabled for partial formulas
-void print_vars(maxint_t x, int64_t y, int64_t c, int threads)
+void print_vars(maxint_t x, int64_t y, int64_t k, int threads)
 {
   if (is_print_variables())
   {
-    int64_t z = (int64_t)(x / y);
-    print(x, y, z, c, threads);
+    print(x, y, k, threads);
     std::cout << std::endl;
   }
 }
 
 /// Used by pi_gourdon(x)
-void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
+void print_gourdon(maxint_t x, int64_t y, int64_t k, int threads)
 {
   int64_t x_star = get_x_star_gourdon(x, y);
-  double alpha_y = get_alpha_y(x, y);
-  double alpha_z = get_alpha_z(y, z);
+  double alpha = get_alpha(x, y);
 
   std::cout << "x = " << x << std::endl;
   std::cout << "y = " << y << std::endl;
-  std::cout << "z = " << z << std::endl;
   std::cout << "k = " << k << std::endl;
   std::cout << "x_star = " << x_star << std::endl;
-  std::cout << "alpha_y = " << to_string(alpha_y, 3) << std::endl;
-  std::cout << "alpha_z = " << to_string(alpha_z, 3) << std::endl;
+  std::cout << "alpha = " << to_string(alpha, 3) << std::endl;
 
   print_threads(threads);
 }
 
 /// Only enabled for partial formulas
-void print_gourdon_vars(maxint_t x, int64_t y, int threads)
+void print_gourdon_vars(maxint_t x, int64_t y, int64_t k, int threads)
 {
   if (is_print_variables())
   {
-    double alpha_y = get_alpha_y(x, y);
-    std::cout << "x = " << x << std::endl;
-    std::cout << "y = " << y << std::endl;
-    std::cout << "alpha_y = " << to_string(alpha_y, 3) << std::endl;
-    print_threads(threads);
-    std::cout << std::endl;
-  }
-}
-
-/// Only enabled for partial formulas
-void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
-{
-  if (is_print_variables())
-  {
-    print_gourdon(x, y, z, k, threads);
+    print_gourdon(x, y, k, threads);
     std::cout << std::endl;
   }
 }

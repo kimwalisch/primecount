@@ -1,5 +1,24 @@
-Changes in primecount-8.9, 2026-10-13
+Changes in primecount-9.0, 2026-10-21
 
+* ci.yml: Compile Linux GCC tests with -march=x86-64, Ubuntu 26.04 enables AVX2.
+* D.cpp, D_*.hpp: Bound the first prime by x^(1/4) instead of x_star.
+* D.cpp: Reduce the prime count lookup table and prime vector sizes.
+* AC.cpp: Limit the prime count lookup table and prime vector to y.
+* test.cpp: Support --alpha in --test, run tests after parsing all options.
+* Pass alpha as function parameter, --alpha no longer affects nested pi(x) computations.
+* AC_*.hpp: Remove redundant y bounds from the C1 formula.
+* Tests: Cover y = sqrt(x) and both FactorTable entry widths.
+* pi_gourdon.cpp: Allow y = x^(1/2) in Gourdon's algorithm, simplify y bounds.
+* util.cpp: Simplify get_x_star_gourdon(), round down x / y^2.
+* Use phi(x, k) instead of phi(x, c) in all prime counting algorithms.
+* print.cpp: Don't print z = x / y in the --status output.
+* Use xy = x / y instead of z = x / y in the LMO and Deleglise-Rivat algorithms.
+* AC.cpp, D.cpp, Phi0.cpp: Remove z parameter, use y instead.
+* D.cpp: Use FactorTable instead of FactorTableD, remove FactorTableD.hpp.
+* util.cpp: Remove alpha_z tuning factor from Gourdon's algorithm, use z = y.
+* CmdOptions.cpp: Remove --alpha-y and --alpha-z, use --alpha for Gourdon's algorithm.
+* test/gourdon: Regenerate D, AC and Phi0 tests using y = z.
+* FactorTable.hpp: Reduce Deleglise-Rivat S2_hard memory using 16-bit prime factor ordinals.
 * D_avx2.hpp: AVX2 filtering for Gourdon's D algorithm.
 * D.cpp: Add AVX2 runtime dispatch.
 * test/gourdon/D_avx2.cpp: Test AVX2 filtering against scalar filtering.

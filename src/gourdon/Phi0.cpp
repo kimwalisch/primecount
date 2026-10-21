@@ -1,17 +1,14 @@
 ///
 /// @file  Phi0.cpp
 /// @brief Calculate the contribution of the ordinary leaves in
-///        Xavier Gourdon's prime counting algorithm. Note that the
-///        Phi0 formula on the 7th page of Gourdon's paper is not
-///        correct, however the correct Phi0 formula can be found on
-///        page 3 of Gourdon's paper.
-///
-///        The only difference in the computation of the ordinary
-///        leaves compared to the Deleglise-Rivat algorithm is that we
-///        iterate over all square free numbers <= z (instead of y)
-///        whose largest prime factor <= y, with z >= y and
-///        z < x^(1/2). Also the small constant is named k instead
-///        of c.
+///        Xavier Gourdon's prime counting algorithm. The Phi0
+///        formula on pages 6 and 7 of Gourdon's paper sums over
+///        the square free numbers n <= y, which is only correct
+///        for z = y. The general Phi0 formula on page 3 sums over
+///        the square free numbers n <= z with prime factors <= y.
+///        Since primecount uses z = y, both formulas coincide and
+///        the computation of the ordinary leaves is identical to
+///        the Deleglise-Rivat algorithm (see S1.cpp).
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -43,7 +40,7 @@ namespace {
 ///
 template <int MU, typename T, typename P>
 T Phi0_thread(T x,
-              int64_t z,
+              int64_t y,
               uint64_t b,
               int64_t k,
               T square_free,
@@ -54,22 +51,21 @@ T Phi0_thread(T x,
   for (b++; b < primes.size(); b++)
   {
     T next = square_free * primes[b];
-    if (next > z) break;
+    if (next > y) break;
     phi0 += MU * phi_tiny(x / next, k);
-    phi0 += Phi0_thread<-MU>(x, z, b, k, next, primes);
+    phi0 += Phi0_thread<-MU>(x, y, b, k, next, primes);
   }
 
   return phi0;
 }
 
 /// Parallel computation of the ordinary leaves.
-/// Run time: O(z)
+/// Run time: O(y * log(log(y)))
 /// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
 X Phi0_OpenMP(X x,
               Y y,
-              int64_t z,
               int64_t k,
               int threads)
 {
@@ -86,7 +82,7 @@ X Phi0_OpenMP(X x,
   for (int64_t b = k + 1; b <= pi_y; b++)
   {
     phi0 -= phi_tiny(x / primes[b], k);
-    phi0 += Phi0_thread<1>(x, z, b, k, (X) primes[b], primes);
+    phi0 += Phi0_thread<1>(x, y, b, k, (X) primes[b], primes);
   }
 
   return phi0;
@@ -98,7 +94,6 @@ namespace primecount {
 
 int64_t Phi0(int64_t x,
              int64_t y,
-             int64_t z,
              int64_t k,
              int threads,
              bool is_print)
@@ -109,11 +104,11 @@ int64_t Phi0(int64_t x,
   {
     print("");
     print("=== Phi0(x, y) ===");
-    print_gourdon_vars(x, y, z, k, threads);
+    print_gourdon_vars(x, y, k, threads);
     time = get_time();
   }
 
-  int64_t phi0 = Phi0_OpenMP(x, (uint32_t) y, z, k, threads);
+  int64_t phi0 = Phi0_OpenMP(x, (uint32_t) y, k, threads);
 
   if (is_print)
     print("Phi0", phi0, time);
@@ -125,7 +120,6 @@ int64_t Phi0(int64_t x,
 
 int128_t Phi0(int128_t x,
               int64_t y,
-              int64_t z,
               int64_t k,
               int threads,
               bool is_print)
@@ -136,7 +130,7 @@ int128_t Phi0(int128_t x,
   {
     print("");
     print("=== Phi0(x, y) ===");
-    print_gourdon_vars(x, y, z, k, threads);
+    print_gourdon_vars(x, y, k, threads);
     time = get_time();
   }
 
@@ -144,9 +138,9 @@ int128_t Phi0(int128_t x,
 
   // uses less memory
   if (y <= pstd::numeric_limits<uint32_t>::max())
-    phi0 = Phi0_OpenMP(x, (uint32_t) y, z, k, threads);
+    phi0 = Phi0_OpenMP(x, (uint32_t) y, k, threads);
   else
-    phi0 = Phi0_OpenMP(x, y, z, k, threads);
+    phi0 = Phi0_OpenMP(x, y, k, threads);
 
   if (is_print)
     print("Phi0", phi0, time);

@@ -36,37 +36,29 @@ namespace primecount {
 ///
 int64_t pi_gourdon_64(int64_t x,
                       int threads,
+                      double alpha,
                       bool is_print)
 {
   if (x < 2)
     return 0;
 
-  auto alpha = get_alpha_gourdon(x);
-  double alpha_y = alpha.first;
-  double alpha_z = alpha.second;
-  int64_t x13 = iroot<3>(x);
+  alpha = get_alpha_gourdon(x, alpha);
   int64_t sqrtx = isqrt(x);
-  int64_t y = (int64_t)(x13 * alpha_y);
+  int64_t x13 = iroot<3>(x);
+  int64_t x14 = iroot<4>(x);
+  int64_t y = (int64_t)(x13 * alpha);
+  int64_t k = PhiTiny::get_k(x14);
 
-  // x^(1/3) < y < x^(1/2)
+  // x^(1/3) < y <= x^(1/2)
   y = std::max(y, x13 + 1);
-  y = std::min(y, sqrtx - 1);
-  y = std::max(y, (int64_t) 1);
-
-  int64_t k = PhiTiny::get_k(x);
-  int64_t z = (int64_t)(y * alpha_z);
-
-  // y <= z < x^(1/2)
-  z = std::max(z, y);
-  z = std::min(z, sqrtx - 1);
-  z = std::max(z, (int64_t) 1);
+  y = std::min(y, sqrtx);
 
   if (is_print)
   {
     print("");
     print("=== pi_gourdon_64(x) ===");
     print("pi(x) = A - B + C + D + Phi0 + Sigma");
-    print_gourdon(x, y, z, k, threads);
+    print_gourdon(x, y, k, threads);
   }
 
   // For very short computations (< 1 second) we achieve the best
@@ -80,10 +72,10 @@ int64_t pi_gourdon_64(int64_t x,
   // both the CPU and operating system.
 
   int64_t sigma = Sigma(x, y, threads, is_print);
-  int64_t phi0 = Phi0(x, y, z, k, threads, is_print);
-  int64_t ac = AC(x, y, z, k, threads, is_print);
+  int64_t phi0 = Phi0(x, y, k, threads, is_print);
+  int64_t ac = AC(x, y, k, threads, is_print);
   int64_t b = B(x, y, threads, is_print);
-  int64_t d = D(x, y, z, k, threads, is_print);
+  int64_t d = D(x, y, k, threads, is_print);
   int64_t pix = ac - b + d + phi0 + sigma;
 
   verify_pix("pi_gourdon_64", x, pix);
@@ -100,23 +92,22 @@ int64_t pi_gourdon_64(int64_t x,
 ///
 int128_t pi_gourdon_128(int128_t x,
                         int threads,
+                        double alpha,
                         bool is_print)
 {
   if (x < 2)
     return 0;
 
-  auto alpha = get_alpha_gourdon(x);
-  double alpha_y = alpha.first;
-  double alpha_z = alpha.second;
-
-  int64_t x13 = iroot<3>(x);
+  alpha = get_alpha_gourdon(x, alpha);
   int64_t sqrtx = isqrt(x);
-  int64_t y = (int64_t)(x13 * alpha_y);
+  int64_t x13 = iroot<3>(x);
+  int64_t x14 = iroot<4>(x);
+  int64_t y = (int64_t)(x13 * alpha);
+  int64_t k = PhiTiny::get_k(x14);
 
-  // x^(1/3) < y < x^(1/2)
+  // x^(1/3) < y <= x^(1/2)
   y = std::max(y, x13 + 1);
-  y = std::min(y, sqrtx - 1);
-  y = std::max(y, (int64_t) 1);
+  y = std::min(y, sqrtx);
 
   // x / y is stored in int64_t variables, hence x / y must be
   // <= 2^63-1. We use 2^62 as a safety buffer to protect
@@ -124,20 +115,12 @@ int128_t pi_gourdon_128(int128_t x,
   if_unlikely(x > (int128_t(y) << 62))
     throw primecount_error("pi_gourdon_128(x): x is too large");
 
-  int64_t k = PhiTiny::get_k(x);
-  int64_t z = (int64_t)(y * alpha_z);
-
-  // y <= z < x^(1/2)
-  z = std::max(z, y);
-  z = std::min(z, sqrtx - 1);
-  z = std::max(z, (int64_t) 1);
-
   if (is_print)
   {
     print("");
     print("=== pi_gourdon_128(x) ===");
     print("pi(x) = A - B + C + D + Phi0 + Sigma");
-    print_gourdon(x, y, z, k, threads);
+    print_gourdon(x, y, k, threads);
   }
 
   // For very short computations (< 1 second) we achieve the best
@@ -151,10 +134,10 @@ int128_t pi_gourdon_128(int128_t x,
   // both the CPU and operating system.
 
   int128_t sigma = Sigma(x, y, threads, is_print);
-  int128_t phi0 = Phi0(x, y, z, k, threads, is_print);
-  int128_t ac = AC(x, y, z, k, threads, is_print);
+  int128_t phi0 = Phi0(x, y, k, threads, is_print);
+  int128_t ac = AC(x, y, k, threads, is_print);
   int128_t b = B(x, y, threads, is_print);
-  int128_t d = D(x, y, z, k, threads, is_print);
+  int128_t d = D(x, y, k, threads, is_print);
   int128_t pix = ac - b + d + phi0 + sigma;
 
   verify_pix("pi_gourdon_128", x, pix);

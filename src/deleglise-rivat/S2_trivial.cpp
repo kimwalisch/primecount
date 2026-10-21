@@ -10,7 +10,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -38,8 +38,8 @@ namespace {
 template <typename T>
 T S2_trivial(T x,
              int64_t y,
-             int64_t z,
-             int64_t c,
+             int64_t xy,
+             int64_t k,
              int threads)
 {
   if (y < 2)
@@ -47,9 +47,9 @@ T S2_trivial(T x,
 
   PiTable pi(y, threads);
   int64_t pi_y = pi[y];
-  int64_t sqrtz = isqrt(z);
-  int64_t prime_c = nth_prime(c);
-  int64_t start = std::max(prime_c, sqrtz) + 1;
+  int64_t sqrt_xy = isqrt(xy);
+  int64_t prime_k = nth_prime(k);
+  int64_t start = std::max(prime_k, sqrt_xy) + 1;
 
   if (start >= y)
     return 0;
@@ -58,7 +58,7 @@ T S2_trivial(T x,
   T sum = 0;
   int64_t prime;
 
-  // For all primes[b] > z^(1/2) && < x^(1/3):
+  // For all primes[b] > (x/y)^(1/2) && < x^(1/3):
   // (primes[b] < x / primes[b]^2 < y)
   // sum += pi[y] - pi[x / primes[b]^2]
   while ((prime = it.next_prime()) < y)
@@ -94,8 +94,8 @@ namespace primecount {
 
 int64_t S2_trivial(int64_t x,
                    int64_t y,
-                   int64_t z,
-                   int64_t c,
+                   int64_t xy,
+                   int64_t k,
                    int threads,
                    bool is_print)
 {
@@ -105,11 +105,11 @@ int64_t S2_trivial(int64_t x,
   {
     print("");
     print("=== S2_trivial(x, y) ===");
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
-  int64_t sum = ::S2_trivial(x, y, z, c, threads);
+  int64_t sum = ::S2_trivial(x, y, xy, k, threads);
 
   if (is_print)
     print("S2_trivial", sum, time);
@@ -121,8 +121,8 @@ int64_t S2_trivial(int64_t x,
 
 int128_t S2_trivial(int128_t x,
                     int64_t y,
-                    int64_t z,
-                    int64_t c,
+                    int64_t xy,
+                    int64_t k,
                     int threads,
                     bool is_print)
 {
@@ -132,11 +132,11 @@ int128_t S2_trivial(int128_t x,
   {
     print("");
     print("=== S2_trivial(x, y) ===");
-    print_vars(x, y, c, threads);
+    print_vars(x, y, k, threads);
     time = get_time();
   }
 
-  int128_t sum = ::S2_trivial(x, y, z, c, threads);
+  int128_t sum = ::S2_trivial(x, y, xy, k, threads);
 
   if (is_print)
     print("S2_trivial", sum, time);

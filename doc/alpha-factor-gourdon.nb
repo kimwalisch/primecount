@@ -1,6 +1,5 @@
 Notebook[{Cell[
-BoxData[RowBox[{"(*"," ",RowBox[{"List"," ","of"," ","fast"," ","Gourdon"," ","alpha"," ","factors"," ",RowBox[
-{"(",RowBox[{"alpha"," ","="," ",RowBox[{"alpha_y"," ","*"," ","alpha_z"}]}],")"}]," ","found"," ","by"," ","running"," ","pi",RowBox[
+BoxData[RowBox[{"(*"," ",RowBox[{"List"," ","of"," ","fast"," ","Gourdon"," ","alpha"," ","factors"," ","found"," ","by"," ","running"," ","pi",RowBox[
 {"(","x",")"}]," ","benchmarks"," ","using"," ","the"," ","find_optimal","_alpha",RowBox[
 {"_gourdon",".","sh"}]," ","script"}]," ","*)"}]],"Input",CellLabel -> "In[4]:= ",
 ExpressionUUID -> "f87dc3af-e904-4286-a802-feca0c120acd"],Cell[
