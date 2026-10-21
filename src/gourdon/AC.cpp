@@ -16,9 +16,7 @@
 #include <primecount-internal.hpp>
 #include <cpu_arch_macros.hpp>
 #include <gourdon.hpp>
-#include <imath.hpp>
 #include <int128_t.hpp>
-#include <min.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
 
@@ -95,17 +93,17 @@ int64_t AC(int64_t x,
   }
 
   int64_t x_star = get_x_star_gourdon(x, y);
-  int64_t max_c_prime = y;
-  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
-  int64_t max_prime = max(max_a_prime, max_c_prime);
 
+  // A primes satisfy p > x / y^2, hence q <= sqrt(x / p) < y.
+  // All C lookup arguments and prime factors are <= y too.
+  //
   // The A and C algorithms use the large PiTable only
   // for initialization. The inner-most loops of those
   // algorithms use the small SegmentedPiTable instead
   // which fits into the CPU's cache.
-  PiTable pi(max_prime, threads);
+  PiTable pi(y, threads);
 
-  auto primes = pi.get_primes<uint32_t>(max_prime, threads);
+  auto primes = pi.get_primes<uint32_t>(y, threads);
   int64_t sum = AC_OpenMP((uint64_t) x, y, k, x_star, pi, primes, threads, is_print);
 
   if (is_print)
@@ -134,26 +132,26 @@ int128_t AC(int128_t x,
   }
 
   int64_t x_star = get_x_star_gourdon(x, y);
-  int64_t max_c_prime = y;
-  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
-  int64_t max_prime = max(max_a_prime, max_c_prime);
 
+  // A primes satisfy p > x / y^2, hence q <= sqrt(x / p) < y.
+  // All C lookup arguments and prime factors are <= y too.
+  //
   // The A and C algorithms use the large PiTable only
   // for initialization. The inner-most loops of those
   // algorithms use the small SegmentedPiTable instead
   // which fits into the CPU's cache.
-  PiTable pi(max_prime, threads);
+  PiTable pi(y, threads);
   int128_t sum;
 
   // uses less memory
-  if (max_prime <= pstd::numeric_limits<uint32_t>::max())
+  if (y <= pstd::numeric_limits<uint32_t>::max())
   {
-    auto primes = pi.get_primes<uint32_t>(max_prime, threads);
+    auto primes = pi.get_primes<uint32_t>(y, threads);
     sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
   else
   {
-    auto primes = pi.get_primes<int64_t>(max_prime, threads);
+    auto primes = pi.get_primes<int64_t>(y, threads);
     sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
 

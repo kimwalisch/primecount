@@ -31,7 +31,7 @@ struct AC_formula_params
 /// 1) The default alpha
 /// 2) The minimum alpha=1
 /// 3) The maximum alpha
-std::array<AC_formula_params, 43> test_cases =
+std::array<AC_formula_params, 67> test_cases =
 {{
   { 10, 3, 0, 0 },
   { 10, 3, 0, 0 },
@@ -76,7 +76,35 @@ std::array<AC_formula_params, 43> test_cases =
   { 394702, 149, 8, 6475 },
   { 394703, 149, 8, 6476 },
   { 397715, 149, 8, 6570 },
-  { 397716, 149, 8, 6570 }
+  { 397716, 149, 8, 6570 },
+  // Small inputs, including x_star clamped to y for x = 2 and 3
+  { 2, 1, 0, 0 },
+  { 3, 1, 0, 0 },
+  { 4, 2, 0, 0 },
+  { 7, 2, 0, 0 },
+  { 8, 2, 0, 0 },
+  { 9, 3, 0, 0 },
+  { 49, 7, 1, 0 },
+  { 72, 5, 1, 0 },
+  // The previous A prime bound exceeds y at x = 484 through 499
+  { 483, 10, 2, 6 },
+  { 484, 10, 2, 6 },
+  { 499, 10, 2, 6 },
+  { 500, 10, 2, 5 },
+  // PiTable block boundary: the previous limit reaches 240
+  { 3167999, 239, 8, 46119 },
+  { 3168000, 239, 8, 46119 },
+  { 3198775, 239, 8, 46231 },
+  { 3198776, 239, 8, 46231 },
+  { 3168000, 240, 8, 46223 },
+  { 3168000, 241, 8, 46782 },
+  // Square and 10^8 boundaries
+  { 99980000, 9999, 8, 3086785 },
+  { 99980001, 9999, 8, 3086785 },
+  { 99980002, 9999, 8, 3086785 },
+  { 99999999, 465, 8, 657446 },
+  { 100000000, 465, 8, 657446 },
+  { 100000001, 465, 8, 657446 }
 }};
 
 void check(bool OK)
