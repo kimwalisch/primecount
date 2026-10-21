@@ -94,9 +94,6 @@ int64_t AC(int64_t x,
 
   int64_t x_star = get_x_star_gourdon(x, y);
 
-  // A primes satisfy p > x / y^2, hence q <= sqrt(x / p) < y.
-  // All C lookup arguments and prime factors are <= y too.
-  //
   // The A and C algorithms use the large PiTable only
   // for initialization. The inner-most loops of those
   // algorithms use the small SegmentedPiTable instead
@@ -133,9 +130,6 @@ int128_t AC(int128_t x,
 
   int64_t x_star = get_x_star_gourdon(x, y);
 
-  // A primes satisfy p > x / y^2, hence q <= sqrt(x / p) < y.
-  // All C lookup arguments and prime factors are <= y too.
-  //
   // The A and C algorithms use the large PiTable only
   // for initialization. The inner-most loops of those
   // algorithms use the small SegmentedPiTable instead
