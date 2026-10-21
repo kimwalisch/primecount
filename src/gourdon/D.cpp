@@ -257,17 +257,8 @@ int128_t D(int128_t x,
   {
     FactorTable<uint32_t> factor(y, threads);
     PiTable pi(max_prime, threads);
-
-    if (max_prime <= UINT32_MAX)
-    {
-      auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-      sum = D_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
-    }
-    else
-    {
-      auto primes = pi.get_primes<int64_t>(max_prime, threads);
-      sum = D_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
-    }
+    auto primes = pi.get_primes<int64_t>(max_prime, threads);
+    sum = D_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
   }
 
   if (is_print)
