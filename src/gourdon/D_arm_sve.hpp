@@ -87,11 +87,11 @@ template <typename XP, typename Index, std::size_t N, std::size_t M>
 ALWAYS_INLINE void batch_div_arm_sve(XP xp,
                                      const Array<Index, N>& indexes,
                                      Array<int64_t, M>& xpm_low,
-                                     std::size_t m_count,
+                                     uint64_t m_count,
                                      uint64_t low)
 {
-  std::size_t i = 0;
-  std::size_t lanes = svcntd();
+  uint64_t i = 0;
+  uint64_t lanes = svcntd();
 
   NO_UNROLL_LOOP
   for (; i < m_count; i += lanes)

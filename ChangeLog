@@ -1,5 +1,6 @@
 Changes in primecount-9.0, 2026-10-21
 
+* D_arm_sve.hpp: Fix ambiguous svwhilelt_b64() call on macOS.
 * ci.yml: Compile Linux GCC tests with -march=x86-64, Ubuntu 26.04 enables AVX2.
 * D.cpp, D_*.hpp: Bound the first prime by x^(1/4) instead of x_star.
 * D.cpp: Reduce the prime count lookup table and prime vector sizes.
