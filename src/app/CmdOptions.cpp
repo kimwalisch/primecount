@@ -232,8 +232,8 @@ double getAlpha(const Option& opt)
 namespace primecount {
 
 void help(int exitCode);
+void test(double alpha);
 void version();
-void test();
 
 void CmdOptions::setMainOption(OptionID optionID,
                                const std::string& optStr)
@@ -344,13 +344,18 @@ CmdOptions parseOptions(int argc, char** argv)
       case OPTION_HELP:         help(/* exitCode */ 0); break;
       case OPTION_NUMBER:       numbers.push_back(getVal<maxint_t>(opt)); break;
       case OPTION_STATUS:       opts.optionStatus(opt); break;
-      case OPTION_TEST:         test(); break;
       case OPTION_THREADS:      set_num_threads(getVal<int>(opt)); break;
       case OPTION_TIME:         opts.time = true; break;
       case OPTION_VERSION:      version(); break;
       default:                  opts.setMainOption(optionID, opt.str);
     }
   }
+
+  // test() runs all tests and exits.
+  // Run the tests after all options have been parsed,
+  // so that e.g. --alpha and --threads are applied.
+  if (opts.option == OPTION_TEST)
+    test(opts.alpha);
 
   if (opts.option == OPTION_PHI)
   {

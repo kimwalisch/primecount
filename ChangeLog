@@ -1,5 +1,6 @@
 Changes in primecount-9.0, 2026-10-20
 
+* test.cpp: Support --alpha in --test, run tests after parsing all options.
 * Pass alpha as function parameter, --alpha no longer affects nested pi(x) computations.
 * AC_*.hpp: Remove redundant y bounds from the C1 formula.
 * Tests: Cover y = sqrt(x) and both FactorTable entry widths.
