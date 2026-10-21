@@ -149,7 +149,7 @@ T D_thread_avx512(T x,
                   int64_t y,
                   int64_t xy,
                   int64_t k,
-                  int64_t x_star,
+                  int64_t x14,
                   const Primes& primes,
                   const PiTable& pi,
                   const FactorTable& factor,
@@ -161,8 +161,8 @@ T D_thread_avx512(T x,
   int64_t segment_size = thread.segment_size;
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t limit = min(low + segment_size * segments, xy);
-  int64_t max_b = pi[min3(isqrt(x / low1), isqrt(limit), x_star)];
-  int64_t min_b = pi[min(xy / limit, x_star)];
+  int64_t max_b = pi[min3(isqrt(x / low1), isqrt(limit), x14)];
+  int64_t min_b = pi[min(xy / limit, x14)];
   min_b = max(k, min_b) + 1;
 
   if (min_b > max_b)
@@ -360,7 +360,7 @@ T D_thread_avx512(T x,
       sieve.cross_off_count(prime, b);
     }
 
-    // For pi_sqrty < b <= pi_x_star
+    // For pi_sqrty < b <= pi_x14
     // Find all special leaves in the current segment
     // that are composed of 2 primes:
     // low <= x / (primes[b] * primes[l]) < high

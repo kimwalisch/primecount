@@ -31,7 +31,7 @@ struct D_formula_params
 /// 1) The default alpha
 /// 2) The minimum alpha=1
 /// 3) The maximum alpha
-std::array<D_formula_params, 56> test_cases =
+std::array<D_formula_params, 65> test_cases =
 {{
   { 10, 3, 0, 0 },
   { 10, 3, 0, 0 },
@@ -92,7 +92,17 @@ std::array<D_formula_params, 56> test_cases =
   // y = sqrt(x) and its neighbors
   { 1000000, 999, 8, 1246 },
   { 100000000, 9999, 8, 1181490 },
-  { 100000000, 10000, 8, 1181490 }
+  { 100000000, 10000, 8, 1181490 },
+  // Prime fourth powers with the minimum y
+  { 707280, 90, 8, 953 },
+  { 707281, 90, 8, 953 },
+  { 707282, 90, 8, 953 },
+  { 923520, 98, 8, 2070 },
+  { 923521, 98, 8, 2070 },
+  { 923522, 98, 8, 2070 },
+  { 88529280, 446, 8, 1836639 },
+  { 88529281, 446, 8, 1836639 },
+  { 88529282, 446, 8, 1836639 }
 }};
 
 void check(bool OK)

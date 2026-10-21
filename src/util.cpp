@@ -241,7 +241,7 @@ double get_alpha_gourdon(maxint_t x, double alpha)
 /// Gourdon's formulas require x_star <= (x / y)^(1/2):
 /// Sigma5 and parts of Sigma2 sum over the primes
 /// (x / y)^(1/2) < p <= x^(1/3) independently of x_star, whereas
-/// the A, C, D, Sigma3, Sigma4, Sigma6 formulas and the other
+/// the A, C, Sigma3, Sigma4, Sigma6 formulas and the other
 /// parts of Sigma2 depend on x_star. For x^(1/3) < y <= x^(1/2)
 /// this bound holds if x / y^2 is rounded down.
 ///
