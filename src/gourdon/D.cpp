@@ -178,6 +178,7 @@ T D_OpenMP(T x,
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t max_b = max(pi_root3_xy, pi_sqrty);
   max_b = min(max_b, pi_x14);
+
   // Only rows with prime^2 <= y < prime^3 use this prefix
   Vector<int64_t> mertens_y = phi_vector(y, max_b, primes, pi);
   for (int64_t b = 1; b <= max_b; b++)
