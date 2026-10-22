@@ -32,17 +32,6 @@ struct SemiprimeEvent
   int64_t weight;
 };
 
-/// Rows with prime <= sqrt(y) have the band (x/(prime*y), y] if
-/// sqrt(x/prime) < y < prime^3, i.e. if prime > band_min_prime().
-/// The band also contains the easy leaves of the row if x/prime^3 < y,
-/// i.e. if prime > (x/y)^(1/3), the C1 formula skips these rows.
-///
-inline int64_t band_min_prime(int64_t xy, int64_t y)
-{
-  int64_t min_prime = max(iroot<3>(y), xy / y);
-  return min(min_prime, isqrt(y));
-}
-
 /// For p = primes[b] and p^2 <= t < p^3, the Moebius prefix sum
 /// over the p-rough integers M(t) = sum_{n <= t, lpf(n) > p} mu(n)
 /// satisfies M(t) = phi(t, b - 1) - phi_minus_mertens(t, p, b, pi).
@@ -122,11 +111,13 @@ T sum_phi_minus_mertens(T xp,
   return sum;
 }
 
-/// Rows whose band has easy leaves (see band_min_prime()): the band
-/// terms whose positions are < p^2 only need PiTable lookups.
-/// D_thread() skips the row p in threads whose sieve limit is < p^2,
-/// hence these terms are computed once per row and band_row() only
-/// computes the band terms whose positions are >= p^2.
+/// Rows (x/y)^(1/3) < p <= sqrt(y) have x < p^3 * y <= p * y^2 and
+/// y^2 <= x, hence sqrt(x/p) < y < p^3. So these rows have a band,
+/// which also contains their easy leaves. The band terms whose
+/// positions are < p^2 only need PiTable lookups. D_thread() skips
+/// the row p in threads whose sieve limit is < p^2, hence these
+/// terms are computed once per row and band_row() only computes the
+/// band terms whose positions are >= p^2.
 ///
 template <typename T, typename Primes>
 T easy_band_terms(T xp,

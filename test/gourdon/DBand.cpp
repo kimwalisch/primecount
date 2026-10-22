@@ -148,10 +148,10 @@ void check(const Input& input)
   int64_t sqrt_xp = isqrt(input.xp);
   int64_t xy = input.xp * p / input.y;
 
-  // band_row() tests the row itself, whereas D.cpp and
-  // the C1 formula use band_min_prime() and (x/y)^(1/3).
+  // band_row() tests the row itself, whereas
+  // D.cpp uses (x/y)^(1/3) for the mixed bands.
   check(sqrt_xp < input.y && input.y < square * p &&
-        square <= input.y && p > band_min_prime(xy, input.y) &&
+        square <= input.y &&
         input.mixed == (lower < square) &&
         input.mixed == (p > iroot<3>(xy)),
         "The test must enter a band");
@@ -208,8 +208,27 @@ void check(const Input& input)
   }
 }
 
+/// D.cpp computes easy_band_terms() for all rows
+/// (x/y)^(1/3) < p <= sqrt(y), these must have a mixed band.
+void check_mixed_rows()
+{
+  for (int64_t x = 1; x <= 30000; x++)
+  {
+    for (int64_t y = 1; y * y <= x; y++)
+    {
+      for (int64_t p = iroot<3>(x / y) + 1; p * p <= y; p++)
+      {
+        int64_t xp = x / p;
+        check(isqrt(xp) < y && p * p > y / p && xp / y < p * p,
+              "Row without mixed band");
+      }
+    }
+  }
+}
+
 int main()
 {
+  check_mixed_rows();
   for (const Input& input : inputs)
     check(input);
   std::cout << "All band segment tests passed successfully!" << std::endl;

@@ -190,9 +190,8 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
-  // Rows whose band has easy leaves, see band_min_prime()
-  int64_t pi_band = pi[band_min_prime(xy, y)];
-  INDETERMINATE RelaxedAtomic<int64_t> min_b(max3(k, pi_root3_xy, pi_band) + 1);
+  // Rows whose band has easy leaves, see easy_band_terms()
+  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_root3_xy) + 1);
   int64_t last_b = min(pi_sqrty, pi_x14);
   UT sum = 0;
 
