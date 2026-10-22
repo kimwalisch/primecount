@@ -213,6 +213,7 @@ void PiTable::init_count(uint64_t low,
 int64_t PiTable::prev_prime(uint64_t x) const
 {
   int64_t count = operator[](x);
+
   if (count == 0)
     return 0;
 
