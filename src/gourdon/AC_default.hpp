@@ -28,7 +28,6 @@
 #ifndef AC_DEFAULT_HPP
 #define AC_DEFAULT_HPP
 
-#include "DBand.hpp"
 #include "LoadBalancerAC.hpp"
 #include "SegmentedPiTable.hpp"
 
@@ -125,81 +124,14 @@ T A(T xlow,
   return sum;
 }
 
-/// Compute the 1st part of the C formula.
-/// pi[(x/y)^(1/3)] < b <= pi[sqrt(y)]
-/// x / (primes[b] * m) <= y
-/// low <= x / (primes[b] * m) < high
-///
-/// m is either a prime or a product of 2 distinct primes.
-/// In both cases m is coprime to the first b primes and m <= y.
-/// Since each prime factor of m is > (x / y)^(1/3) and y <= sqrt(x),
-/// m cannot contain more than 2 prime factors.
-///
-template <typename T,
-          typename XP,
-          typename Primes>
-T C1(T xlow,
-     T xhigh,
-     XP xp,
-     uint64_t b,
-     uint64_t y,
-     const Primes& primes,
-     const PiTable& pi,
-     const SegmentedPiTable& segmentedPi)
-{
-  T sum = 0;
-  uint64_t prime = primes[b];
-  uint64_t max_m = min(xlow / prime, y);
-  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
-  uint64_t min_m = fast_div64(xhigh, prime);
-  min_m = max3(min_m, x_div_prime3, y / prime);
-
-  if (min_m >= max_m)
-    return 0;
-
-  // m = primes[i]
-  uint64_t min_i = pi[min_m] + 1;
-  uint64_t max_i = pi[max_m];
-
-  // for (i = min_i; i <= max_i; i++)
-  //   sum -= segmentedPi[xp / primes[i]] - b + 2;
-  sum -= sum_pi<T, 1>(xp, min_i, max_i, b, primes, segmentedPi);
-
-  // m = primes[i] * primes[j]
-  uint64_t max_q = isqrt(max_m);
-
-  if (prime < max_q)
-  {
-    uint64_t min_q_i = b + 1;
-    uint64_t max_q_i = pi[max_q];
-
-    for (uint64_t i = min_q_i; i <= max_q_i; i++)
-    {
-      uint64_t q = primes[i];
-      uint64_t min_r = max(q, min_m / q);
-      uint64_t max_r = max_m / q;
-
-      if (min_r >= max_r)
-        continue;
-
-      uint64_t min_j = pi[min_r] + 1;
-      uint64_t max_j = pi[max_r];
-      XP xpq = fast_div(xp, q);
-
-      // for (j = min_j; j <= max_j; j++)
-      //   sum += segmentedPi[xpq / primes[j]] - b + 2;
-      sum += sum_pi<T, 1>(xpq, min_j, max_j, b, primes, segmentedPi);
-    }
-  }
-
-  return sum;
-}
-
 /// Compute the 2nd part of the C formula.
 /// Computes the clustered and sparse easy leaves of the C
 /// formula for which the second factor is necessarily prime.
 /// pi[sqrt(y)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
+///
+/// D computes the 1st part of the C formula in the band of
+/// the rows pi[(x/y)^(1/3)] < b <= pi[sqrt(y)], see DBand.hpp.
 ///
 template <typename T,
           typename XP,
@@ -307,21 +239,15 @@ T AC_OpenMP_default(T x,
 
   int64_t pi_y = pi[y];
   int64_t max_clustered_global = primes[pi_y];
-  int64_t sqrty = isqrt(y);
-  int64_t pi_sqrty = pi[sqrty];
+  int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
-
-  // C1 skips the rows p > band_min_prime(),
-  // D computes their easy leaves in the band.
-  int64_t max_c1 = pi[band_min_prime(xy, y)];
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
   // entire computation. The same threads are used for:
   //
-  // 1) Computation of the C1 formula.
-  // 2) Computation of the C2 formula.
-  // 3) Computation of the A formula.
+  // 1) Computation of the C2 formula.
+  // 2) Computation of the A formula.
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
@@ -358,24 +284,6 @@ T AC_OpenMP_default(T x,
         int64_t pi_sqrt_low = pi[isqrt(low)];
         T xlow = x / max(low, 1);
         T xhigh = x / high;
-
-        if (low < y)
-        {
-          int64_t min_c1 = max(k, pi_root3_xy);
-          int64_t min_c1_prime = min(xy / high, sqrty);
-          min_c1 = max3(min_c1, pi_sqrt_low, pi[min_c1_prime]) + 1;
-
-          // C1 formula: pi[(x/y)^(1/3)] < b <= max_c1
-          for (int64_t b = min_c1; b <= max_c1; b++)
-          {
-            T xp = x / primes[b];
-
-            if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum -= C1(xlow, xhigh, uint64_t(xp), b, y, primes, pi, segmentedPi);
-            else
-              sum -= C1(xlow, xhigh, xp, b, y, primes, pi, segmentedPi);
-          }
-        }
 
         int64_t min_c2 = max3(k, pi_root3_xy, pi_sqrty);
         int64_t min_c2_prime = min(xhigh / y, x_star);

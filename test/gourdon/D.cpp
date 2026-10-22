@@ -133,7 +133,7 @@ int64_t D_reference(int64_t x, int64_t y, int64_t k)
     if (prime > max_prime) break;
 
     // Rows with x/p^3 < y and sqrt(x/p) < y < p^3 also
-    // contain their easy leaves (C1 skips these rows).
+    // contain their easy leaves (AC does not compute them).
     int64_t xp = x / prime;
     bool easy_in_band = prime * prime <= y &&
                         xp / (prime * prime) < y &&
