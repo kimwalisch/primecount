@@ -29,7 +29,7 @@
 #ifndef D_DEFAULT_HPP
 #define D_DEFAULT_HPP
 
-#include "DCentral.hpp"
+#include "DBand.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>

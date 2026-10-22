@@ -25,7 +25,7 @@
 #ifndef D_AVX512_HPP
 #define D_AVX512_HPP
 
-#include "DCentral.hpp"
+#include "DBand.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>

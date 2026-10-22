@@ -18,7 +18,7 @@
 #ifndef D_AVX2_HPP
 #define D_AVX2_HPP
 
-#include "DCentral.hpp"
+#include "DBand.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>

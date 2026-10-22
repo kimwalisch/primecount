@@ -18,7 +18,7 @@
 #ifndef D_ARM_NEON_HPP
 #define D_ARM_NEON_HPP
 
-#include "DCentral.hpp"
+#include "DBand.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>

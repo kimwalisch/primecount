@@ -12,7 +12,7 @@
 /// file in the top level directory.
 ///
 
-#include "DCentral.hpp"
+#include "DBand.hpp"
 
 #include <primecount-internal.hpp>
 #include <cpu_arch_macros.hpp>

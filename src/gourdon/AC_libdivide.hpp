@@ -21,7 +21,7 @@
 #include "AC_default.hpp"
 #include "LoadBalancerAC.hpp"
 #include "SegmentedPiTable.hpp"
-#include "DCentral.hpp"
+#include "DBand.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>

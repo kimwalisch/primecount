@@ -1,5 +1,5 @@
 ///
-/// @file  SemiprimeEventBitmap.cpp
+/// @file  SemiprimeEventSorter.cpp
 /// @brief Test semiprime event ordering and weight preservation.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
@@ -8,7 +8,7 @@
 /// file in the top level directory.
 ///
 
-#include <SemiprimeEventBitmap.hpp>
+#include <SemiprimeEventSorter.hpp>
 #include <Vector.hpp>
 #include <primesieve/iterator.hpp>
 

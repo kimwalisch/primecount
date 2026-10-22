@@ -1,5 +1,5 @@
 ///
-/// @file  DCentral.cpp
+/// @file  DBand.cpp
 /// @brief Check central D contributions and query order in each sieve
 ///        segment against dense partial-sieve and Moebius prefixes.
 ///
@@ -9,7 +9,7 @@
 /// file in the top level directory.
 ///
 
-#include <DCentral.hpp>
+#include <DBand.hpp>
 #include <generate_primes.hpp>
 #include <int128_t.hpp>
 #include <PiTable.hpp>

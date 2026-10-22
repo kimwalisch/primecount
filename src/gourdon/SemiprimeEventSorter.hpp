@@ -1,5 +1,5 @@
 ///
-/// @file  SemiprimeEventBitmap.hpp
+/// @file  SemiprimeEventSorter.hpp
 /// @brief Sort distinct semiprime events by decreasing n using two
 ///        wheel-compressed bitmaps for presence and weight.
 ///
@@ -9,8 +9,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef SEMIPRIME_EVENT_BITMAP_HPP
-#define SEMIPRIME_EVENT_BITMAP_HPP
+#ifndef SEMIPRIME_EVENT_SORTER_HPP
+#define SEMIPRIME_EVENT_SORTER_HPP
 
 #include <BitSieve240.hpp>
 #include <ctz.hpp>

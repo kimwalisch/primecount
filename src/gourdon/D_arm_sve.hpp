@@ -25,7 +25,7 @@
 #ifndef D_ARM_SVE_HPP
 #define D_ARM_SVE_HPP
 
-#include "DCentral.hpp"
+#include "DBand.hpp"
 
 #include <primecount-internal.hpp>
 #include <BaseFactorTable.hpp>

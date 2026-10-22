@@ -1,5 +1,5 @@
 ///
-/// @file  DCentral.hpp
+/// @file  DBand.hpp
 /// @brief Cancel prime leaves in the central regions of Gourdon's D
 ///        formula using a weighted Dirichlet hyperbola decomposition.
 ///
@@ -9,10 +9,10 @@
 /// file in the top level directory.
 ///
 
-#ifndef D_CENTRAL_HPP
-#define D_CENTRAL_HPP
+#ifndef D_BAND_HPP
+#define D_BAND_HPP
 
-#include "SemiprimeEventBitmap.hpp"
+#include "SemiprimeEventSorter.hpp"
 
 #include <fast_div.hpp>
 #include <imath.hpp>
