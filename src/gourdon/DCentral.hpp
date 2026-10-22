@@ -187,7 +187,7 @@ ALWAYS_INLINE T central_square_segment(T xp,
                                        int64_t b,
                                        int64_t upper,
                                        int64_t middle,
-                                       int64_t z,
+                                       int64_t y,
                                        int64_t low,
                                        int64_t high,
                                        int64_t phi,
@@ -209,7 +209,7 @@ ALWAYS_INLINE T central_square_segment(T xp,
 
   // The remaining original leaves have a prime second factor <= p^2
   int64_t lower_m = min(fast_div(xp, high), square);
-  lower_m = max3(lower_m, z / p, p);
+  lower_m = max3(lower_m, y / p, p);
   int64_t upper_m = min(fast_div(xp, max(low, int64_t(1))), square);
   if (lower_m < upper_m)
     for (int64_t i = pi[upper_m]; primes[i] > lower_m; i--)
@@ -230,7 +230,6 @@ ALWAYS_INLINE bool central_row(T xp,
                                int64_t p,
                                int64_t b,
                                int64_t y,
-                               int64_t z,
                                int64_t low,
                                int64_t high,
                                int64_t phi,
@@ -245,18 +244,18 @@ ALWAYS_INLINE bool central_row(T xp,
 {
   int64_t upper = min(fast_div(xp, p * p), y + 1);
 
-  if (upper <= y && upper >= p * p)
+  if (upper <= y && upper >= p * p && p * p > upper / p)
   {
     int64_t middle = isqrt(xp);
     if (middle < upper)
     {
       sum += central_square_segment(xp, p, b, upper, middle,
-                                    z, low, high, phi, primes, pi,
+                                    y, low, high, phi, primes, pi,
                                     count, events, sorter);
       return true;
     }
   }
-  else if (upper > y && z == y && p * p > y / p)
+  else if (upper > y && p * p > y / p)
   {
     int64_t middle = isqrt(xp);
     if (middle < y)

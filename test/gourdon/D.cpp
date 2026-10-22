@@ -34,7 +34,7 @@ struct D_formula_params
 /// 1) The default alpha
 /// 2) The minimum alpha=1
 /// 3) The maximum alpha
-std::array<D_formula_params, 65> test_cases =
+std::array<D_formula_params, 69> test_cases =
 {{
   { 10, 3, 0, 0 },
   { 10, 3, 0, 0 },
@@ -96,6 +96,10 @@ std::array<D_formula_params, 65> test_cases =
   { 1000000, 999, 8, 1246 },
   { 100000000, 9999, 8, 1181490 },
   { 100000000, 10000, 8, 1181490 },
+  { 148035889, 12167, 8, 1850582 },
+  { 148035890, 12167, 8, 1850582 },
+  { 148048055, 12167, 8, 1850748 },
+  { 148048056, 12167, 8, 1850748 },
   // Prime fourth powers with the minimum y
   { 707280, 90, 8, 953 },
   { 707281, 90, 8, 953 },
@@ -115,12 +119,11 @@ void check(bool OK)
     std::exit(1);
 }
 
-int64_t D_reference(int64_t x, int64_t y, int64_t z, int64_t k)
+int64_t D_reference(int64_t x, int64_t y, int64_t k)
 {
-  auto primes = generate_primes<uint32_t>(z);
-  auto lpf = generate_lpf(z, primes);
-  auto mpf = generate_mpf(z, primes);
-  auto mu = generate_moebius(z, primes);
+  auto primes = generate_primes<uint32_t>(y);
+  auto lpf = generate_lpf(y, primes);
+  auto mu = generate_moebius(y, primes);
   int64_t max_prime = iroot<4>(x);
   int64_t sum = 0;
 
@@ -129,11 +132,10 @@ int64_t D_reference(int64_t x, int64_t y, int64_t z, int64_t k)
     int64_t prime = primes[b];
     if (prime > max_prime) break;
 
-    for (int64_t m = prime + 1; m <= z; m++)
+    for (int64_t m = prime + 1; m <= y; m++)
       if (mu[m] != 0 &&
           lpf[m] > prime &&
-          mpf[m] <= y &&
-          prime * m > z &&
+          prime * m > y &&
           x / (prime * m) >= prime * prime)
         sum -= mu[m] * phi(x / (prime * m), b - 1);
   }
@@ -170,18 +172,17 @@ int main()
 
     for (int64_t center : { ipow<5>(p), p * p * p * q * r })
       for (int64_t delta : { -1, 0, 1 })
-        for (int64_t z : { p * p - 1, p * p, p * p + 1,
+        for (int64_t y : { p * p - 1, p * p, p * p + 1,
                            q * r - 1, q * r, q * r + 1 })
         {
           int64_t x = center + delta;
-          int64_t y = iroot<3>(x) + 1;
-          int64_t expected = D_reference(x, y, z, 8);
-          int64_t res = D(x, y, z, 8, threads);
-          std::cout << "D boundary(" << x << ", " << y << ", " << z << ") = " << res;
+          int64_t expected = D_reference(x, y, 8);
+          int64_t res = D(x, y, 8, threads);
+          std::cout << "D boundary(" << x << ", " << y << ") = " << res;
           check(res == expected);
 
           #ifdef HAVE_INT128_T
-            int128_t res2 = D((int128_t) x, y, z, 8, threads);
+            int128_t res2 = D((int128_t) x, y, 8, threads);
             check(res2 == expected);
           #endif
         }
@@ -191,7 +192,6 @@ int main()
   {
     int64_t xp;
     int64_t y;
-    int64_t z;
     int64_t prime;
     int region;
   };
@@ -199,40 +199,37 @@ int main()
   // Regions: 0 = fallback, 1 = natural upper bound, 2 = upper bound y.
   // Include A = p^2, A = H, prime/semiprime endpoints, and boundaries
   // immediately below, at, and above multiples of the sieve alignment.
-  const Array<CentralParams, 33> central_cases = {{
-    { 279840, 530, 530, 23, 0 },
-    { 279841, 530, 530, 23, 0 },
-    { 280370, 530, 530, 23, 1 },
-    { 280898, 530, 530, 23, 1 },
-    { 280899, 530, 530, 23, 2 },
-    { 280900, 530, 530, 23, 0 },
-    { 280901, 530, 530, 23, 0 },
-    { 559681, 1058, 1058, 23, 1 },
-    { 559682, 1058, 1058, 23, 1 },
-    { 560739, 1058, 1058, 23, 2 },
-    { 560740, 1058, 1058, 23, 2 },
-    { 280370, 600, 700, 23, 1 },
-    { 665499, 1058, 2116, 23, 0 },
-    { 7653060, 12167, 12167, 23, 0 },
-    { 292140, 541, 541, 23, 2 },
-    { 807302, 899, 899, 23, 2 },
-    { 864017, 1200, 1200, 23, 2 },
-    { 396017, 720, 720, 23, 2 },
-    { 444888, 767, 767, 23, 2 },
-    { 444889, 767, 767, 23, 2 },
-    { 444890, 767, 767, 23, 2 },
-    { 707280, 941, 941, 23, 2 },
-    { 707281, 941, 941, 23, 2 },
-    { 707282, 941, 941, 23, 2 },
-    { 808200, 999, 999, 23, 2 },
-    { 808201, 999, 999, 23, 2 },
-    { 808202, 999, 999, 23, 2 },
-    { 921599, 1200, 1200, 23, 2 },
-    { 921600, 1200, 1200, 23, 2 },
-    { 921601, 1200, 1200, 23, 2 },
-    { 1414562, 1682, 1682, 29, 1 },
-    { 1416243, 1682, 1682, 29, 2 },
-    { 1582779, 1682, 3364, 29, 0 }
+  const Array<CentralParams, 30> central_cases = {{
+    { 279840, 530, 23, 0 },
+    { 279841, 530, 23, 0 },
+    { 280370, 530, 23, 1 },
+    { 280898, 530, 23, 1 },
+    { 280899, 530, 23, 2 },
+    { 280900, 530, 23, 0 },
+    { 280901, 530, 23, 0 },
+    { 559681, 1058, 23, 1 },
+    { 559682, 1058, 23, 1 },
+    { 560739, 1058, 23, 2 },
+    { 560740, 1058, 23, 2 },
+    { 7653060, 12167, 23, 0 },
+    { 292140, 541, 23, 2 },
+    { 807302, 899, 23, 2 },
+    { 864017, 1200, 23, 2 },
+    { 396017, 720, 23, 2 },
+    { 444888, 767, 23, 2 },
+    { 444889, 767, 23, 2 },
+    { 444890, 767, 23, 2 },
+    { 707280, 941, 23, 2 },
+    { 707281, 941, 23, 2 },
+    { 707282, 941, 23, 2 },
+    { 808200, 999, 23, 2 },
+    { 808201, 999, 23, 2 },
+    { 808202, 999, 23, 2 },
+    { 921599, 1200, 23, 2 },
+    { 921600, 1200, 23, 2 },
+    { 921601, 1200, 23, 2 },
+    { 1414562, 1682, 29, 1 },
+    { 1416243, 1682, 29, 2 }
   }};
 
   for (const CentralParams& params : central_cases)
@@ -246,21 +243,20 @@ int main()
 
     if (p * p <= upper && middle < upper && upper <= params.y)
       region = 1;
-    else if (params.z == params.y &&
-             p * p <= lower && lower <= middle &&
+    else if (p * p <= lower && lower <= middle &&
              middle < params.y && params.y < p * p * p)
       region = 2;
 
     std::cout << "D central region " << params.region << " ("
-              << x << ", " << params.y << ", " << params.z << ")";
+              << x << ", " << params.y << ")";
     check(region == params.region &&
           iroot<3>(x) < params.y &&
-          params.y <= params.z && params.z < isqrt(x));
-    int64_t expected = D_reference(x, params.y, params.z, 8);
-    check(D(x, params.y, params.z, 8, threads) == expected);
+          params.y <= isqrt(x));
+    int64_t expected = D_reference(x, params.y, 8);
+    check(D(x, params.y, 8, threads) == expected);
 
     #ifdef HAVE_INT128_T
-      check(D((int128_t) x, params.y, params.z, 8, threads) == expected);
+      check(D((int128_t) x, params.y, 8, threads) == expected);
     #endif
   }
 

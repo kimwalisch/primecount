@@ -234,7 +234,7 @@ T D_thread_avx512(T x,
       if (prime >= max_m)
         goto next_segment;
 
-      if (central_row(xp, prime, b, y, z, low, high, phi[b], primes, pi,
+      if (central_row(xp, prime, b, y, low, high, phi[b], primes, pi,
                       mertens_y, count_sieve, events, sorter, sum, max_m))
       {
         phi[b] += sieve.get_total_count();
@@ -405,7 +405,7 @@ T D_thread_avx512(T x,
       T xp = x / prime;
       int64_t xp_low = min(fast_div(xp, low1), y);
       int64_t xp_high = min(fast_div(xp, high), y);
-      int64_t min_m = max3(xp_high, z / prime, prime);
+      int64_t min_m = max3(xp_high, y / prime, prime);
       int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
       int64_t l = pi[max_m];
 

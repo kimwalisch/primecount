@@ -25,34 +25,32 @@ struct Input
 {
   int64_t xp;
   int64_t y;
-  int64_t z;
   int64_t prime;
   bool natural;
 };
 
-const Array<Input, 22> inputs = {{
-  { 280370, 530, 530, 23, true },
-  { 280898, 530, 530, 23, true },
-  { 280899, 530, 530, 23, false },
-  { 559681, 1058, 1058, 23, true },
-  { 559682, 1058, 1058, 23, true },
-  { 280370, 600, 700, 23, true },
-  { 1414562, 1682, 1682, 29, true },
-  { 560739, 1058, 1058, 23, false },
-  { 560740, 1058, 1058, 23, false },
-  { 1416243, 1682, 1682, 29, false },
-  { 292140, 541, 541, 23, false },
-  { 807302, 899, 899, 23, false },
-  { 864017, 1200, 1200, 23, false },
-  { 396017, 720, 720, 23, false },
-  { 444888, 767, 767, 23, false },
-  { 444889, 767, 767, 23, false },
-  { 444890, 767, 767, 23, false },
-  { 707280, 941, 941, 23, false },
-  { 707281, 941, 941, 23, false },
-  { 707282, 941, 941, 23, false },
-  { 921599, 1200, 1200, 23, false },
-  { 921600, 1200, 1200, 23, false }
+const Array<Input, 21> inputs = {{
+  { 280370, 530, 23, true },
+  { 280898, 530, 23, true },
+  { 280899, 530, 23, false },
+  { 559681, 1058, 23, true },
+  { 559682, 1058, 23, true },
+  { 1414562, 1682, 29, true },
+  { 560739, 1058, 23, false },
+  { 560740, 1058, 23, false },
+  { 1416243, 1682, 29, false },
+  { 292140, 541, 23, false },
+  { 807302, 899, 23, false },
+  { 864017, 1200, 23, false },
+  { 396017, 720, 23, false },
+  { 444888, 767, 23, false },
+  { 444889, 767, 23, false },
+  { 444890, 767, 23, false },
+  { 707280, 941, 23, false },
+  { 707281, 941, 23, false },
+  { 707282, 941, 23, false },
+  { 921599, 1200, 23, false },
+  { 921600, 1200, 23, false }
 }};
 
 void check(bool ok, const char* message)
@@ -117,7 +115,7 @@ void check_segments(const Input& input, int64_t size,
     T actual;
     if (input.natural)
       actual = central_square_segment(T(input.xp), p, b, upper, middle,
-                                      input.z, low, high, phi, primes, pi,
+                                      input.y, low, high, phi, primes, pi,
                                       count, events, sorter);
     else
       actual = central_y_segment(T(input.xp), p, b, lower, middle,
@@ -143,9 +141,9 @@ void check(const Input& input)
   check(p * p <= lower && lower <= middle && middle < upper &&
         upper < p * p * p && upper <= input.y,
         "The test must enter a valid central region");
-  check(input.natural ? lower == p * p : input.z == input.y,
+  check(!input.natural || lower == p * p,
         "Central test region does not match its parameters");
-  int64_t min_m = input.natural ? max(p, input.z / p) : lower;
+  int64_t min_m = input.natural ? max(p, input.y / p) : lower;
   int64_t stop = input.xp / (min_m + 1) + 1;
   Reference reference(max(stop, input.y), p);
   Vector<int64_t> expected(stop + 1);

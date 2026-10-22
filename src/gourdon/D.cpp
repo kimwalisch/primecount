@@ -22,7 +22,6 @@
 #include <int128_t.hpp>
 #include <LoadBalancerS2.hpp>
 #include <macros.hpp>
-#include <min.hpp>
 #include <phi_vector.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
@@ -172,15 +171,11 @@ T D_OpenMP(T x,
   // Hard special leaves satisfy m > p and
   // p^3 * m <= x, hence p^4 < x.
   int64_t x14 = iroot<4>(x);
-  Vector<int64_t> mertens_y;
-  if (z == y)
-  {
-    int64_t max_b = pi[min(iroot<3>(x / y), x_star)];
-    // Only rows with prime^2 <= y < prime^3 use this prefix
-    mertens_y = phi_vector(y, max_b, primes, pi);
-    for (int64_t b = 1; b <= max_b; b++)
-      mertens_y[b] -= central_correction(y, primes[b], b, pi);
-  }
+  int64_t max_b = pi[iroot<3>(xy)];
+  // Only rows with prime^2 <= y < prime^3 use this prefix
+  Vector<int64_t> mertens_y = phi_vector(y, max_b, primes, pi);
+  for (int64_t b = 1; b <= max_b; b++)
+    mertens_y[b] -= central_correction(y, primes[b], b, pi);
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -231,9 +226,8 @@ int64_t D(int64_t x,
 
   FactorTable<uint16_t> factor(y, threads);
   int64_t xy = x / y;
-  int64_t max_prime = min(y, xy / isqrt(y));
-  PiTable pi(max_prime, threads);
-  auto primes = pi.get_primes<uint32_t>(max_prime, threads);
+  PiTable pi(y, threads);
+  auto primes = pi.get_primes<uint32_t>(y, threads);
   int64_t sum = D_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
 
   if (is_print)
@@ -262,31 +256,30 @@ int128_t D(int128_t x,
   }
 
   int64_t xy = x / y;
-  int64_t max_prime = min(y, xy / isqrt(y));
   int128_t sum;
 
   // Use 16-bit factor table entries whenever possible.
   if (y <= FactorTable<uint16_t>::max())
   {
     FactorTable<uint16_t> factor(y, threads);
-    PiTable pi(max_prime, threads);
+    PiTable pi(y, threads);
 
-    if (max_prime <= UINT32_MAX)
+    if (y <= UINT32_MAX)
     {
-      auto primes = pi.get_primes<uint32_t>(max_prime, threads);
+      auto primes = pi.get_primes<uint32_t>(y, threads);
       sum = D_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
     }
     else
     {
-      auto primes = pi.get_primes<int64_t>(max_prime, threads);
+      auto primes = pi.get_primes<int64_t>(y, threads);
       sum = D_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
     }
   }
   else
   {
     FactorTable<uint32_t> factor(y, threads);
-    PiTable pi(max_prime, threads);
-    auto primes = pi.get_primes<int64_t>(max_prime, threads);
+    PiTable pi(y, threads);
+    auto primes = pi.get_primes<int64_t>(y, threads);
     sum = D_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
   }
 
