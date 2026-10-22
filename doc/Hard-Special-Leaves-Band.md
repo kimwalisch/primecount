@@ -393,7 +393,7 @@ all band rows. Other entries are never read by band code.
 | `src/gourdon/SemiprimeEventSorter.hpp` | sorts events by decreasing `n` (bitmap over the mod-240 wheel, falls back to `std::sort`) — from PR #146 |
 | `src/gourdon/D.cpp` | `D_OpenMP()`: PiTable/primes up to `y`, `mertens_y`, unsigned reduction, easy-band loop |
 | `src/gourdon/D_default.hpp`, `D_avx2.hpp`, `D_avx512.hpp`, `D_arm_neon.hpp`, `D_arm_sve.hpp` | D kernels, call `band_row()` |
-| `src/gourdon/AC.cpp` | AC's PiTable up to `y`, primes up to `min(isqrt(x / (isqrt(y) + 1)), y)` (Section 4.5) |
+| `src/gourdon/AC.cpp` | AC's PiTable up to `y`, primes up to `min(isqrt(x / isqrt(y)), y)` (Section 4.5) |
 | `src/gourdon/AC_default.hpp`, `AC_libdivide.hpp`, `AC_arm_sve.hpp` | A and C2 formulas; C1 was removed (Section 4.5) |
 | `src/PiTable.hpp`, `PiTable.cpp` | `prev_prime(x)`: the largest prime `<= x`, used by AC |
 | `test/gourdon/DBand.cpp` | dense reference test of `band_row()`/`easy_band_terms()` per segment, query order, `max_m`; exhaustive check that every row `(x/y)^(1/3) < p <= sqrt(y)` has a mixed band (`x <= 30000`) |
@@ -526,7 +526,7 @@ valid `y`.
 
 AC's PiTable is still sized `y`: C2's clustered leaves `q <= y` need
 `pi(y)` and other lookups up to `y`. Since `bfb74102`, AC's primes vector
-only goes up to `max_prime = min(isqrt(x / (isqrt(y) + 1)), y)`:
+only goes up to `max_prime = min(isqrt(x / isqrt(y)), y)`:
 
 - The A and C2 rows have `p > sqrt(y)`, because
   `x_star >= x^(1/4) >= sqrt(y)` and C2 starts after `pi_sqrty`.

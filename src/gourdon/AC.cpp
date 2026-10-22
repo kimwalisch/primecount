@@ -104,7 +104,7 @@ int64_t AC(int64_t x,
 
   // The A and C2 formulas use the primes p > sqrt(y) and
   // q <= sqrt(x / p), hence all primes are <= sqrt(x / sqrt(y)).
-  int64_t max_prime = min(isqrt(x / (isqrt(y) + 1)), y);
+  int64_t max_prime = min(isqrt(x / isqrt(y)), y);
   auto primes = pi.get_primes<uint32_t>(max_prime, threads);
   int64_t sum = AC_OpenMP((uint64_t) x, y, k, x_star, pi, primes, threads, is_print);
 
@@ -144,7 +144,7 @@ int128_t AC(int128_t x,
 
   // The A and C2 formulas use the primes p > sqrt(y) and
   // q <= sqrt(x / p), hence all primes are <= sqrt(x / sqrt(y)).
-  int64_t max_prime = min(isqrt(x / (isqrt(y) + 1)), y);
+  int64_t max_prime = min(isqrt(x / isqrt(y)), y);
 
   // uses less memory
   if (max_prime <= pstd::numeric_limits<uint32_t>::max())
