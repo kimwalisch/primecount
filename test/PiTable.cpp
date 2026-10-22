@@ -206,6 +206,30 @@ int main()
     }
   }
 
+  // Test PiTable::prev_prime(x)
+  {
+    int threads = 1;
+    PiTable pi(1000000, threads);
+    primesieve::iterator it;
+    uint64_t prime = it.next_prime();
+    int64_t last_prime = 0;
+
+    for (uint64_t x = 0; x < pi.size(); x++)
+    {
+      if (x == prime)
+      {
+        last_prime = prime;
+        prime = it.next_prime();
+      }
+      bool OK = (pi.prev_prime(x) == last_prime);
+
+      if (!OK)
+        std::cout << "prev_prime(" << x << ") = " << pi.prev_prime(x);
+
+      check(OK);
+    }
+  }
+
   std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;

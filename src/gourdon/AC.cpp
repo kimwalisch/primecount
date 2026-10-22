@@ -16,7 +16,9 @@
 #include <primecount-internal.hpp>
 #include <cpu_arch_macros.hpp>
 #include <gourdon.hpp>
+#include <imath.hpp>
 #include <int128_t.hpp>
+#include <min.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
 
@@ -100,7 +102,10 @@ int64_t AC(int64_t x,
   // which fits into the CPU's cache.
   PiTable pi(y, threads);
 
-  auto primes = pi.get_primes<uint32_t>(y, threads);
+  // The rows of the A and C2 formulas have prime > sqrt(y)
+  // and only use the primes <= sqrt(x / prime).
+  int64_t max_prime = min(isqrt(x / (isqrt(y) + 1)), y);
+  auto primes = pi.get_primes<uint32_t>(max_prime, threads);
   int64_t sum = AC_OpenMP((uint64_t) x, y, k, x_star, pi, primes, threads, is_print);
 
   if (is_print)
@@ -137,15 +142,19 @@ int128_t AC(int128_t x,
   PiTable pi(y, threads);
   int128_t sum;
 
+  // The rows of the A and C2 formulas have prime > sqrt(y)
+  // and only use the primes <= sqrt(x / prime).
+  int64_t max_prime = min(isqrt(x / (isqrt(y) + 1)), y);
+
   // uses less memory
-  if (y <= pstd::numeric_limits<uint32_t>::max())
+  if (max_prime <= pstd::numeric_limits<uint32_t>::max())
   {
-    auto primes = pi.get_primes<uint32_t>(y, threads);
+    auto primes = pi.get_primes<uint32_t>(max_prime, threads);
     sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
   else
   {
-    auto primes = pi.get_primes<int64_t>(y, threads);
+    auto primes = pi.get_primes<int64_t>(max_prime, threads);
     sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
 

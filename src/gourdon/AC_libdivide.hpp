@@ -229,7 +229,7 @@ T AC_OpenMP_libdivide(T x,
   INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
   int64_t pi_y = pi[y];
-  int64_t max_clustered_global = primes[pi_y];
+  int64_t max_clustered_global = pi.prev_prime(y);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
 
