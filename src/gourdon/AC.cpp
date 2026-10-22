@@ -3,9 +3,13 @@
 /// @brief Setup and dispatch for the A + C formulas (easy special
 ///        leaves) in Xavier Gourdon's prime counting algorithm.
 ///
-///        This file prepares the prime count lookup table and primes,
-///        dispatches to the scalar or SIMD implementation, and
-///        prints algorithm details and the result when requested.
+///        This file prepares the primes, dispatches to the scalar or
+///        SIMD implementation, and prints algorithm details and the
+///        result when requested.
+///
+///        The A and C algorithms use the large PiTable only for
+///        initialization. Their inner-most loops use the small
+///        SegmentedPiTable instead which fits into the CPU's cache.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -80,9 +84,11 @@ namespace primecount {
 int64_t AC(int64_t x,
            int64_t y,
            int64_t k,
+           const PiTable& pi,
            int threads,
            bool is_print)
 {
+  ASSERT(uint64_t(y) < pi.size());
   double time;
 
   if (is_print)
@@ -95,12 +101,6 @@ int64_t AC(int64_t x,
   }
 
   int64_t x_star = get_x_star_gourdon(x, y);
-
-  // The A and C algorithms use the large PiTable only
-  // for initialization. The inner-most loops of those
-  // algorithms use the small SegmentedPiTable instead
-  // which fits into the CPU's cache.
-  PiTable pi(y, threads);
 
   // The A and C2 formulas use the primes p > sqrt(y) and
   // q <= sqrt(x / p), hence all primes are <= sqrt(x / sqrt(y)).
@@ -119,9 +119,11 @@ int64_t AC(int64_t x,
 int128_t AC(int128_t x,
             int64_t y,
             int64_t k,
+            const PiTable& pi,
             int threads,
             bool is_print)
 {
+  ASSERT(uint64_t(y) < pi.size());
   double time;
 
   if (is_print)
@@ -134,12 +136,6 @@ int128_t AC(int128_t x,
   }
 
   int64_t x_star = get_x_star_gourdon(x, y);
-
-  // The A and C algorithms use the large PiTable only
-  // for initialization. The inner-most loops of those
-  // algorithms use the small SegmentedPiTable instead
-  // which fits into the CPU's cache.
-  PiTable pi(y, threads);
   int128_t sum;
 
   // The A and C2 formulas use the primes p > sqrt(y) and

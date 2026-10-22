@@ -17,6 +17,7 @@
 #include <primesieve.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
 
@@ -100,9 +101,11 @@ namespace primecount {
 
 int64_t Sigma(int64_t x,
               int64_t y,
+              const PiTable& pi,
               int threads,
               bool is_print)
 {
+  ASSERT(uint64_t(y) < pi.size());
   double time;
 
   if (is_print)
@@ -114,8 +117,6 @@ int64_t Sigma(int64_t x,
   }
 
   int64_t x_star = get_x_star_gourdon(x, y);
-  PiTable pi(y, threads);
-
   int64_t a = pi[y];
   int64_t b = pi[iroot<3>(x)];
   int64_t c = pi[isqrt(x / y)];
@@ -137,9 +138,11 @@ int64_t Sigma(int64_t x,
 
 int128_t Sigma(int128_t x,
                int64_t y,
+               const PiTable& pi,
                int threads,
                bool is_print)
 {
+  ASSERT(uint64_t(y) < pi.size());
   double time;
 
   if (is_print)
@@ -151,8 +154,6 @@ int128_t Sigma(int128_t x,
   }
 
   int128_t x_star = get_x_star_gourdon(x, y);
-  PiTable pi(y, threads);
-
   int128_t a = pi[y];
   int128_t b = pi[iroot<3>(x)];
   int128_t c = pi[isqrt(x / y)];

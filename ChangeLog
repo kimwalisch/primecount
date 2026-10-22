@@ -1,5 +1,7 @@
 Changes in primecount-9.0, 2026-10-22
 
+* Gourdon: Share one PiTable between Sigma, Phi0, AC and D.
+* Phi0.cpp: Extract primes from PiTable instead of sieving them again.
 * Sigma.cpp: Limit the prime count lookup table to y.
 * AC.cpp: Limit the primes vector to sqrt(x / sqrt(y)), add PiTable::prev_prime(x).
 * AC_*.hpp: Remove the C1 formula, D computes its easy leaves in the band.

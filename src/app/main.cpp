@@ -29,6 +29,7 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <PhiTiny.hpp>
+#include <PiTable.hpp>
 #include <print.hpp>
 #include <S.hpp>
 
@@ -154,10 +155,12 @@ maxint_t AC(maxint_t x,
   if (is_print())
     set_print_variables(true);
 
+  const PiTable pi(y, threads);
+
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return AC((int64_t) x, y, k, threads);
+    return AC((int64_t) x, y, k, pi, threads);
   else
-    return AC(x, y, k, threads);
+    return AC(x, y, k, pi, threads);
 }
 
 maxint_t B(maxint_t x,
@@ -222,10 +225,12 @@ maxint_t D(maxint_t x,
   if (is_print())
     set_print_variables(true);
 
+  const PiTable pi(y, threads);
+
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return D((int64_t) x, y, k, threads);
+    return D((int64_t) x, y, k, pi, threads);
   else
-    return D(x, y, k, threads);
+    return D(x, y, k, pi, threads);
 }
 
 maxint_t Phi0(maxint_t x,
@@ -257,10 +262,12 @@ maxint_t Phi0(maxint_t x,
   if (is_print())
     set_print_variables(true);
 
+  const PiTable pi(y, threads);
+
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return Phi0((int64_t) x, y, k, threads);
+    return Phi0((int64_t) x, y, k, pi, threads);
   else
-    return Phi0(x, y, k, threads);
+    return Phi0(x, y, k, pi, threads);
 }
 
 maxint_t Sigma(maxint_t x,
@@ -290,10 +297,12 @@ maxint_t Sigma(maxint_t x,
   if (is_print())
     set_print_variables(true);
 
+  const PiTable pi(y, threads);
+
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return Sigma((int64_t) x, y, threads);
+    return Sigma((int64_t) x, y, pi, threads);
   else
-    return Sigma(x, y, threads);
+    return Sigma(x, y, pi, threads);
 }
 
 maxint_t P2(maxint_t x,

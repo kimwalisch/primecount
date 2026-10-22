@@ -226,9 +226,11 @@ namespace primecount {
 int64_t D(int64_t x,
           int64_t y,
           int64_t k,
+          const PiTable& pi,
           int threads,
           bool is_print)
 {
+  ASSERT(uint64_t(y) < pi.size());
   double time;
 
   if (is_print)
@@ -242,7 +244,6 @@ int64_t D(int64_t x,
 
   FactorTable<uint16_t> factor(y, threads);
   int64_t xy = x / y;
-  PiTable pi(y, threads);
   auto primes = pi.get_primes<uint32_t>(y, threads);
   int64_t sum = D_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
 
@@ -257,9 +258,11 @@ int64_t D(int64_t x,
 int128_t D(int128_t x,
            int64_t y,
            int64_t k,
+           const PiTable& pi,
            int threads,
            bool is_print)
 {
+  ASSERT(uint64_t(y) < pi.size());
   double time;
 
   if (is_print)
@@ -278,7 +281,6 @@ int128_t D(int128_t x,
   if (y <= FactorTable<uint16_t>::max())
   {
     FactorTable<uint16_t> factor(y, threads);
-    PiTable pi(y, threads);
 
     if (y <= UINT32_MAX)
     {
@@ -294,7 +296,6 @@ int128_t D(int128_t x,
   else
   {
     FactorTable<uint32_t> factor(y, threads);
-    PiTable pi(y, threads);
     auto primes = pi.get_primes<int64_t>(y, threads);
     sum = D_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
   }

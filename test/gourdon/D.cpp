@@ -12,6 +12,7 @@
 #include <gourdon.hpp>
 #include <generate_primes.hpp>
 #include <imath.hpp>
+#include <PiTable.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
@@ -157,12 +158,13 @@ int main()
 
   for (const D_formula_params& params : test_cases)
   {
-    int64_t res = D(params.x, params.y, params.k, threads);
+    const PiTable pi(params.y, threads);
+    int64_t res = D(params.x, params.y, params.k, pi, threads);
     std::cout << "D_64bit(" << params.x << ", " << params.y << ", " << params.k << ") = " << res;
     check(res == params.res);
 
     #ifdef HAVE_INT128_T
-      int128_t res2 = D((int128_t) params.x, params.y, params.k, threads);
+      int128_t res2 = D((int128_t) params.x, params.y, params.k, pi, threads);
       std::cout << "D_128bit(" << params.x << ", " << params.y << ", " << params.k << ") = " << res2;
       check(res2 == params.res);
     #endif
@@ -185,12 +187,13 @@ int main()
         {
           int64_t x = center + delta;
           int64_t expected = D_reference(x, y, 8);
-          int64_t res = D(x, y, 8, threads);
+          const PiTable pi(y, threads);
+          int64_t res = D(x, y, 8, pi, threads);
           std::cout << "D boundary(" << x << ", " << y << ") = " << res;
           check(res == expected);
 
           #ifdef HAVE_INT128_T
-            int128_t res2 = D((int128_t) x, y, 8, threads);
+            int128_t res2 = D((int128_t) x, y, 8, pi, threads);
             check(res2 == expected);
           #endif
         }
@@ -259,10 +262,11 @@ int main()
           iroot<3>(x) < params.y &&
           params.y <= isqrt(x));
     int64_t expected = D_reference(x, params.y, 8);
-    check(D(x, params.y, 8, threads) == expected);
+    const PiTable pi(params.y, threads);
+    check(D(x, params.y, 8, pi, threads) == expected);
 
     #ifdef HAVE_INT128_T
-      check(D((int128_t) x, params.y, 8, threads) == expected);
+      check(D((int128_t) x, params.y, 8, pi, threads) == expected);
     #endif
   }
 

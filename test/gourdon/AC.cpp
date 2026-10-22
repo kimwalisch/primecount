@@ -10,6 +10,7 @@
 
 #include <primecount.hpp>
 #include <gourdon.hpp>
+#include <PiTable.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -120,12 +121,13 @@ int main()
 
   for (const AC_formula_params& params : test_cases)
   {
-    int64_t res = AC(params.x, params.y, params.k, threads);
+    const PiTable pi(params.y, threads);
+    int64_t res = AC(params.x, params.y, params.k, pi, threads);
     std::cout << "AC_64bit(" << params.x << ", " << params.y << ", " << params.k << ") = " << res;
     check(res == params.res);
 
     #ifdef HAVE_INT128_T
-      int128_t res2 = AC((int128_t) params.x, params.y, params.k, threads);
+      int128_t res2 = AC((int128_t) params.x, params.y, params.k, pi, threads);
       std::cout << "AC_128bit(" << params.x << ", " << params.y << ", " << params.k << ") = " << res2;
       check(res2 == params.res);
     #endif
