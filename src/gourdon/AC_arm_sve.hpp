@@ -12,9 +12,9 @@
 #ifndef AC_ARM_SVE_HPP
 #define AC_ARM_SVE_HPP
 
+#include "DBand.hpp"
 #include "LoadBalancerAC.hpp"
 #include "SegmentedPiTable.hpp"
-#include "DBand.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
@@ -392,8 +392,8 @@ T AC_OpenMP_arm_sve(T x,
           {
             T xp = x / primes[b];
 
-            // The band of D contains the easy leaves of this row
-            if (is_extended_row(xp, primes[b], y))
+            // D computes the easy leaves of this row in its band
+            if (band_has_easy_leaves(xp, primes[b], y))
               continue;
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())

@@ -47,7 +47,7 @@ namespace {
 using namespace primecount;
 
 // Not a lambda, operator() requires the ARM SVE target attribute
-struct DCountArmSve
+struct SieveCountArmSve
 {
   Sieve& sieve;
 
@@ -152,9 +152,9 @@ T D_thread_arm_sve(T x,
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
-  Vector<CentralEvent> events;
-  SemiprimeEventBitmap sorter;
-  DCountArmSve count_sieve{sieve};
+  Vector<SemiprimeEvent> events;
+  SemiprimeEventSorter sorter;
+  SieveCountArmSve count_sieve{sieve};
   thread.init_time = get_time();
 
   INDETERMINATE Array<uint32_t, 128> m_indexes32;
@@ -192,8 +192,8 @@ T D_thread_arm_sve(T x,
       if (prime >= max_m)
         goto next_segment;
 
-      if (central_row(xp, prime, b, y, low, high, phi[b], primes, pi,
-                      mertens_y, count_sieve, events, sorter, sum, max_m))
+      if (band_row(xp, prime, b, y, low, high, phi[b], primes, pi,
+                   mertens_y, count_sieve, events, sorter, sum, max_m))
       {
         phi[b] += sieve.get_total_count();
         sieve.cross_off_count(prime, b);
@@ -201,7 +201,7 @@ T D_thread_arm_sve(T x,
       }
 
       // A composite m with all prime factors > prime exceeds prime^2.
-      // Test the uncapped bound: later rows may still have central
+      // Test the uncapped bound: later rows may still have band
       // leaves even when the capped max_m is at most prime^2.
       if (original_max_m <= prime * prime && low >= y)
         break;

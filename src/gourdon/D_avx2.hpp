@@ -132,8 +132,8 @@ T D_thread_avx2(T x,
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
-  Vector<CentralEvent> events;
-  SemiprimeEventBitmap sorter;
+  Vector<SemiprimeEvent> events;
+  SemiprimeEventSorter sorter;
   auto count_sieve = [&sieve](uint64_t stop) { return sieve.count(stop); };
   thread.init_time = get_time();
 
@@ -172,8 +172,8 @@ T D_thread_avx2(T x,
       if (prime >= max_m)
         goto next_segment;
 
-      if (central_row(xp, prime, b, y, low, high, phi[b], primes, pi,
-                      mertens_y, count_sieve, events, sorter, sum, max_m))
+      if (band_row(xp, prime, b, y, low, high, phi[b], primes, pi,
+                   mertens_y, count_sieve, events, sorter, sum, max_m))
       {
         phi[b] += sieve.get_total_count();
         sieve.cross_off_count(prime, b);
@@ -181,7 +181,7 @@ T D_thread_avx2(T x,
       }
 
       // A composite m with all prime factors > prime exceeds prime^2.
-      // Test the uncapped bound: later rows may still have central
+      // Test the uncapped bound: later rows may still have band
       // leaves even when the capped max_m is at most prime^2.
       if (original_max_m <= prime * prime && low >= y)
         break;

@@ -48,7 +48,7 @@ Vector<Event> trial_events(int64_t p, int64_t lower, int64_t upper)
   return events;
 }
 
-void check(SemiprimeEventBitmap& sorter, Vector<Event>& events,
+void check(SemiprimeEventSorter& sorter, Vector<Event>& events,
            int64_t p, int64_t lower, int64_t upper)
 {
   Vector<Event> expected(events.size());
@@ -81,7 +81,7 @@ void check(SemiprimeEventBitmap& sorter, Vector<Event>& events,
 
 int main()
 {
-  SemiprimeEventBitmap sorter;
+  SemiprimeEventSorter sorter;
 
   // Trial division independently supplies squares and both event weights
   for (int64_t p : {2, 3, 5, 7, 23})

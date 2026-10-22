@@ -135,16 +135,16 @@ int64_t D_reference(int64_t x, int64_t y, int64_t k)
     // Rows with x/p^3 < y and sqrt(x/p) < y < p^3 also
     // contain their easy leaves (C1 skips these rows).
     int64_t xp = x / prime;
-    bool extended = prime * prime <= y &&
-                    xp / (prime * prime) < y &&
-                    prime * prime > y / prime &&
-                    isqrt(xp) < y;
+    bool easy_in_band = prime * prime <= y &&
+                        xp / (prime * prime) < y &&
+                        prime * prime > y / prime &&
+                        isqrt(xp) < y;
 
     for (int64_t m = prime + 1; m <= y; m++)
       if (mu[m] != 0 &&
           lpf[m] > prime &&
           prime * m > y &&
-          (extended || x / (prime * m) >= prime * prime))
+          (easy_in_band || x / (prime * m) >= prime * prime))
         sum -= mu[m] * phi(x / (prime * m), b - 1);
   }
 
@@ -196,27 +196,28 @@ int main()
         }
   }
 
-  struct CentralParams
+  struct BandParams
   {
     int64_t xp;
     int64_t y;
     int64_t prime;
-    int region;
+    int band;
   };
 
-  // Regions: 0 = fallback, 1 = natural upper bound, 2 = upper bound y.
-  // Include A = p^2, A = H, prime/semiprime endpoints, and boundaries
-  // immediately below, at, and above multiples of the sieve alignment.
-  const Array<CentralParams, 30> central_cases = {{
-    { 279840, 530, 23, 0 },
-    { 279841, 530, 23, 0 },
-    { 280370, 530, 23, 1 },
-    { 280898, 530, 23, 1 },
+  // Bands: 0 = none, 1 = mixed (x/p^3 < y), 2 = hard (x/p^3 >= y).
+  // Include x/(p*y) = p^2, x/(p*y) = sqrt(x/p), prime/semiprime
+  // endpoints, and boundaries immediately below, at, and above
+  // multiples of the sieve alignment.
+  const Array<BandParams, 30> band_cases = {{
+    { 279840, 530, 23, 1 },
+    { 279841, 530, 23, 1 },
+    { 280370, 530, 23, 2 },
+    { 280898, 530, 23, 2 },
     { 280899, 530, 23, 2 },
     { 280900, 530, 23, 0 },
     { 280901, 530, 23, 0 },
     { 559681, 1058, 23, 1 },
-    { 559682, 1058, 23, 1 },
+    { 559682, 1058, 23, 2 },
     { 560739, 1058, 23, 2 },
     { 560740, 1058, 23, 2 },
     { 7653060, 12167, 23, 0 },
@@ -236,28 +237,25 @@ int main()
     { 921599, 1200, 23, 2 },
     { 921600, 1200, 23, 2 },
     { 921601, 1200, 23, 2 },
-    { 1414562, 1682, 29, 1 },
+    { 1414562, 1682, 29, 2 },
     { 1416243, 1682, 29, 2 }
   }};
 
-  for (const CentralParams& params : central_cases)
+  for (const BandParams& params : band_cases)
   {
     int64_t p = params.prime;
     int64_t x = params.xp * p;
-    int64_t upper = params.xp / (p * p);
-    int64_t lower = params.xp / params.y;
-    int64_t middle = isqrt(params.xp);
-    int region = 0;
+    int64_t sqrt_xp = isqrt(params.xp);
+    int band = 0;
 
-    if (p * p <= upper && middle < upper && upper <= params.y)
-      region = 1;
-    else if (p * p <= lower && lower <= middle &&
-             middle < params.y && params.y < p * p * p)
-      region = 2;
+    if (p * p <= params.y &&
+        sqrt_xp < params.y &&
+        params.y < p * p * p)
+      band = (params.xp / (p * p) < params.y) ? 1 : 2;
 
-    std::cout << "D central region " << params.region << " ("
+    std::cout << "D band " << params.band << " ("
               << x << ", " << params.y << ")";
-    check(region == params.region &&
+    check(band == params.band &&
           iroot<3>(x) < params.y &&
           params.y <= isqrt(x));
     int64_t expected = D_reference(x, params.y, 8);

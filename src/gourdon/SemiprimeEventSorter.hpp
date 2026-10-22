@@ -23,7 +23,7 @@
 
 namespace primecount {
 
-class SemiprimeEventBitmap : private BitSieve240
+class SemiprimeEventSorter : private BitSieve240
 {
 public:
   /// Events must have distinct n=q*r in (lower, upper], where p<=q<=r

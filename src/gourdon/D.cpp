@@ -180,7 +180,7 @@ T D_OpenMP(T x,
   // Only rows with prime^2 <= y < prime^3 use this prefix
   Vector<int64_t> mertens_y = phi_vector(y, max_b, primes, pi);
   for (int64_t b = 1; b <= max_b; b++)
-    mertens_y[b] -= central_correction(y, primes[b], b, pi);
+    mertens_y[b] -= phi_minus_mertens(y, primes[b], b, pi);
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -206,11 +206,11 @@ T D_OpenMP(T x,
       sum += partial;
     }
 
-    // Band terms of the extended rows with positions < prime^2
+    // Band terms with positions < prime^2, computed once per row
     for (int64_t b = min_b++; b <= last_b; b = min_b++)
     {
       UT xp = UT(x / primes[b]);
-      sum += central_cheap_terms(xp, primes[b], b, y, mertens_y[b], primes, pi);
+      sum += easy_band_terms(xp, primes[b], b, y, mertens_y[b], primes, pi);
     }
   }
 
