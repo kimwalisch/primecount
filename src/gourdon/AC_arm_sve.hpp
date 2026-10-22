@@ -339,7 +339,7 @@ T AC_OpenMP_arm_sve(T x,
 
   // C1 skips the rows p > band_min_prime(),
   // D computes their easy leaves in the band.
-  int64_t max_c1 = pi[min(band_min_prime(xy, y), sqrty)];
+  int64_t max_c1 = pi[band_min_prime(xy, y)];
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the

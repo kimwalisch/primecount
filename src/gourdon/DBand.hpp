@@ -39,7 +39,8 @@ struct SemiprimeEvent
 ///
 inline int64_t band_min_prime(int64_t xy, int64_t y)
 {
-  return max(iroot<3>(y), xy / y);
+  int64_t min_prime = max(iroot<3>(y), xy / y);
+  return min(min_prime, isqrt(y));
 }
 
 /// For p = primes[b] and p^2 <= t < p^3, the Moebius prefix sum

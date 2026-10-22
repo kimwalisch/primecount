@@ -306,7 +306,7 @@ T AC_OpenMP_libdivide(T x,
 
   // C1 skips the rows p > band_min_prime(),
   // D computes their easy leaves in the band.
-  int64_t max_c1 = pi[min(band_min_prime(xy, y), sqrty)];
+  int64_t max_c1 = pi[band_min_prime(xy, y)];
 
   // Initialize libdivide vector from primes vector
   Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
