@@ -96,8 +96,11 @@ Band terms whose position is `< p^2` need only PiTable lookups (the
 `easy_band_terms()`. All other band terms are computed per sieve segment
 by `band_row()`.
 
-At default parameters, `y >= x^(2/5)` holds for `x >= ~4*10^11`. Then
-every C1 row has a mixed band and C1 computes nothing (Section 10).
+For every valid `y`, every row of C1's range `(x/y)^(1/3) < p <= sqrt(y)`
+has a mixed band. Hence C1 computes nothing, and it can be deleted
+without changing `y` or `alpha` (Section 10). Band rows and C1 rows exist
+only if `y > x^(2/5)`. At default parameters, D has band rows only for
+`x >= ~4*10^11`.
 
 Effect: the share of D's sieve queries that are removed grows by 3–7
 percentage points (Section 7). For example, at `x = 10^20` it rises from
@@ -261,15 +264,21 @@ Row ranges, in increasing `p`:
 
 | Rows | D | AC |
 |---|---|---|
-| `k < p <= band_min_prime` | no band; hard leaves as in master | C1 computes the easy leaves if `p > (x/y)^(1/3)` |
+| `k < p <= band_min_prime` | no band; hard leaves as in master | (not a C1 row) |
 | `band_min_prime < p <= (x/y)^(1/3)` | hard band | (not a C1 row) |
-| `max(band_min_prime, (x/y)^(1/3)) < p <= sqrt(y)` | mixed band | C1 skips the row |
+| `(x/y)^(1/3) < p <= sqrt(y)` | mixed band | C1 row, skipped by C1 |
 | `sqrt(y) < p <= x^(1/4)` | 2-prime loop, no band | C2 rows |
 
-When `y >= x^(2/5)`: `band_min_prime <= (x/y)^(1/3)`, there are no C1
-rows without a band, and C1 is empty (Section 10). When `y < x^(2/5)`:
-there are no hard bands, and the C1 rows
-`(x/y)^(1/3) < p <= band_min_prime` remain in C1.
+The ranges are in this order because
+`band_min_prime(xy, y) <= iroot<3>(xy)` for every valid `y` (Section
+10.1); some of them may be empty. So every C1 row is a mixed-band row,
+and no row is left for C1.
+
+Band rows and C1 rows exist only if `y > x^(2/5)`. A band row has
+`x < p*y^2` (`H < y`), a C1 row has `x < p^3*y` (`p > (x/y)^(1/3)`), and
+with `p <= sqrt(y)` both give `x < y^(5/2)`. For `y <= x^(2/5)`, every
+row `p <= sqrt(y)` is in the first range: D has no band rows and C1 has
+no rows, as in master.
 
 ### 3.5 Position bookkeeping: easy band terms and segment terms
 
@@ -499,9 +508,13 @@ sum += band_row(xp, prime, b, y, low, high, phi[b], mertens_y[b],
 ### 4.5 AC
 
 In `AC_OpenMP_*`: `max_c1 = pi[band_min_prime(xy, y)]`, and the C1 loop
-runs over `b = min_c1 .. max_c1`. The rows `b > max_c1` (with
-`b <= pi_sqrty`) are exactly D's mixed-band rows, since every C1 row has
-`p > (x/y)^(1/3)`. AC includes `DBand.hpp` only for `band_min_prime()`.
+runs over `b = min_c1 .. max_c1` with `min_c1 > max(k, pi_root3_xy)`.
+Since `band_min_prime(xy, y) <= iroot<3>(xy)` (Section 10.1),
+`max_c1 <= pi_root3_xy < min_c1`, so the loop is never entered, for every
+valid `y`. C1's rows `max(k, pi_root3_xy) < b <= pi_sqrty` are exactly
+D's mixed-band rows (Section 3.4). AC includes `DBand.hpp` only for
+`band_min_prime()`. `C1()`, `C1_libdivide()`, `C1_arm_sve()` and their
+loops are dead code (Section 10.3).
 
 ### 4.6 `SemiprimeEventSorter`
 
@@ -746,117 +759,122 @@ Verify each item and report issues with a concrete counterexample.
 
 ---
 
-## 10. Removing C1: enforcing `y >= x^(2/5)`
+## 10. Removing C1: C1 is always empty
 
 ### 10.1 The claim
 
-Note on exponents: the condition is **`y >= x^(2/5)`**. Because
-`y ~ alpha * x^(1/3)`, this corresponds to `alpha >= ~x^(1/15)`, **not**
-`alpha >= x^(2/5)`.
+**Correction.** Earlier versions of this section claimed that C1 is
+empty only if `y >= x^(2/5)`, and proposed a lower bound for `y`. That
+was wrong. The argument compared `band_min_prime()` only with C1's lower
+row bound `(x/y)^(1/3)` and ignored its upper bound `p <= sqrt(y)`, and
+the check script only tested that `y^5 >= x^2` implies an empty C1 loop
+(Appendix A.2), not the converse. `C1-Removal-Analysis.md` found the
+error; this section follows its proof.
 
-**Claim:** if `y^5 >= x^2`, the C1 loop in AC is empty. Every C1 row has a
-mixed band in D, and D computes its easy leaves.
+**Claim:** for all integers `1 <= y <= N`:
 
-**Proof.** C1 rows are `max(k, pi_root3_xy) < b <= max_c1 =
-pi[band_min_prime(xy, y)]`, so it suffices to show
-`band_min_prime(xy, y) <= iroot<3>(xy)`.
+```
+band_min_prime(N, y) = min(max(iroot<3>(y), N/y), isqrt(y)) <= iroot<3>(N)
+```
 
-- `iroot<3>(y) <= iroot<3>(xy)`, because `y <= floor(x/y)` ⟺ `y^2 <= x`.
-- Let `a = floor(x/y^2) = floor(xy/y)`. From `y^5 >= x^2` we get
-  `a <= x/y^2 <= (x/y)^(1/3)`. Then `a^3 <= x/y` ⟹ `a^3 <= floor(x/y)`
-  (`a^3` is an integer) ⟹ `a <= iroot<3>(xy)`.
-- The `isqrt(y)` cap only lowers the value.
+Every valid Gourdon setup has `y^2 <= x`, hence `y <= N = floor(x/y) = xy`.
+This includes tiny `x` (`x = 2, 3` with `y = 1`, `x = 8` with `y = 2`).
 
-Checked numerically on 300,000 random `(x, y)` with
-`y^5 >= x^2` and `x <= 10^31` (Appendix A.2).
+**Proof** (`C1-Removal-Analysis.md`, Section 4.1). Let `R = iroot<3>(N)`.
+
+- `iroot<3>(y) <= R`, because `y <= N`.
+- If `isqrt(y) <= R`, the outer `min()` gives the claim.
+- Otherwise `y >= (R+1)^2`. Since `N < (R+1)^3`, we get
+  `N/y < (R+1)^3/(R+1)^2 = R+1`, so `floor(N/y) <= R`.
+
+**Consequences.**
+
+- AC: `max_c1 <= pi_root3_xy < min_c1`, so the C1 loop is never entered
+  (Section 4.5).
+- Every C1 row has a mixed band. A C1 row has `p^2 <= y` and
+  `x < p^3*y` (⟺ `p > iroot<3>(xy)`). Together with `y^2 <= x`:
+  - `x < p^3*y <= p*y^2`, so `H < y`;
+  - `y^2 <= x < p^3*y`, so `y < p^3`;
+  - `x < p^3*y`, so `L = floor(x/(p*y)) < p^2`;
+  - `p^4 <= y^2 <= x`, so the row is below D's cap `x^(1/4)`.
+
+  The mixed band contains all of C1's leaves of the row (Section 3.3).
+- `y > x^(2/5)` is necessary for C1 rows and band rows to exist (Section
+  3.4), but it is not a condition for removing C1. For `y <= x^(2/5)`, C1
+  has no rows, already in master. For `y > x^(2/5)`, every C1 row is a
+  mixed-band row.
+
+**Verification.**
+
+- `C1-Removal-Analysis.md`, Section 10: exhaustive and random checks of
+  the claim in C++ (against the production `band_min_prime()`),
+  JavaScript and C#.
+- Python with exact integers:
+  - the claim for all `1 <= y <= N <= 2500` and for 200,000 random
+    `x < 10^31` (3,326,250 cases);
+  - 200,000 random rows, including 24,736 C1 rows. Each C1 row has a
+    mixed band, `p <= x^(1/4)` and `y^5 > x^2`.
+- A build with `abort()` in the C1 loop body of all three AC kernels
+  never aborted:
+  - `ctest` 67/67, including the AC tests with small `y`;
+  - `primecount --test`;
+  - 400 random `(x, alpha, threads)` cases with `x <= 3*10^14` against
+    `--deleglise-rivat`;
+  - `--AC --alpha={1,2,3.5}` at `x = 10^6, 10^9, 10^12, 10^15`.
 
 ### 10.2 Current defaults
 
-`y = floor(floor(x^(1/3)) * alpha)`, with
-`alpha = get_alpha_gourdon(x)`, clamped to `[x^(1/3) + 1, sqrt(x)]`.
+`y = floor(floor(x^(1/3)) * alpha)`, with `alpha = get_alpha_gourdon(x)`,
+clamped to `[x^(1/3) + 1, sqrt(x)]`. Band rows with `p > k` (`k = 8` for
+all `x` below):
 
-| x | default y | y / x^(2/5) | C1 empty |
-|---|---:|---:|---|
-| 1e6 | 207 | 0.824 | no |
-| 1e9 | 2,619 | 0.658 | no |
-| 1e11 | 13,825 | 0.550 | no |
-| 10^11.6 | 43,687 | 1.001 | yes (from 10^11.7 also with `--double-check`, which multiplies alpha by 0.97) |
-| 1e12 | 76,500 | 1.212 | yes |
-| 1e20 | 245,535,363 | 2.455 | yes |
-| 1e31 | 11,631,189,649,596 | 4.630 | yes |
+| x | default y | y / x^(2/5) | hard-band rows | mixed-band rows (= C1 rows) |
+|---|---:|---:|---:|---:|
+| 1e6 | 207 | 0.824 | 0 | 0 |
+| 1e9 | 2,619 | 0.658 | 0 | 0 |
+| 1e11 | 13,825 | 0.550 | 0 | 0 |
+| 4e11 | 43,824 | 1.002 | 0 | 0 |
+| 4.1e11 | 44,545 | 1.009 | 0 | 1 |
+| 1e12 | 76,500 | 1.212 | 12 | 7 |
+| 1e20 | 245,535,363 | 2.455 | 680 | 888 |
+| 1e31 | 11,631,189,649,596 | 4.630 | 67,681 | 169,271 |
 
-So for `x >= ~4*10^11` nothing changes. For smaller `x`, `y` grows by up
-to about 1.8x (at `x = 10^11`). These runs are fast, but
-**benchmark** `x` in `[10^6, 10^12]` before and after, e.g.
-`primecount 1e10 --time`, and possibly re-fit the small-`x` alpha
-formula. The asymptotically optimal `y ~ x^(1/3) log^3 x` grows more
-slowly than `x^(2/5)`, but within primecount's range `x <= 10^31` the
-default ratio keeps increasing (4.63 at `10^31`).
+Below about `x = 4*10^11`, D has no band rows at default parameters, and
+C1 had no rows in master either. Above it, the C1 rows are D's mixed-band
+rows. No change of `alpha` or `y` is needed.
 
 ### 10.3 Implementation plan
 
-1. **Clamp `y`**, not alpha. `alpha` is truncated to 3 decimals and
-   `y = (int64_t)(x13 * alpha)` truncates again. An exact,
-   overflow-free bound:
-   ```cpp
-   // C1 is empty if y >= x^(2/5): every C1 row has a band in D
-   int64_t x15 = iroot<5>(x);
-   y = std::max(y, (x15 + 1) * (x15 + 1));   // >= x^(2/5)
-   y = std::min(y, sqrtx);                   // keep the existing upper bound last
-   ```
-   `(floor(x^(1/5)) + 1)^2 > x^(2/5)`, and the excess is below 1.3% at
-   `x >= 10^11`. Alternatively compute the exact `ceil(x^(2/5))` with
-   integer correction.
+No change of `alpha`, `y`, `get_alpha_gourdon()` or the seven places that
+compute Gourdon's `y` (`pi_gourdon.cpp` and `main.cpp`) is needed
+(`C1-Removal-Analysis.md`, Section 8).
 
-   Gourdon's `y` is computed in 7 places with identical code:
-   - `src/gourdon/pi_gourdon.cpp`: `pi_gourdon_64`, `pi_gourdon_128`;
-   - `src/app/main.cpp`: the CLI entry points `AC()`, `B()`, `D()`,
-     `Phi0()`, `Sigma()`.
-
-   All must use the same `y`, since `pi(x) = A - B + C + D + Phi0 + Sigma`
-   only holds with one `y`. Consider factoring them into one helper next
-   to `get_alpha_gourdon()` in `src/util.cpp`, e.g.
-   `int64_t get_y_gourdon(maxint_t x, double alpha)`.
-
-   `get_alpha(x, y)` in `util.cpp` recomputes the printed alpha from `y`,
-   so the output stays consistent. Keep the `x / y <= 2^62` check
-   (`pi_gourdon_128`); a larger `y` only helps it.
-2. **Tiny `x`.** After `min(y, sqrtx)` the bound can fail. For `x = 2, 3`,
-   `y = 1`; for `x = 8`, `y = 2`. C1 is still empty because it needs a
-   prime `p <= sqrt(y)` with `p > (x/y)^(1/3)`. Verify exhaustively for
-   `x <= 10^7` and randomly above: after the new clamping,
-   `pi[band_min_prime(xy, y)] <= max(k, pi[iroot<3>(xy)])`. Add an
-   `ASSERT` with this condition in `AC_OpenMP_*` (or in `AC()`), so a
-   caller with a smaller `y` is caught in Debug builds.
-3. **Delete C1:**
+1. **Delete C1** (`C1-Removal-Analysis.md`, Section 9.1):
    - `C1()` in `AC_default.hpp`, `C1_libdivide()` in `AC_libdivide.hpp`,
      `C1_arm_sve()` in `AC_arm_sve.hpp`;
-   - the `if (low < y) { ... C1 loop ... }` blocks in the three
-     `AC_OpenMP_*` functions;
-   - `max_c1` and `#include "DBand.hpp"` in AC.
+   - the `if (low < y) { ... C1 loop ... }` blocks, `max_c1` and the
+     C1-only variables in the three `AC_OpenMP_*` functions;
+   - `#include "DBand.hpp"` in AC.
 
-   Check whether `LoadBalancerAC` or `SegmentedPiTable` sizing depends
-   on C1's needs (`low < y`). Update the file-level doc comments
-   ("A + C", C1/C2 descriptions) and `doc/Easy-Special-Leaves.pdf`
-   references if they mention C1.
-4. **Tests.** `test/gourdon/AC.cpp` calls `AC(x, y, k)` with explicit
-   `y`, several below `x^(2/5)`, e.g. `{1000000, 101}`, `{1000000, 207}`,
-   `{10000000, 485}`. For those `y`, AC without C1 is incomplete. Change
-   these cases to `y >= x^(2/5)` (and regenerate expected values from an
-   independent source), or remove them. `test/gourdon/D.cpp` may keep
-   small `y`, since D itself remains correct for every
-   `y >= x^(1/3)` (it uses `pi_band`). Keep `D()` general.
-5. **Follow-up simplifications.**
-   - With `y >= x^(2/5)`, `band_min_prime() <= iroot<3>(xy)`, so in
-     `D.cpp` `max3(k, pi_root3_xy, pi_band)` reduces to
-     `max(k, pi_root3_xy)` for `pi_gourdon`. Keep `pi_band` while `D()`
-     accepts arbitrary `y` (tests).
-   - The kernel cut-off's `low >= y` condition is **still required**
-     (Section 4.3).
-   - `ChangeLog` entry; update the tex paper later.
-6. **Verify** as in Section 6. Run Release and Debug `ctest`,
-   `--test`, `1e18`, the random sweep with random `--alpha` (the clamp
-   now overrides small alphas) and `test/gourdon/alpha_gourdon.cpp`.
+   Keep `LoadBalancerAC`, `SegmentedPiTable` and the segments below `y`:
+   A and C2 still have work there. Update the comments that list C1 (file
+   descriptions and the thread-reuse comment in `AC_OpenMP_*`) and note
+   that D computes these rows.
+2. **Tests.** Keep all AC and D test values, including those with small
+   `y`, e.g. `{1000000, 101}`, `{1000000, 207}`, `{10000000, 485}`. Their
+   C1 range is empty, already in master, so deleting C1 changes no value.
+3. **Optional D simplification** (`C1-Removal-Analysis.md`, Section 9.2).
+   In `D.cpp`, the easy-band loop can start at `max(k, pi_root3_xy) + 1`
+   instead of `max3(k, pi_root3_xy, pi_band) + 1`, for every valid `y`.
+   Then only `test/gourdon/DBand.cpp` uses `band_min_prime()`. Either
+   keep it, or remove it and test directly that every C1 row has a mixed
+   band. `band_row()` does not use it.
+4. The kernel cut-off's `low >= y` condition is still required (Section
+   4.3).
+5. `ChangeLog` entry; update the tex paper later.
+6. **Verify** as in Section 6: Release and Debug `ctest`, `--test`,
+   `1e18`, and the random sweep with random `--alpha`, which covers `y`
+   below and above `x^(2/5)`.
 
 ---
 
