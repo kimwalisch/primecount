@@ -1,5 +1,6 @@
 Changes in primecount-9.0, 2026-10-22
 
+* doc/C1-Removal-Analysis.md: Analyze C1 removal without changing Gourdon's y bound.
 * DBand.hpp: Cancel the prime hard leaves in the band (x/(p*y), y] of the rows of D.
 * DBand.hpp: Rows with x/p^3 < y also compute their C1 easy leaves in the band.
 * D: Skip factor table scans when the remaining factors must be prime.
