@@ -39,8 +39,8 @@ Your tasks:
 - **A. Full code review.** Verify every formula and bound against the
   mathematics; Section 9 has a checklist and Sections 3–5 the proofs
   to verify.
-- **B. Remove the C1 sum from AC** by enforcing `y >= x^(2/5)`
-  (Section 10).
+- **B. Remove the C1 sum from AC.** It is already empty for every
+  valid `y`, so no `y` or `alpha` bound is needed (Section 10).
 - **C. Further refinements.** Section 11 lists candidates.
 
 Read `AGENTS.md` in the repository root first. It covers coding
@@ -464,9 +464,9 @@ sum += band_row(xp, prime, b, y, low, high, phi[b], mertens_y[b],
   all later rows is prime, so the 2-prime loop takes over. The test sits
   *before* `band_row()`, so it uses the uncapped `max_m`. It requires
   `low >= y`, because the 2-prime loop computes no band terms; with
-  `low >= y` there are none in the segment. In the current design this
-  condition is needed for every `y`, not only `y < x^(2/5)`: without it,
-  the break would also skip the band terms of the current row.
+  `low >= y` there are none in the segment. Without it, the break would
+  also skip the band terms of the current row. This matters only if the
+  row has a band, which requires `y > x^(2/5)` (Section 3.4).
 - **Remaining leaves.** For every band row the factor-table loop computes
   the leaves `m <= min(max_m, L)`. Their positions `X/m >= X/L >= y` come
   after all band positions, so counts stay nondecreasing.
@@ -767,9 +767,9 @@ Verify each item and report issues with a concrete counterexample.
 empty only if `y >= x^(2/5)`, and proposed a lower bound for `y`. That
 was wrong. The argument compared `band_min_prime()` only with C1's lower
 row bound `(x/y)^(1/3)` and ignored its upper bound `p <= sqrt(y)`, and
-the check script only tested that `y^5 >= x^2` implies an empty C1 loop
-(Appendix A.2), not the converse. `C1-Removal-Analysis.md` found the
-error; this section follows its proof.
+the check script only sampled `y >= x^(2/5)`. Appendix A.2 now samples
+every valid `y`. `C1-Removal-Analysis.md` found the error; this section
+follows its proof.
 
 **Claim:** for all integers `1 <= y <= N`:
 
@@ -894,7 +894,8 @@ compute Gourdon's `y` (`pi_gourdon.cpp` and `main.cpp`) is needed
 - **Test coverage.**
   - Real `x > 2^64` band rows with 128-bit `T` (the dense test only uses
     small `xp` with `uint128_t`).
-  - A unit test asserting that C1 is empty under the new `y` clamp.
+  - A unit test that every C1 row has a mixed band, replacing the
+    `band_min_prime()` checks if that helper is removed (Section 10.3).
 - **Remove the `p` parameter** of `SemiprimeEventSorter::sort` if
   `p > 5` is always guaranteed (k >= 3?). Check `PhiTiny::get_k()` for
   small `x`; currently `p <= 5` occurs for tiny `x` and needs the
@@ -942,7 +943,10 @@ for p in range(2, 3000):
 print("OK")
 ```
 
-### A.2 `y^5 >= x^2` implies an empty C1 loop (Python)
+### A.2 The C1 loop is empty for every valid `y` (Python)
+
+Checks `band_min_prime(xy, y) <= iroot<3>(xy)` (Section 10.1) for random
+`y` in the whole valid range, below and above `x^(2/5)`.
 
 ```python
 import math, random
@@ -958,9 +962,7 @@ def iroot(n, k):
 rng = random.Random(3)
 for _ in range(300000):
     x = max(int(10 ** rng.uniform(2, 31)) + rng.randrange(-3, 4), 2)
-    ymin = iroot(x * x, 5)
-    if ymin ** 5 < x * x: ymin += 1
-    if ymin > math.isqrt(x): continue
+    ymin = min(iroot(x, 3) + 1, math.isqrt(x))
     y = rng.randint(ymin, math.isqrt(x))
     xy = x // y
     band_min_prime = min(max(iroot(y, 3), xy // y), math.isqrt(y))
