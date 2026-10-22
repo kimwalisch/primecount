@@ -26,6 +26,7 @@
 #include <phi_vector.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
+#include <RelaxedAtomic.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -181,17 +182,6 @@ T D_OpenMP(T x,
   for (int64_t b = 1; b <= max_b; b++)
     mertens_y[b] -= central_correction(y, primes[b], b, pi);
 
-  // Band terms of the extended rows with positions < prime^2
-  UT sum = 0;
-  int64_t last_b = min(pi_sqrty, pi_x14);
-
-  #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
-  for (int64_t b = k + 1; b <= last_b; b++)
-  {
-    UT xp = UT(x / primes[b]);
-    sum += central_cheap_terms(xp, primes[b], b, y, mertens_y[b], primes, pi);
-  }
-
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t thread_threshold = 1 << 20;
@@ -199,6 +189,9 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
+  INDETERMINATE RelaxedAtomic<int64_t> min_b(k + 1);
+  int64_t last_b = min(pi_sqrty, pi_x14);
+  UT sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
@@ -211,6 +204,13 @@ T D_OpenMP(T x,
       thread.sum = signed_from_unsigned<T>(partial);
       thread.stop_time = get_time();
       sum += partial;
+    }
+
+    // Band terms of the extended rows with positions < prime^2
+    for (int64_t b = min_b++; b <= last_b; b = min_b++)
+    {
+      UT xp = UT(x / primes[b]);
+      sum += central_cheap_terms(xp, primes[b], b, y, mertens_y[b], primes, pi);
     }
   }
 
