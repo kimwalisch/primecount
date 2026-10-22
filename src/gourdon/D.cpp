@@ -175,7 +175,8 @@ T D_OpenMP(T x,
   int64_t x14 = iroot<4>(x);
   int64_t pi_x14 = pi[x14];
   int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t max_b = max(pi[iroot<3>(xy)], pi_sqrty);
+  int64_t pi_root3_xy = pi[iroot<3>(xy)];
+  int64_t max_b = max(pi_root3_xy, pi_sqrty);
   max_b = min(max_b, pi_x14);
   // Only rows with prime^2 <= y < prime^3 use this prefix
   Vector<int64_t> mertens_y = phi_vector(y, max_b, primes, pi);
@@ -189,7 +190,9 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
-  INDETERMINATE RelaxedAtomic<int64_t> min_b(k + 1);
+  // Rows whose band has easy leaves, see band_min_prime()
+  int64_t pi_band = pi[band_min_prime(xy, y)];
+  INDETERMINATE RelaxedAtomic<int64_t> min_b(max3(k, pi_root3_xy, pi_band) + 1);
   int64_t last_b = min(pi_sqrty, pi_x14);
   UT sum = 0;
 

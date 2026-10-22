@@ -103,7 +103,6 @@ void check_segments(const Input& input, int64_t size,
   int64_t p = input.prime;
   int64_t b = pi[p];
   int64_t lower = input.xp / input.y;
-  int64_t sqrt_xp = isqrt(input.xp);
   int64_t stop = expected.size() - 1;
   int64_t mertens_y = reference.mertens[input.y];
   Vector<SemiprimeEvent> events;
@@ -119,6 +118,7 @@ void check_segments(const Input& input, int64_t size,
   {
     int64_t high = min(low + size, stop);
     int64_t phi = reference.phi[low];
+    int64_t max_m = input.y;
     uint64_t previous = 0;
     auto count = [&](uint64_t position) -> uint64_t {
       check(position < uint64_t(high - low), "Band count escaped its segment");
@@ -127,16 +127,10 @@ void check_segments(const Input& input, int64_t size,
       return reference.phi[low + position] - phi;
     };
 
-    T actual;
-    if (input.mixed)
-      actual = mixed_band_segment(T(input.xp), p, b, input.y, low, high,
-                                  phi, primes, pi, count, events, sorter);
-    else
-      actual = hard_band_segment(T(input.xp), p, b, lower, sqrt_xp,
-                                 mertens_y, low, high, phi,
-                                 primes, pi, count, events, sorter);
+    T actual = band_row(T(input.xp), p, b, input.y, low, high, phi, mertens_y,
+                        primes, pi, count, events, sorter, max_m);
     int64_t wanted = expected[high] - expected[low];
-    if (actual != T(wanted))
+    if (actual != T(wanted) || max_m != lower)
     {
       std::cerr << "Band segment differs: p=" << p << ", low=" << low
                 << ", high=" << high << ", integer bytes=" << sizeof(T)
@@ -152,41 +146,35 @@ void check(const Input& input)
   int64_t square = p * p;
   int64_t lower = input.xp / input.y;
   int64_t sqrt_xp = isqrt(input.xp);
-  if (input.mixed)
-    check(band_has_easy_leaves(input.xp, p, input.y) &&
-          square <= input.y && lower < square &&
-          lower >= input.y / p,
-          "The test must enter a mixed band");
-  else
-    check(square <= lower && lower <= sqrt_xp && sqrt_xp < input.y &&
-          input.y < square * p && input.xp / square >= input.y,
-          "The test must enter a hard band");
+  int64_t xy = input.xp * p / input.y;
 
-  // Mixed bands also contain the easy leaves m <= y,
-  // in hard bands all leaves m <= y are hard.
-  int64_t min_m = input.mixed ? max(p, input.y / p) : lower;
-  int64_t stop = input.xp / (min_m + 1) + 1;
-  Reference reference(max(stop, input.y), p);
+  // band_row() tests the row itself, whereas D.cpp and
+  // the C1 formula use band_min_prime() and (x/y)^(1/3).
+  check(sqrt_xp < input.y && input.y < square * p &&
+        square <= input.y && p > band_min_prime(xy, input.y) &&
+        input.mixed == (lower < square) &&
+        input.mixed == (p > iroot<3>(xy)),
+        "The test must enter a band");
+
+  // All band terms have positions < y
+  int64_t stop = input.y;
+  Reference reference(stop, p);
   Vector<int64_t> expected(stop + 1);
   for (int64_t i = 0; i <= stop; i++)
     expected[i] = 0;
 
   // Accumulate independent dense events at their exact query positions.
-  // In mixed bands the terms below p^2 are computed once per row.
+  // The band terms below p^2 are computed once per row.
   int64_t easy = 0;
   auto add = [&](int64_t position, int64_t value) {
-    if (input.mixed && position < square)
+    if (position < square)
       easy += value;
     else
       expected[position + 1] += value;
   };
 
   add(sqrt_xp, reference.mertens[sqrt_xp] * reference.phi[sqrt_xp]);
-  int64_t boundary = -reference.mertens[input.y] * reference.phi[lower];
-  if (input.mixed)
-    easy += boundary;
-  else
-    add(lower, boundary);
+  add(lower, -reference.mertens[input.y] * reference.phi[lower]);
   for (int64_t n = lower + 1; n <= sqrt_xp; n++)
     if (reference.lpf[n] >= p)
     {
@@ -194,13 +182,10 @@ void check(const Input& input)
       int64_t t = input.xp / n;
       add(t, -(reference.mertens[t] + c * reference.phi[t]));
     }
-  if (input.mixed)
-    for (int64_t m = min_m + 1; m <= lower; m++)
-      if (reference.lpf[m] > p)
-        add(input.xp / m, -reference.mu[m] * reference.phi[input.xp / m]);
 
+  // The band contains the leaves lower < m <= y
   int64_t direct = 0;
-  for (int64_t m = min_m + 1; m <= input.y; m++)
+  for (int64_t m = lower + 1; m <= input.y; m++)
     if (reference.lpf[m] > p)
       direct -= reference.mu[m] * reference.phi[input.xp / m];
   for (int64_t i = 1; i <= stop; i++)

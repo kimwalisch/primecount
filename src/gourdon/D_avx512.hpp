@@ -229,24 +229,17 @@ T D_thread_avx512(T x,
       int64_t xp_high = min(fast_div(xp, high), y);
       int64_t min_m = max(xp_high, y / prime);
       int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
-      int64_t original_max_m = max_m;
 
       if (prime >= max_m)
         goto next_segment;
 
-      if (band_row(xp, prime, b, y, low, high, phi[b], primes, pi,
-                   mertens_y, count_sieve, events, sorter, sum, max_m))
-      {
-        phi[b] += sieve.get_total_count();
-        sieve.cross_off_count(prime, b);
-        continue;
-      }
-
-      // A composite m with all prime factors > prime exceeds prime^2.
-      // Test the uncapped bound: later rows may still have band
-      // leaves even when the capped max_m is at most prime^2.
-      if (original_max_m <= prime * prime && low >= y)
+      // A composite m with all prime factors > prime exceeds
+      // prime^2 and all band terms have positions < y.
+      if (max_m <= prime * prime && low >= y)
         break;
+
+      sum += band_row(xp, prime, b, y, low, high, phi[b], mertens_y[b],
+                      primes, pi, count_sieve, events, sorter, max_m);
 
       min_m = FactorTable::to_index(min_m);
       max_m = FactorTable::to_index(max_m);

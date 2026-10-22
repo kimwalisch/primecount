@@ -304,6 +304,10 @@ T AC_OpenMP_libdivide(T x,
   int64_t pi_sqrty = pi[sqrty];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
 
+  // C1 skips the rows p > band_min_prime(),
+  // D computes their easy leaves in the band.
+  int64_t max_c1 = pi[min(band_min_prime(xy, y), sqrty)];
+
   // Initialize libdivide vector from primes vector
   Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
   lprimes.resize(primes.size());
@@ -371,14 +375,10 @@ T AC_OpenMP_libdivide(T x,
           int64_t min_c1_prime = min(xy / high, sqrty);
           min_c1 = max3(min_c1, pi_sqrt_low, pi[min_c1_prime]) + 1;
 
-          // C1 formula: pi[(x/y)^(1/3)] < b <= pi[sqrt(y)]
-          for (int64_t b = min_c1; b <= pi_sqrty; b++)
+          // C1 formula: pi[(x/y)^(1/3)] < b <= max_c1
+          for (int64_t b = min_c1; b <= max_c1; b++)
           {
             T xp = x / primes[b];
-
-            // D computes the easy leaves of this row in its band
-            if (band_has_easy_leaves(xp, primes[b], y))
-              continue;
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
               sum -= C1_libdivide(xlow, xhigh, uint64_t(xp), b, y, lprimes, primes, pi, segmentedPi);
