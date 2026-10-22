@@ -3,7 +3,8 @@
 Specification of the "full extension" and its implementation in primecount
 
 - Repository: `kimwalisch/primecount`, branch `claude/d-extended-band`,
-  head `60db7d7d` (2026-10-22), after the C1 removal (Section 10.3).
+  head `bfb74102` (2026-10-22), after the C1 removal (Section 10.3) and
+  the reduction of AC's primes vector (Section 4.5).
 - Base: PR #146 by Chopper Lin (head `cc9e282`), which is based on
   master `bcbf2f6`.
 - Companion document: `Hard_Special_Leaves_Cancellation_2.tex` (Kim
@@ -392,13 +393,15 @@ all band rows. Other entries are never read by band code.
 | `src/gourdon/SemiprimeEventSorter.hpp` | sorts events by decreasing `n` (bitmap over the mod-240 wheel, falls back to `std::sort`) — from PR #146 |
 | `src/gourdon/D.cpp` | `D_OpenMP()`: PiTable/primes up to `y`, `mertens_y`, unsigned reduction, easy-band loop |
 | `src/gourdon/D_default.hpp`, `D_avx2.hpp`, `D_avx512.hpp`, `D_arm_neon.hpp`, `D_arm_sve.hpp` | D kernels, call `band_row()` |
+| `src/gourdon/AC.cpp` | AC's PiTable up to `y`, primes up to `min(isqrt(x / (isqrt(y) + 1)), y)` (Section 4.5) |
 | `src/gourdon/AC_default.hpp`, `AC_libdivide.hpp`, `AC_arm_sve.hpp` | A and C2 formulas; C1 was removed (Section 4.5) |
+| `src/PiTable.hpp`, `PiTable.cpp` | `prev_prime(x)`: the largest prime `<= x`, used by AC |
 | `test/gourdon/DBand.cpp` | dense reference test of `band_row()`/`easy_band_terms()` per segment, query order, `max_m`; exhaustive check that every row `(x/y)^(1/3) < p <= sqrt(y)` has a mixed band (`x <= 30000`) |
 | `test/gourdon/SemiprimeEventSorter.cpp` | sorter test |
 | `test/gourdon/D.cpp` | regenerated values; `D_reference()` brute force incl. band semantics; boundary cases; 30 band cases labelled 0 = no band, 1 = mixed, 2 = hard |
 | `test/gourdon/AC.cpp` | regenerated values (`AC_old - delta`) |
 
-### 4.2 `DBand.hpp`, function by function (line numbers at `60db7d7d`)
+### 4.2 `DBand.hpp`, function by function (line numbers at `bfb74102`)
 
 - `struct SemiprimeEvent { int64_t n; int64_t weight; }` (line 29).
 - `phi_minus_mertens(t, p, b, pi)` (line 39): `E_p(t)` for
@@ -521,9 +524,28 @@ Before the removal, `AC_OpenMP_*` ran the C1 loop over
 `max_c1 <= pi_root3_xy < min_c1`, so the loop was never entered, for any
 valid `y`.
 
-AC's PiTable and primes are still sized `y`. The PiTable must be: C2's
-clustered leaves `q <= y` need `pi(y)` and other lookups up to `y`. The
-primes could be reduced (Section 11).
+AC's PiTable is still sized `y`: C2's clustered leaves `q <= y` need
+`pi(y)` and other lookups up to `y`. Since `bfb74102`, AC's primes vector
+only goes up to `max_prime = min(isqrt(x / (isqrt(y) + 1)), y)`:
+
+- The A and C2 rows have `p > sqrt(y)`, because
+  `x_star >= x^(1/4) >= sqrt(y)` and C2 starts after `pi_sqrty`.
+- They only read the primes `<= sqrt(x/p)`: the second primes of their
+  sparse leaves, which are also `<= y` (C2's reflected range lies inside
+  its sparse range), and the row primes `p <= x^(1/3)`, i.e.
+  `p <= sqrt(x/p)`. All row primes are `<= max_prime`; this was also
+  checked for 95 million `(x, y)` pairs, exhaustively for `x <= 300000`
+  and randomly up to `10^31`.
+- C2's largest clustered prime `max_clustered_global`, the largest prime
+  `<= y`, used to be `primes[pi[y]]` and now comes from
+  `PiTable::prev_prime(y)`.
+
+At default `y` the vector has 2.7x fewer primes at `1e19` and 4.8x fewer
+at `1e24`, where they then fit `uint32_t`. AC's peak memory at `1e19`
+dropped from 75.8 MB to 37.3 MB (libdivide stores a 9-byte divider per
+prime). pi(x)'s peak memory is set by D (71.9 MB at `1e19`), which needs
+primes up to almost `y`, because its first band rows have `sqrt(x/p)`
+close to `y`.
 
 ### 4.6 `SemiprimeEventSorter`
 
@@ -646,6 +668,20 @@ After the C1 removal (`60db7d7d`), on the same machine:
 - Random sweep (Appendix A.3): 200 cases with `10^5 <= x <= 3*10^14`.
 - The ARM compile-only checks above, and `AC.cpp` on x86 with and
   without `ENABLE_LIBDIVIDE`.
+
+After the AC primes reduction (`bfb74102`):
+
+- Release and Debug builds: `ctest` 67/67 (including the new
+  `prev_prime()` test in `test/PiTable.cpp`), `--test` passes and `1e18`
+  is correct.
+- `--AC` gives the same values as at `60db7d7d` for 400 random
+  `(x, alpha, threads)` cases with `x <= 3*10^16`, 400 cases with the
+  Debug binary (`Vector` index asserts) and `x <= 10^12`, and for
+  `x = 2^64 + 1`, `3*10^19 + 7` (`alpha = 20`) and `10^20 + 3`
+  (`alpha = 3`).
+- Random sweep (Appendix A.3): 200 cases with `10^5 <= x <= 3*10^14`.
+- ARM compile-only checks as above, and x86 builds of `AC.cpp` with and
+  without `ENABLE_LIBDIVIDE` and with `DISABLE_INT128`.
 
 Not yet done (recommended):
 - run on real ARM (SVE and NEON);
@@ -912,18 +948,6 @@ compute Gourdon's `y` (`pi_gourdon.cpp` and `main.cpp`) are unchanged
   (0.8% of D).
 - **Test coverage.** Real `x > 2^64` band rows with 128-bit `T` (the
   dense test only uses small `xp` with `uint128_t`).
-- **AC primes vector** (not implemented). Without C1, the A and C2 rows
-  have `p > sqrt(y)` and only read primes `<= sqrt(x/p)`. So
-  `get_primes(min(isqrt(x / (isqrt(y) + 1)), y))` suffices, except for
-  C2's `max_clustered_global = primes[pi[y]]` (the largest prime `<= y`),
-  which a short PiTable loop can find instead.
-  - At default `y` this is 2.7x fewer primes at `1e19` and 4.8x fewer at
-    `1e24`, where they then fit `uint32_t`.
-  - A validated prototype reduced AC's peak memory at `1e19` from 75.8 MB
-    to 36.9 MB (libdivide stores a 9-byte divider per prime).
-  - However, D sets pi(x)'s peak memory (71.9 MB at `1e19`): it needs
-    primes up to almost `y`, because its first band rows have
-    `sqrt(x/p)` close to `y`.
 - **Remove the `p` parameter** of `SemiprimeEventSorter::sort` if
   `p > 5` is always guaranteed (k >= 3?). Check `PhiTiny::get_k()` for
   small `x`; currently `p <= 5` occurs for tiny `x` and needs the
