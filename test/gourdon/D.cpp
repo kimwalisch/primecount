@@ -132,11 +132,11 @@ int64_t D_reference(int64_t x, int64_t y, int64_t k)
     int64_t prime = primes[b];
     if (prime > max_prime) break;
 
-    // Rows with x/p^3 <= y and sqrt(x/p) < y < p^3 also
+    // Rows with x/p^3 < y and sqrt(x/p) < y < p^3 also
     // contain their easy leaves (C1 skips these rows).
     int64_t xp = x / prime;
     bool extended = prime * prime <= y &&
-                    xp / (prime * prime) <= y &&
+                    xp / (prime * prime) < y &&
                     prime * prime > y / prime &&
                     isqrt(xp) < y;
 

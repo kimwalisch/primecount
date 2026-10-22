@@ -29,15 +29,16 @@ struct Input
   bool extended;
 };
 
-// Extended rows (x/p^3 <= y) use the band (x/(p*y), y], the
-// last extended inputs have sqrt(x/p) < p^2.
+// Extended rows (x/p^3 < y) use the band (x/(p*y), y], the
+// last extended inputs have sqrt(x/p) < p^2. Rows with x/p^3 = y
+// use the y-region with x/(p*y) = p^2.
 const Array<Input, 26> inputs = {{
-  { 280370, 530, 23, true },
-  { 280898, 530, 23, true },
+  { 280370, 530, 23, false },
+  { 280898, 530, 23, false },
   { 280899, 530, 23, false },
   { 559681, 1058, 23, true },
-  { 559682, 1058, 23, true },
-  { 1414562, 1682, 29, true },
+  { 559682, 1058, 23, false },
+  { 1414562, 1682, 29, false },
   { 560739, 1058, 23, false },
   { 560740, 1058, 23, false },
   { 1416243, 1682, 29, false },
@@ -152,12 +153,12 @@ void check(const Input& input)
   int64_t middle = isqrt(input.xp);
   if (input.extended)
     check(is_extended_row(input.xp, p, input.y) &&
-          square <= input.y && lower <= square &&
+          square <= input.y && lower < square &&
           lower >= input.y / p,
           "The test must enter an extended row");
   else
     check(square <= lower && lower <= middle && middle < input.y &&
-          input.y < square * p && input.xp / square > input.y,
+          input.y < square * p && input.xp / square >= input.y,
           "The test must enter the y-region");
 
   // Extended rows also contain the easy leaves m <= y,

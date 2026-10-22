@@ -181,7 +181,7 @@ ALWAYS_INLINE T central_y_segment(T xp,
   return sum;
 }
 
-/// Rows with x/p^3 <= y and sqrt(x/p) < y < p^3. In these rows the
+/// Rows with x/p^3 < y and sqrt(x/p) < y < p^3. In these rows the
 /// band (x/(p*y), y] of D contains all hard leaves above x/(p*y) and
 /// all easy leaves of the row, hence the C1 formula skips these rows.
 ///
@@ -190,7 +190,7 @@ ALWAYS_INLINE bool is_extended_row(T xp, int64_t p, int64_t y)
 {
   int64_t upper = min(fast_div(xp, p * p), y + 1);
   int64_t middle = isqrt(xp);
-  return upper <= y && p * p > y / p && middle < y;
+  return upper < y && p * p > y / p && middle < y;
 }
 
 /// Extended rows: the band terms whose positions are < p^2 only
@@ -214,9 +214,9 @@ T central_cheap_terms(T xp,
   int64_t lower = fast_div64(xp, y);
   int64_t middle = isqrt(xp);
 
-  // lower = X/y <= p^2, phi(lower, b - 1) counts 1,
-  // the primes in [p, lower] and p^2 if lower = p^2.
-  int64_t phi_lower = pi[lower] - b + 2 + (lower >= square);
+  // lower = X/y < p^2, phi(lower, b - 1) counts
+  // 1 and the primes in [p, lower].
+  int64_t phi_lower = pi[lower] - b + 2;
   T sum = 0;
   sum -= T(mertens_y) * T(phi_lower);
 
@@ -242,7 +242,7 @@ T central_cheap_terms(T xp,
 
 /// Extended rows, terms of the current segment [low, high[:
 /// the band terms with positions >= p^2 and the remaining
-/// hard leaves m <= X/y, which are prime since X/y <= p^2.
+/// hard leaves m <= X/y, which are prime since X/y < p^2.
 ///
 template <typename T, typename Primes, typename Count>
 ALWAYS_INLINE T central_extended_segment(T xp,
@@ -313,7 +313,9 @@ ALWAYS_INLINE bool central_row(T xp,
 {
   int64_t upper = min(fast_div(xp, p * p), y + 1);
 
-  if (upper <= y)
+  // Rows with x/p^3 = y have no easy leaves,
+  // they use the y-region with x/(p*y) = p^2.
+  if (upper < y)
   {
     if (is_extended_row(xp, p, y))
     {
