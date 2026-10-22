@@ -102,8 +102,8 @@ int64_t AC(int64_t x,
   // which fits into the CPU's cache.
   PiTable pi(y, threads);
 
-  // The rows of the A and C2 formulas have prime > sqrt(y)
-  // and only use the primes <= sqrt(x / prime).
+  // The A and C2 formulas use the primes p > sqrt(y) and
+  // q <= sqrt(x / p), hence all primes are <= sqrt(x / sqrt(y)).
   int64_t max_prime = min(isqrt(x / (isqrt(y) + 1)), y);
   auto primes = pi.get_primes<uint32_t>(max_prime, threads);
   int64_t sum = AC_OpenMP((uint64_t) x, y, k, x_star, pi, primes, threads, is_print);
@@ -142,8 +142,8 @@ int128_t AC(int128_t x,
   PiTable pi(y, threads);
   int128_t sum;
 
-  // The rows of the A and C2 formulas have prime > sqrt(y)
-  // and only use the primes <= sqrt(x / prime).
+  // The A and C2 formulas use the primes p > sqrt(y) and
+  // q <= sqrt(x / p), hence all primes are <= sqrt(x / sqrt(y)).
   int64_t max_prime = min(isqrt(x / (isqrt(y) + 1)), y);
 
   // uses less memory
