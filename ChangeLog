@@ -1,5 +1,6 @@
-Changes in primecount-9.0, 2026-10-21
+Changes in primecount-9.0, 2026-10-22
 
+* AC_*.hpp: Use Gourdon's inversion equality for the clustered C1 easy leaves.
 * D_arm_sve.hpp: Fix ambiguous svwhilelt_b64() call on macOS.
 * ci.yml: Compile Linux GCC tests with -march=x86-64, Ubuntu 26.04 enables AVX2.
 * D.cpp, D_*.hpp: Bound the first prime by x^(1/4) instead of x_star.

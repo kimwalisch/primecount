@@ -147,6 +147,13 @@ T A_arm_sve(T xlow,
 /// Since each prime factor of m is > (x / y)^(1/3) and y <= sqrt(x),
 /// m cannot contain more than 2 prime factors.
 ///
+/// The clustered prime leaves m > max(x / p^3, sqrt(x / p)) are
+/// computed using Gourdon's inversion equality: a boundary correction
+/// plus their conjugates r with x / (p * max_clustered) < r and
+/// r <= x / (p * (min_clustered + 1)), where max_clustered is the
+/// largest prime <= y. Conjugates that are also sparse leaves are
+/// counted twice.
+///
 template <typename T,
           typename XP,
           typename Primes>
@@ -158,6 +165,8 @@ T C1_arm_sve(T xlow,
              XP xp,
              uint64_t b,
              uint64_t y,
+             uint64_t pi_y,
+             uint64_t max_clustered_global,
              const Primes& primes,
              const PiTable& pi,
              const SegmentedPiTable& segmentedPi)
@@ -165,25 +174,73 @@ T C1_arm_sve(T xlow,
   T sum = 0;
   uint64_t prime = primes[b];
   uint64_t max_m = min(xlow / prime, y);
-  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   uint64_t min_m = fast_div64(xhigh, prime);
-  min_m = max3(min_m, x_div_prime3, y / prime);
 
+  // No leaves and no conjugates in the current segment
   if (min_m >= max_m)
     return 0;
 
-  // m = primes[i]
-  uint64_t min_i = pi[min_m] + 1;
-  uint64_t max_i = pi[max_m];
+  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
+  uint64_t min_leaf = max(x_div_prime3, y / prime);
+  uint64_t min_clustered = max(min_leaf, uint64_t(isqrt(xp)));
+  min_clustered = min(min_clustered, y);
+  uint64_t pi_min_leaf = pi[min_leaf];
+  uint64_t pi_min_clustered = pi[min_clustered];
+  uint64_t pi_conj_lo = 0;
+  uint64_t pi_conj_hi = 0;
 
+  if (min_clustered < max_clustered_global)
+  {
+    pi_conj_lo = pi[fast_div64(xp, max_clustered_global)];
+    pi_conj_hi = pi[fast_div64(xp, min_clustered + 1)];
+
+    // Compute the boundary correction once
+    if (min_m < max_clustered_global &&
+        max_m >= max_clustered_global)
+    {
+      sum -= T(pi_conj_lo) * pi_y - T(pi_conj_hi) * pi_min_clustered;
+      sum += T(b - 2) * (pi_y - pi_min_clustered);
+    }
+  }
+
+  // Primes inside the current segment: ]pi_lo, pi_hi]
+  uint64_t pi_lo = pi[min_m];
+  uint64_t pi_hi = pi[max_m];
+
+  // Sparse leaves below the conjugates.
   // for (i = min_i; i <= max_i; i++)
   //   sum -= segmentedPi[xp / primes[i]] - b + 2;
+  uint64_t min_i = max(pi_min_leaf, pi_lo) + 1;
+  uint64_t max_i = min3(pi_min_clustered, pi_conj_lo, pi_hi);
+  sum -= sum_pi_arm_sve<T, 1>(xp, min_i, max_i, b, primes, segmentedPi);
+
+  // Conjugates that are not leaves.
+  // for (i = min_i; i <= max_i; i++)
+  //   sum -= segmentedPi[xp / primes[i]];
+  min_i = max(pi_conj_lo, pi_lo) + 1;
+  max_i = min3(pi_conj_hi, pi_min_leaf, pi_hi);
+  sum -= sum_pi_arm_sve<T, 1>(xp, min_i, max_i, 2, primes, segmentedPi);
+
+  // Conjugates that are also sparse leaves.
+  // for (i = min_i; i <= max_i; i++)
+  //   sum -= segmentedPi[xp / primes[i]] * 2 - b + 2;
+  min_i = max3(pi_conj_lo, pi_min_leaf, pi_lo) + 1;
+  max_i = min3(pi_conj_hi, pi_min_clustered, pi_hi);
+  sum -= sum_pi_arm_sve<T, 2>(xp, min_i, max_i, b, primes, segmentedPi);
+
+  // Sparse leaves above the conjugates.
+  // for (i = min_i; i <= max_i; i++)
+  //   sum -= segmentedPi[xp / primes[i]] - b + 2;
+  min_i = max3(pi_min_leaf, pi_conj_hi, pi_lo) + 1;
+  max_i = min(pi_min_clustered, pi_hi);
   sum -= sum_pi_arm_sve<T, 1>(xp, min_i, max_i, b, primes, segmentedPi);
 
   // m = primes[i] * primes[j]
+  min_m = max(min_m, min_leaf);
   uint64_t max_q = isqrt(max_m);
 
-  if (prime < max_q)
+  if (min_m < max_m &&
+      prime < max_q)
   {
     uint64_t min_q_i = b + 1;
     uint64_t max_q_i = pi[max_q];
@@ -382,9 +439,11 @@ T AC_OpenMP_arm_sve(T x,
 
         if (low < y)
         {
+          // The conjugates of the clustered C1 leaves are
+          // located up to y, hence low >= prime^2 is possible.
           int64_t min_c1 = max(k, pi_root3_xy);
           int64_t min_c1_prime = min(xy / high, sqrty);
-          min_c1 = max3(min_c1, pi_sqrt_low, pi[min_c1_prime]) + 1;
+          min_c1 = max(min_c1, pi[min_c1_prime]) + 1;
 
           // C1 formula: pi[(x/y)^(1/3)] < b <= pi[sqrt(y)]
           for (int64_t b = min_c1; b <= pi_sqrty; b++)
@@ -392,9 +451,9 @@ T AC_OpenMP_arm_sve(T x,
             T xp = x / primes[b];
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum -= C1_arm_sve(xlow, xhigh, uint64_t(xp), b, y, primes, pi, segmentedPi);
+              sum -= C1_arm_sve(xlow, xhigh, uint64_t(xp), b, y, pi_y, max_clustered_global, primes, pi, segmentedPi);
             else
-              sum -= C1_arm_sve(xlow, xhigh, xp, b, y, primes, pi, segmentedPi);
+              sum -= C1_arm_sve(xlow, xhigh, xp, b, y, pi_y, max_clustered_global, primes, pi, segmentedPi);
           }
         }
 
