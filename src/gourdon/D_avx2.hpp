@@ -183,7 +183,7 @@ T D_thread_avx2(T x,
       // A composite m with all prime factors > prime exceeds prime^2.
       // Test the uncapped bound: later rows may still have central
       // leaves even when the capped max_m is at most prime^2.
-      if (original_max_m <= prime * prime)
+      if (original_max_m <= prime * prime && low >= y)
         break;
 
       min_m = FactorTable::to_index(min_m);

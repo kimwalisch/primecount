@@ -1,6 +1,7 @@
 Changes in primecount-9.0, 2026-10-22
 
 * DCentral.hpp: Cancel prime hard leaves in the central regions of D.
+* DCentral.hpp: Extend the band to y if x/p^3 <= y, it absorbs the C1 easy leaves of these rows.
 * D: Skip factor table scans when the remaining factors must be prime.
 * D_arm_sve.hpp: Fix ambiguous svwhilelt_b64() call on macOS.
 * ci.yml: Compile Linux GCC tests with -march=x86-64, Ubuntu 26.04 enables AVX2.

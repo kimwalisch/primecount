@@ -14,6 +14,7 @@
 
 #include "LoadBalancerAC.hpp"
 #include "SegmentedPiTable.hpp"
+#include "DCentral.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
@@ -390,6 +391,10 @@ T AC_OpenMP_arm_sve(T x,
           for (int64_t b = min_c1; b <= pi_sqrty; b++)
           {
             T xp = x / primes[b];
+
+            // The band of D contains the easy leaves of this row
+            if (is_extended_row(xp, primes[b], y))
+              continue;
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
               sum -= C1_arm_sve(xlow, xhigh, uint64_t(xp), b, y, primes, pi, segmentedPi);

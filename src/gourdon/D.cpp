@@ -22,6 +22,7 @@
 #include <int128_t.hpp>
 #include <LoadBalancerS2.hpp>
 #include <macros.hpp>
+#include <min.hpp>
 #include <phi_vector.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
@@ -171,11 +172,25 @@ T D_OpenMP(T x,
   // Hard special leaves satisfy m > p and
   // p^3 * m <= x, hence p^4 < x.
   int64_t x14 = iroot<4>(x);
-  int64_t max_b = pi[iroot<3>(xy)];
+  int64_t pi_x14 = pi[x14];
+  int64_t pi_sqrty = pi[isqrt(y)];
+  int64_t max_b = max(pi[iroot<3>(xy)], pi_sqrty);
+  max_b = min(max_b, pi_x14);
   // Only rows with prime^2 <= y < prime^3 use this prefix
   Vector<int64_t> mertens_y = phi_vector(y, max_b, primes, pi);
   for (int64_t b = 1; b <= max_b; b++)
     mertens_y[b] -= central_correction(y, primes[b], b, pi);
+
+  // Band terms of the extended rows with positions < prime^2
+  UT sum = 0;
+  int64_t last_b = min(pi_sqrty, pi_x14);
+
+  #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
+  for (int64_t b = k + 1; b <= last_b; b++)
+  {
+    UT xp = UT(x / primes[b]);
+    sum += central_cheap_terms(xp, primes[b], b, y, mertens_y[b], primes, pi);
+  }
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -184,7 +199,6 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
-  UT sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {

@@ -26,10 +26,12 @@ struct Input
   int64_t xp;
   int64_t y;
   int64_t prime;
-  bool natural;
+  bool extended;
 };
 
-const Array<Input, 21> inputs = {{
+// Extended rows (x/p^3 <= y) use the band (x/(p*y), y], the
+// last extended inputs have sqrt(x/p) < p^2.
+const Array<Input, 26> inputs = {{
   { 280370, 530, 23, true },
   { 280898, 530, 23, true },
   { 280899, 530, 23, false },
@@ -50,7 +52,12 @@ const Array<Input, 21> inputs = {{
   { 707281, 941, 23, false },
   { 707282, 941, 23, false },
   { 921599, 1200, 23, false },
-  { 921600, 1200, 23, false }
+  { 921600, 1200, 23, false },
+  { 279840, 530, 23, true },
+  { 250000, 600, 23, true },
+  { 200000, 900, 23, true },
+  { 150000, 1800, 23, true },
+  { 700000, 1500, 29, true }
 }};
 
 void check(bool ok, const char* message)
@@ -89,16 +96,22 @@ struct Reference
 template <typename T, typename Prime>
 void check_segments(const Input& input, int64_t size,
                     const Reference& reference, const Vector<int64_t>& expected,
-                    const Vector<Prime>& primes, const PiTable& pi)
+                    int64_t cheap, const Vector<Prime>& primes, const PiTable& pi)
 {
   int64_t p = input.prime;
   int64_t b = pi[p];
-  int64_t upper = input.natural ? input.xp / (p * p) : input.y;
-  int64_t lower = input.xp / upper;
+  int64_t lower = input.xp / input.y;
   int64_t middle = isqrt(input.xp);
   int64_t stop = expected.size() - 1;
+  int64_t mertens_y = reference.mertens[input.y];
   Vector<CentralEvent> events;
   SemiprimeEventBitmap sorter;
+
+  if (input.extended)
+  {
+    T actual = central_cheap_terms(T(input.xp), p, b, input.y, mertens_y, primes, pi);
+    check(actual == T(cheap), "Central terms below p^2 differ");
+  }
 
   for (int64_t low = 0; low < stop; low += size)
   {
@@ -113,13 +126,12 @@ void check_segments(const Input& input, int64_t size,
     };
 
     T actual;
-    if (input.natural)
-      actual = central_square_segment(T(input.xp), p, b, upper, middle,
-                                      input.y, low, high, phi, primes, pi,
-                                      count, events, sorter);
+    if (input.extended)
+      actual = central_extended_segment(T(input.xp), p, b, input.y, low, high,
+                                        phi, primes, pi, count, events, sorter);
     else
       actual = central_y_segment(T(input.xp), p, b, lower, middle,
-                                 reference.mertens[upper], low, high, phi,
+                                 mertens_y, low, high, phi,
                                  primes, pi, count, events, sorter);
     int64_t wanted = expected[high] - expected[low];
     if (actual != T(wanted))
@@ -135,44 +147,63 @@ void check_segments(const Input& input, int64_t size,
 void check(const Input& input)
 {
   int64_t p = input.prime;
-  int64_t upper = input.natural ? input.xp / (p * p) : input.y;
-  int64_t lower = input.xp / upper;
+  int64_t square = p * p;
+  int64_t lower = input.xp / input.y;
   int64_t middle = isqrt(input.xp);
-  check(p * p <= lower && lower <= middle && middle < upper &&
-        upper < p * p * p && upper <= input.y,
-        "The test must enter a valid central region");
-  check(!input.natural || lower == p * p,
-        "Central test region does not match its parameters");
-  int64_t min_m = input.natural ? max(p, input.y / p) : lower;
+  if (input.extended)
+    check(is_extended_row(input.xp, p, input.y) &&
+          square <= input.y && lower <= square &&
+          lower >= input.y / p,
+          "The test must enter an extended row");
+  else
+    check(square <= lower && lower <= middle && middle < input.y &&
+          input.y < square * p && input.xp / square > input.y,
+          "The test must enter the y-region");
+
+  // Extended rows also contain the easy leaves m <= y,
+  // in the y-region all leaves m <= y are hard.
+  int64_t min_m = input.extended ? max(p, input.y / p) : lower;
   int64_t stop = input.xp / (min_m + 1) + 1;
   Reference reference(max(stop, input.y), p);
   Vector<int64_t> expected(stop + 1);
   for (int64_t i = 0; i <= stop; i++)
     expected[i] = 0;
 
-  // Accumulate independent dense events at their exact query positions
-  expected[middle + 1] += reference.mertens[middle] * reference.phi[middle];
-  int64_t boundary = input.natural ? upper : lower;
-  expected[boundary + 1] -= reference.mertens[upper] * reference.phi[lower];
+  // Accumulate independent dense events at their exact query positions.
+  // In extended rows the terms below p^2 are computed once per row.
+  int64_t cheap = 0;
+  auto add = [&](int64_t position, int64_t value) {
+    if (input.extended && position < square)
+      cheap += value;
+    else
+      expected[position + 1] += value;
+  };
+
+  add(middle, reference.mertens[middle] * reference.phi[middle]);
+  int64_t boundary = -reference.mertens[input.y] * reference.phi[lower];
+  if (input.extended)
+    cheap += boundary;
+  else
+    add(lower, boundary);
   for (int64_t n = lower + 1; n <= middle; n++)
     if (reference.lpf[n] >= p)
     {
       int64_t c = reference.lpf[n] > p ? reference.mu[n] : 0;
       int64_t t = input.xp / n;
-      expected[t + 1] -= reference.mertens[t] + c * reference.phi[t];
+      add(t, -(reference.mertens[t] + c * reference.phi[t]));
     }
-  if (input.natural)
+  if (input.extended)
     for (int64_t m = min_m + 1; m <= lower; m++)
       if (reference.lpf[m] > p)
-        expected[input.xp / m + 1] -= reference.mu[m] * reference.phi[input.xp / m];
+        add(input.xp / m, -reference.mu[m] * reference.phi[input.xp / m]);
 
   int64_t direct = 0;
-  for (int64_t m = min_m + 1; m <= upper; m++)
+  for (int64_t m = min_m + 1; m <= input.y; m++)
     if (reference.lpf[m] > p)
       direct -= reference.mu[m] * reference.phi[input.xp / m];
   for (int64_t i = 1; i <= stop; i++)
     expected[i] += expected[i - 1];
-  check(expected.back() == direct, "Central sum differs from original Moebius leaves");
+  check(expected.back() + cheap == direct, "Central sum differs from original Moebius leaves");
 
   PiTable pi(input.y, 1);
   auto primes32 = pi.get_primes<uint32_t>(input.y, 1);
@@ -181,11 +212,11 @@ void check(const Input& input)
     primes64[i] = primes32[i];
   for (int64_t size : { 240, 1680 })
   {
-    check_segments<uint64_t>(input, size, reference, expected, primes32, pi);
-    check_segments<uint64_t>(input, size, reference, expected, primes64, pi);
+    check_segments<uint64_t>(input, size, reference, expected, cheap, primes32, pi);
+    check_segments<uint64_t>(input, size, reference, expected, cheap, primes64, pi);
     #if defined(HAVE_INT128_T)
-      check_segments<uint128_t>(input, size, reference, expected, primes32, pi);
-      check_segments<uint128_t>(input, size, reference, expected, primes64, pi);
+      check_segments<uint128_t>(input, size, reference, expected, cheap, primes32, pi);
+      check_segments<uint128_t>(input, size, reference, expected, cheap, primes64, pi);
     #endif
   }
 }

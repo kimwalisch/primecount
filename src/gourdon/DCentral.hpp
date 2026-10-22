@@ -181,36 +181,105 @@ ALWAYS_INLINE T central_y_segment(T xp,
   return sum;
 }
 
-template <typename T, typename Primes, typename Count>
-ALWAYS_INLINE T central_square_segment(T xp,
-                                       int64_t p,
-                                       int64_t b,
-                                       int64_t upper,
-                                       int64_t middle,
-                                       int64_t y,
-                                       int64_t low,
-                                       int64_t high,
-                                       int64_t phi,
-                                       const Primes& primes,
-                                       const PiTable& pi,
-                                       const Count& count,
-                                       Vector<CentralEvent>& events,
-                                       SemiprimeEventBitmap& sorter)
+/// Rows with x/p^3 <= y and sqrt(x/p) < y < p^3. In these rows the
+/// band (x/(p*y), y] of D contains all hard leaves above x/(p*y) and
+/// all easy leaves of the row, hence the C1 formula skips these rows.
+///
+template <typename T>
+ALWAYS_INLINE bool is_extended_row(T xp, int64_t p, int64_t y)
 {
+  int64_t upper = min(fast_div(xp, p * p), y + 1);
+  int64_t middle = isqrt(xp);
+  return upper <= y && p * p > y / p && middle < y;
+}
+
+/// Extended rows: the band terms whose positions are < p^2 only
+/// need PiTable lookups. The segmented sieve never processes the
+/// row p below p^2, hence these terms are computed once per row.
+///
+template <typename T, typename Primes>
+T central_cheap_terms(T xp,
+                      int64_t p,
+                      int64_t b,
+                      int64_t y,
+                      int64_t mertens_y,
+                      const Primes& primes,
+                      const PiTable& pi)
+{
+  if (!is_extended_row(xp, p, y))
+    return 0;
+
   int64_t square = p * p;
-  T sum = central_events(xp, p, b, square, middle, low, high,
-                         phi, primes, pi, count, events, sorter);
-  if (low <= upper && upper < high)
+  int64_t upper = fast_div64(xp, square);
+  int64_t lower = fast_div64(xp, y);
+  int64_t middle = isqrt(xp);
+
+  // lower = X/y <= p^2, phi(lower, b - 1) counts 1,
+  // the primes in [p, lower] and p^2 if lower = p^2.
+  int64_t phi_lower = pi[lower] - b + 2 + (lower >= square);
+  T sum = 0;
+  sum -= T(mertens_y) * T(phi_lower);
+
+  if (middle < square)
   {
-    int64_t value = phi + count(upper - low);
-    int64_t phi_square = pi[square] - b + 3;
-    sum -= T(phi_square) * (value - central_correction(upper, p, b, pi));
+    int64_t phi_middle = pi[middle] - b + 2;
+    int64_t mu_middle = 1 - (pi[middle] - b);
+    sum += T(mu_middle) * T(phi_middle);
+
+    // Primes n in (X/p^2, H] have X/n < p^2:
+    // E(X/n) = phi(X/n, b - 1) - M(X/n) = 2 * pi[X/n] - 2b + 1.
+    int64_t begin = pi[max(upper, lower)];
+    int64_t end = pi[middle];
+    T pi_sum = 0;
+    for (int64_t i = begin + 1; i <= end; i++)
+      pi_sum += pi[fast_div64(xp, primes[i])];
+    sum += pi_sum * 2;
+    sum -= T(end - begin) * T(2 * b - 1);
   }
 
-  // The remaining original leaves have a prime second factor <= p^2
-  int64_t lower_m = min(fast_div(xp, high), square);
+  return sum;
+}
+
+/// Extended rows, terms of the current segment [low, high[:
+/// the band terms with positions >= p^2 and the remaining
+/// hard leaves m <= X/y, which are prime since X/y <= p^2.
+///
+template <typename T, typename Primes, typename Count>
+ALWAYS_INLINE T central_extended_segment(T xp,
+                                         int64_t p,
+                                         int64_t b,
+                                         int64_t y,
+                                         int64_t low,
+                                         int64_t high,
+                                         int64_t phi,
+                                         const Primes& primes,
+                                         const PiTable& pi,
+                                         const Count& count,
+                                         Vector<CentralEvent>& events,
+                                         SemiprimeEventBitmap& sorter)
+{
+  int64_t square = p * p;
+  int64_t upper = fast_div64(xp, square);
+  int64_t lower = fast_div64(xp, y);
+  int64_t middle = isqrt(xp);
+  T sum = 0;
+
+  if (middle >= square)
+    sum += central_events(xp, p, b, lower, middle, low, high,
+                          phi, primes, pi, count, events, sorter);
+  else
+  {
+    // n <= X/p^2 < p^2: all n are prime, no events
+    int64_t lower_n = max(fast_div(xp, high), lower);
+    int64_t upper_n = min(fast_div(xp, max(low, int64_t(1))), upper);
+    if (lower_n < upper_n)
+      sum += central_prime_sum(xp, p, b, lower_n, upper_n, primes, pi);
+  }
+
+  // The remaining hard leaves m <= X/y are prime
+  int64_t lower_m = min(fast_div(xp, high), lower);
   lower_m = max3(lower_m, y / p, p);
-  int64_t upper_m = min(fast_div(xp, max(low, int64_t(1))), square);
+  int64_t upper_m = min(fast_div(xp, max(low, int64_t(1))), lower);
   if (lower_m < upper_m)
     for (int64_t i = pi[upper_m]; primes[i] > lower_m; i--)
     {
@@ -244,18 +313,16 @@ ALWAYS_INLINE bool central_row(T xp,
 {
   int64_t upper = min(fast_div(xp, p * p), y + 1);
 
-  if (upper <= y && upper >= p * p && p * p > upper / p)
+  if (upper <= y)
   {
-    int64_t middle = isqrt(xp);
-    if (middle < upper)
+    if (is_extended_row(xp, p, y))
     {
-      sum += central_square_segment(xp, p, b, upper, middle,
-                                    y, low, high, phi, primes, pi,
-                                    count, events, sorter);
+      sum += central_extended_segment(xp, p, b, y, low, high, phi,
+                                      primes, pi, count, events, sorter);
       return true;
     }
   }
-  else if (upper > y && p * p > y / p)
+  else if (p * p > y / p)
   {
     int64_t middle = isqrt(xp);
     if (middle < y)
