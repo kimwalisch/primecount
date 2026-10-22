@@ -492,10 +492,11 @@ sum += band_row(xp, prime, b, y, low, high, phi[b], mertens_y[b],
   `mertens_y[b] -= phi_minus_mertens(y, primes[b], b, pi)`, where
   `max_b = min(max(pi_root3_xy, pi_sqrty), pi_x14)`. See Section 11 for
   a tightening.
-- Accumulation in unsigned `UT` (`D_thread<UT>`). The final value (and
-  `thread.sum` for status output) is converted by
-  `signed_from_unsigned<T>()`. Reason: the boundary products are bounded
-  by `X` (`|M(y) Phi(L)| <= y L <= X`, `|M(H) Phi(H)| <= H^2 <= X`).
+- Accumulation in unsigned `UT` (worker kernels and reduction).
+  `D_thread<T>()` implicitly converts the unsigned worker result to signed
+  `T` before assigning it to `thread.sum`. The final value is converted
+  implicitly by the return from `D_OpenMP()`. The boundary products are
+  bounded by `X` (`|M(y) Phi(L)| <= y L <= X`, `|M(H) Phi(H)| <= H^2 <= X`).
   Partial sums over rows and segments are not bounded tightly enough to
   rule out signed overflow (UB) for `T = int64_t` near `2^63`, so modular
   unsigned arithmetic plus a final signed representative is used. The
@@ -790,7 +791,7 @@ Verify each item and report issues with a concrete counterexample.
 6. Section 3.7: Gourdon's inversion with floors in
    `sum_phi_minus_mertens()`, including `min_r2`/`max_r2` via `isqrt`.
 7. Section 5: PiTable ranges, 64-bit quotient bounds, `int64_t` products,
-   narrowing in `min`/`max`, unsigned arithmetic, `signed_from_unsigned`.
+   narrowing in `min`/`max`, unsigned arithmetic, implicit signed conversions.
 8. Kernels:
    - query order (`L`, `H`, events, then factor-table leaves);
    - `max_m` lowering;

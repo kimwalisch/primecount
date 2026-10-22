@@ -77,20 +77,6 @@ namespace {
 
 using namespace primecount;
 
-/// Recover a signed representative without an out-of-range cast.
-/// The complemented upper-half residue fits in T before negation.
-///
-template <typename T>
-T signed_from_unsigned(typename pstd::make_unsigned<T>::type value)
-{
-  static_assert(pstd::is_signed<T>::value, "Expected a signed result type");
-  using UT = typename pstd::make_unsigned<T>::type;
-  if (value <= UT(pstd::numeric_limits<T>::max()))
-    return T(value);
-  UT complement = ~value;
-  return -T(complement) - 1;
-}
-
 /// Runtime dispatch to highly optimized SIMD algorithm if the CPU
 /// supports the required instruction set.
 ///
@@ -203,10 +189,9 @@ T D_OpenMP(T x,
     while (loadBalancer.get_work(thread))
     {
       thread.start_time = get_time();
-      UT partial = D_thread<UT>(x, y, xy, k, x14, primes, pi, factor, mertens_y, thread);
-      thread.sum = signed_from_unsigned<T>(partial);
+      thread.sum = D_thread<T>(x, y, xy, k, x14, primes, pi, factor, mertens_y, thread);
       thread.stop_time = get_time();
-      sum += partial;
+      sum += thread.sum;
     }
 
     // Band terms with positions < prime^2, computed once per row
@@ -217,7 +202,7 @@ T D_OpenMP(T x,
     }
   }
 
-  return signed_from_unsigned<T>(sum);
+  return sum;
 }
 
 } // namespace
