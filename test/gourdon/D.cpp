@@ -10,6 +10,9 @@
 
 #include <primecount.hpp>
 #include <gourdon.hpp>
+#include <generate_primes.hpp>
+#include <imath.hpp>
+#include <Vector.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -31,7 +34,7 @@ struct D_formula_params
 /// 1) The default alpha
 /// 2) The minimum alpha=1
 /// 3) The maximum alpha
-std::array<D_formula_params, 65> test_cases =
+std::array<D_formula_params, 69> test_cases =
 {{
   { 10, 3, 0, 0 },
   { 10, 3, 0, 0 },
@@ -93,6 +96,10 @@ std::array<D_formula_params, 65> test_cases =
   { 1000000, 999, 8, 1246 },
   { 100000000, 9999, 8, 1181490 },
   { 100000000, 10000, 8, 1181490 },
+  { 148035889, 12167, 8, 1850582 },
+  { 148035890, 12167, 8, 1850582 },
+  { 148048055, 12167, 8, 1850748 },
+  { 148048056, 12167, 8, 1850748 },
   // Prime fourth powers with the minimum y
   { 707280, 90, 8, 953 },
   { 707281, 90, 8, 953 },
@@ -112,6 +119,30 @@ void check(bool OK)
     std::exit(1);
 }
 
+int64_t D_reference(int64_t x, int64_t y, int64_t k)
+{
+  auto primes = generate_primes<uint32_t>(y);
+  auto lpf = generate_lpf(y, primes);
+  auto mu = generate_moebius(y, primes);
+  int64_t max_prime = iroot<4>(x);
+  int64_t sum = 0;
+
+  for (std::size_t b = k + 1; b < primes.size(); b++)
+  {
+    int64_t prime = primes[b];
+    if (prime > max_prime) break;
+
+    for (int64_t m = prime + 1; m <= y; m++)
+      if (mu[m] != 0 &&
+          lpf[m] > prime &&
+          prime * m > y &&
+          x / (prime * m) >= prime * prime)
+        sum -= mu[m] * phi(x / (prime * m), b - 1);
+  }
+
+  return sum;
+}
+
 int main()
 {
   int threads = get_num_threads();
@@ -126,6 +157,106 @@ int main()
       int128_t res2 = D((int128_t) params.x, params.y, params.k, threads);
       std::cout << "D_128bit(" << params.x << ", " << params.y << ", " << params.k << ") = " << res2;
       check(res2 == params.res);
+    #endif
+  }
+
+  // Check the transition from square-free to prime leaves, including
+  // the first square-free composite m beyond each prime squared.
+  const Array<int64_t, 5> primes = { 23, 29, 31, 37, 41 };
+
+  for (std::size_t i = 0; i + 2 < primes.size(); i++)
+  {
+    int64_t p = primes[i];
+    int64_t q = primes[i + 1];
+    int64_t r = primes[i + 2];
+
+    for (int64_t center : { ipow<5>(p), p * p * p * q * r })
+      for (int64_t delta : { -1, 0, 1 })
+        for (int64_t y : { p * p - 1, p * p, p * p + 1,
+                           q * r - 1, q * r, q * r + 1 })
+        {
+          int64_t x = center + delta;
+          int64_t expected = D_reference(x, y, 8);
+          int64_t res = D(x, y, 8, threads);
+          std::cout << "D boundary(" << x << ", " << y << ") = " << res;
+          check(res == expected);
+
+          #ifdef HAVE_INT128_T
+            int128_t res2 = D((int128_t) x, y, 8, threads);
+            check(res2 == expected);
+          #endif
+        }
+  }
+
+  struct CentralParams
+  {
+    int64_t xp;
+    int64_t y;
+    int64_t prime;
+    int region;
+  };
+
+  // Regions: 0 = fallback, 1 = natural upper bound, 2 = upper bound y.
+  // Include A = p^2, A = H, prime/semiprime endpoints, and boundaries
+  // immediately below, at, and above multiples of the sieve alignment.
+  const Array<CentralParams, 30> central_cases = {{
+    { 279840, 530, 23, 0 },
+    { 279841, 530, 23, 0 },
+    { 280370, 530, 23, 1 },
+    { 280898, 530, 23, 1 },
+    { 280899, 530, 23, 2 },
+    { 280900, 530, 23, 0 },
+    { 280901, 530, 23, 0 },
+    { 559681, 1058, 23, 1 },
+    { 559682, 1058, 23, 1 },
+    { 560739, 1058, 23, 2 },
+    { 560740, 1058, 23, 2 },
+    { 7653060, 12167, 23, 0 },
+    { 292140, 541, 23, 2 },
+    { 807302, 899, 23, 2 },
+    { 864017, 1200, 23, 2 },
+    { 396017, 720, 23, 2 },
+    { 444888, 767, 23, 2 },
+    { 444889, 767, 23, 2 },
+    { 444890, 767, 23, 2 },
+    { 707280, 941, 23, 2 },
+    { 707281, 941, 23, 2 },
+    { 707282, 941, 23, 2 },
+    { 808200, 999, 23, 2 },
+    { 808201, 999, 23, 2 },
+    { 808202, 999, 23, 2 },
+    { 921599, 1200, 23, 2 },
+    { 921600, 1200, 23, 2 },
+    { 921601, 1200, 23, 2 },
+    { 1414562, 1682, 29, 1 },
+    { 1416243, 1682, 29, 2 }
+  }};
+
+  for (const CentralParams& params : central_cases)
+  {
+    int64_t p = params.prime;
+    int64_t x = params.xp * p;
+    int64_t upper = params.xp / (p * p);
+    int64_t lower = params.xp / params.y;
+    int64_t middle = isqrt(params.xp);
+    int region = 0;
+
+    if (p * p <= upper && middle < upper && upper <= params.y)
+      region = 1;
+    else if (p * p <= lower && lower <= middle &&
+             middle < params.y && params.y < p * p * p)
+      region = 2;
+
+    std::cout << "D central region " << params.region << " ("
+              << x << ", " << params.y << ")";
+    check(region == params.region &&
+          iroot<3>(x) < params.y &&
+          params.y <= isqrt(x));
+    int64_t expected = D_reference(x, params.y, 8);
+    check(D(x, params.y, 8, threads) == expected);
+
+    #ifdef HAVE_INT128_T
+      check(D((int128_t) x, params.y, 8, threads) == expected);
     #endif
   }
 

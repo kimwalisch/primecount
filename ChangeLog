@@ -1,9 +1,10 @@
-Changes in primecount-9.0, 2026-10-21
+Changes in primecount-9.0, 2026-10-22
 
+* DCentral.hpp: Cancel prime hard leaves in the central regions of D.
+* D: Skip factor table scans when the remaining factors must be prime.
 * D_arm_sve.hpp: Fix ambiguous svwhilelt_b64() call on macOS.
 * ci.yml: Compile Linux GCC tests with -march=x86-64, Ubuntu 26.04 enables AVX2.
 * D.cpp, D_*.hpp: Bound the first prime by x^(1/4) instead of x_star.
-* D.cpp: Reduce the prime count lookup table and prime vector sizes.
 * AC.cpp: Limit the prime count lookup table and prime vector to y.
 * test.cpp: Support --alpha in --test, run tests after parsing all options.
 * Pass alpha as function parameter, --alpha no longer affects nested pi(x) computations.
