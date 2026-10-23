@@ -36,10 +36,10 @@ struct SemiprimeEvent
 /// Returns phi(t, b - 1) - M(t) for p = primes[b] and p^2 <= t < p^3,
 /// where M(t) = sum_{n <= t, lpf(n) > p} mu(n).
 ///
-inline int64_t phi_minus_mertens(int64_t t,
-                                 int64_t p,
-                                 int64_t b,
-                                 const PiTable& pi)
+ALWAYS_INLINE int64_t phi_minus_mertens(int64_t t,
+                                        int64_t p,
+                                        int64_t b,
+                                        const PiTable& pi)
 {
   return 2 * pi[t] + pi[t / p] + pi[isqrt(t)] - 4 * b + 2;
 }
@@ -87,6 +87,7 @@ T sum_phi_minus_mertens(T xp,
 {
   int64_t pi_min_n = pi[min_n];
   int64_t pi_max_n = pi[max_n];
+
   if (pi_min_n == pi_max_n)
     return 0;
 
@@ -131,12 +132,12 @@ T easy_hyperbola_sum(T xp,
   int64_t x_div_p3 = fast_div64(xp, square);
   int64_t xpy = fast_div64(xp, y);
   int64_t sqrt_xp = isqrt(xp);
+  T sum = 0;
 
   // xpy = X/y < p^2, phi(xpy, b - 1) counts
   // 1 and the primes in [p, xpy].
   int64_t phi_xpy = pi[xpy] - b + 2;
-  T sum = 0;
-  sum -= T(mertens_y) * T(phi_xpy);
+  sum -= T(mertens_y) * phi_xpy;
 
   // If H >= p^2, only the L term has a position < p^2
   if (sqrt_xp < square)
@@ -194,13 +195,14 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
 {
   int64_t square = p * p;
   int64_t sqrt_xp = isqrt(xp);
+
   if (sqrt_xp >= y || square <= y / p)
     return 0;
 
-  T sum = 0;
   int64_t xpy = fast_div64(xp, y);
-  max_m = min(max_m, xpy);
   int64_t query_low = max(low, square);
+  max_m = min(max_m, xpy);
+  T sum = 0;
 
   if (query_low <= xpy && xpy < high)
   {
@@ -216,23 +218,24 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
 
   // n in (L, H] with position X/n in [query_low, high[
   int64_t min_n = min(fast_div(xp, high), sqrt_xp);
-  min_n = max(min_n, xpy);
   int64_t max_n = min(fast_div(xp, query_low), sqrt_xp);
+  min_n = max(min_n, xpy);
 
   if (min_n < max_n)
   {
     sum += sum_phi_minus_mertens(xp, p, b, min_n, max_n, primes, pi);
-
-    events.clear();
     int64_t max_i = pi[isqrt(max_n)];
+    events.clear();
+
     for (int64_t i = b; i <= max_i; i++)
     {
       int64_t q = primes[i];
       int64_t min_j = max(i, pi[min_n / q] + 1);
       int64_t max_j = pi[max_n / q];
       for (int64_t j = max_j; j >= min_j; j--)
-        events.push_back(SemiprimeEvent{q * primes[j], (i == b || i == j) ? 1 : 2});
+        events.push_back(SemiprimeEvent{q * primes[j], (i != b && i != j) + 1});
     }
+
     sorter.sort(events, p, min_n, max_n);
 
     for (const SemiprimeEvent& event : events)

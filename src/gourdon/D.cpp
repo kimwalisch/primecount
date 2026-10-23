@@ -164,7 +164,7 @@ T D_OpenMP(T x,
 
   // Only primes with prime^2 <= y < prime^3 use this prefix
   Vector<int64_t> mertens_y = phi_vector(y, pi_sqrty, primes, pi);
-  for (int64_t b = 1; b <= pi_sqrty; b++)
+  for (int64_t b = k + 1; b <= pi_sqrty; b++)
     mertens_y[b] -= phi_minus_mertens(y, primes[b], b, pi);
 
   // These load balancing settings work well on my
@@ -174,7 +174,6 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
-  // Primes with easy hyperbola terms, see easy_hyperbola_sum()
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_root3_xy) + 1);
   UT sum = 0;
 
