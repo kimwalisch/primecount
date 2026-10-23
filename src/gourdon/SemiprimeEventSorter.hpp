@@ -41,7 +41,7 @@ public:
     uint64_t first = uint64_t(min_n + 1) / 240;
     uint64_t last = uint64_t(max_n) / 240;
     uint64_t words64 = last - first + 1;
-    std::size_t count = events.size();
+    uint64_t count = events.size();
 
     // Fall back to std::sort if small primes p <= 5 produce events
     // that are not coprime to 30, if the bitmap does not fit into
@@ -57,9 +57,11 @@ public:
       return;
     }
 
-    std::size_t words = std::size_t(words64);
-    present_.resize(words);
-    weight1_.resize(words);
+    present_.clear();
+    weight1_.clear();
+    present_.resize(words64);
+    weight1_.resize(words64);
+
     std::fill(present_.begin(), present_.end(), 0);
     std::fill(weight1_.begin(), weight1_.end(), 0);
 
@@ -81,8 +83,9 @@ public:
         weight1_[word] |= bit;
     }
 
-    std::size_t written = 0;
-    for (std::size_t word = words; word-- > 0;)
+    uint64_t written = 0;
+
+    for (uint64_t word = words64; word-- > 0;)
     {
       uint64_t bits = present_[word];
       uint64_t weight1 = weight1_[word];
