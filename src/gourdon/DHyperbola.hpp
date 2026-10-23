@@ -131,14 +131,14 @@ T easy_hyperbola_terms(T xp,
 {
   int64_t square = p * p;
   int64_t x_div_p3 = fast_div64(xp, square);
-  int64_t lower = fast_div64(xp, y);
+  int64_t xpy = fast_div64(xp, y);
   int64_t sqrt_xp = isqrt(xp);
 
-  // lower = X/y < p^2, phi(lower, b - 1) counts
-  // 1 and the primes in [p, lower].
-  int64_t phi_lower = pi[lower] - b + 2;
+  // xpy = X/y < p^2, phi(xpy, b - 1) counts
+  // 1 and the primes in [p, xpy].
+  int64_t phi_xpy = pi[xpy] - b + 2;
   T sum = 0;
-  sum -= T(mertens_y) * T(phi_lower);
+  sum -= T(mertens_y) * T(phi_xpy);
 
   if (sqrt_xp < square)
   {
@@ -163,7 +163,7 @@ T easy_hyperbola_terms(T xp,
 /// to x/(p*y) and the caller processes the remaining leaves using
 /// the factor table.
 ///
-/// Let X = floor(x/p), L = lower = floor(X/y), H = sqrt_xp =
+/// Let X = floor(x/p), L = xpy = floor(X/y), H = sqrt_xp =
 /// floor(sqrt(X)) and Phi(t) = phi(t, b - 1). The leaves L < m <= y
 /// contribute
 ///   M(H) Phi(H) - M(y) Phi(L)
@@ -198,14 +198,14 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
     return 0;
 
   T sum = 0;
-  int64_t lower = fast_div64(xp, y);
-  max_m = min(max_m, lower);
+  int64_t xpy = fast_div64(xp, y);
+  max_m = min(max_m, xpy);
   int64_t query_low = max(low, square);
 
-  if (query_low <= lower && lower < high)
+  if (query_low <= xpy && xpy < high)
   {
-    int64_t phi_lower = phi + count(lower - low);
-    sum -= T(phi_lower) * mertens_y;
+    int64_t phi_xpy = phi + count(xpy - low);
+    sum -= T(phi_xpy) * mertens_y;
   }
 
   if (query_low <= sqrt_xp && sqrt_xp < high)
@@ -216,7 +216,7 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
 
   // n in (L, H] with position X/n inside [max(low, p^2), high[
   int64_t min_n = min(fast_div(xp, high), sqrt_xp);
-  min_n = max(min_n, lower);
+  min_n = max(min_n, xpy);
   int64_t max_n = min(fast_div(xp, query_low), sqrt_xp);
 
   if (min_n < max_n)

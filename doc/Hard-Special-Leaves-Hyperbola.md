@@ -121,7 +121,7 @@ faster (C1 disappears) and D is unchanged within noise.
 | `p = p_b`, `b` | `p` / `prime`, `b` | sieving prime and its index, `b = pi(p)` |
 | `X = floor(x/p)` | `xp` | |
 | `H = floor(sqrt(X))` | `sqrt_xp` | |
-| `L = floor(X/U)` with `U = y` | `lower` | the leaves `L < m <= y` use the hyperbola method |
+| `L = floor(X/U)` with `U = y` | `xpy` | the leaves `L < m <= y` use the hyperbola method |
 | `U` | `y` | upper end of these leaves, the same for every prime |
 | `floor(X/p^2) = floor(x/p^3)` | `x_div_p3`, `fast_div(xp, square)` | largest hard leaf; `n <= X/p^2` ⟺ position `X/n >= p^2` |
 | `K = floor(X/p)` (paper Section 8) | `xpp` | `x/p^2` |
@@ -261,7 +261,7 @@ All bounds below are integer-exact, and all comparisons use floors.
 |---|---|---|
 | `sqrt_xp < y` | `p > floor(x/y^2) = floor(floor(x/y)/y)` | `floor(sqrt(N)) < y` ⟺ `N < y^2`; `floor(x/p) < y^2` ⟺ `x < p y^2` ⟺ `floor(x/y^2) < p` |
 | `p*p > y/p` (integer `y/p`) | `p > floor(y^(1/3))`, i.e. `y < p^3` | `floor(y/p) < p^2` ⟺ `y/p < p^2` |
-| `lower < square`, i.e. `floor(X/y) < p^2` | `x/p^3 < y` ⟺ `p > floor((x/y)^(1/3)) = iroot<3>(xy)` | `X/y < p^2` ⟺ `x/y < p^3` ⟺ `floor(x/y) < p^3` |
+| `xpy < square`, i.e. `floor(X/y) < p^2` | `x/p^3 < y` ⟺ `p > floor((x/y)^(1/3)) = iroot<3>(xy)` | `X/y < p^2` ⟺ `x/y < p^3` ⟺ `floor(x/y) < p^3` |
 
 So, for `p <= sqrt(y)`, with the cutoff
 `F = min(max(iroot<3>(y), xy / y), isqrt(y))`:
@@ -461,7 +461,7 @@ never read.
     ```
     so `n` in `(min_n, max_n]` ⟺ `X/n` in `[max(low, p^2), high)` and
     `n` in `(L, H]`. The `min(fast_div(xp, high), sqrt_xp)` clamp also
-    prevents a 128-bit → `int64_t` narrowing; `max(fast_div(...), lower)`
+    prevents a 128-bit → `int64_t` narrowing; `max(fast_div(...), xpy)`
     would return the 128-bit type.
   - Events: for `q = primes[i]`, `i = b .. pi[isqrt(max_n)]`, the indices
     `j` run from `max(i, pi[min_n/q] + 1)` to `pi[max_n/q]`.
@@ -981,9 +981,9 @@ compute Gourdon's `y` (`pi_gourdon.cpp` and `main.cpp`) are unchanged
 ## 11. Open items and refinement ideas
 
 - **Cheaper test in `hyperbola_sum()`.** About 96% of calls are for
-  primes that don't use the hyperbola method. Test `lower >= y`
+  primes that don't use the hyperbola method. Test `xpy >= y`
   (⟺ `isqrt(xp) >= y`, Section 3.4) first, using
-  `lower = min(fast_div(xp, y), y)` to stay 64-bit safe, and compute
+  `xpy = min(fast_div(xp, y), y)` to stay 64-bit safe, and compute
   `isqrt(xp)` only for the primes that use it.
 - **`easy_hyperbola_terms()`** recomputes `L`, `H` and `X/p^2` per prime;
   this is harmless. Its prime loop could use libdivide; probably not

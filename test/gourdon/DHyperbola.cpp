@@ -102,7 +102,7 @@ void check_segments(const Input& input, int64_t size,
 {
   int64_t p = input.prime;
   int64_t b = pi[p];
-  int64_t lower = input.xp / input.y;
+  int64_t xpy = input.xp / input.y;
   int64_t stop = expected.size() - 1;
   int64_t mertens_y = reference.mertens[input.y];
   Vector<SemiprimeEvent> events;
@@ -130,7 +130,7 @@ void check_segments(const Input& input, int64_t size,
     T actual = hyperbola_sum(T(input.xp), p, b, input.y, low, high, phi, mertens_y,
                              primes, pi, count, events, sorter, max_m);
     int64_t wanted = expected[high] - expected[low];
-    if (actual != T(wanted) || max_m != lower)
+    if (actual != T(wanted) || max_m != xpy)
     {
       std::cerr << "Hyperbola segment differs: p=" << p << ", low=" << low
                 << ", high=" << high << ", integer bytes=" << sizeof(T)
@@ -144,7 +144,7 @@ void check(const Input& input)
 {
   int64_t p = input.prime;
   int64_t square = p * p;
-  int64_t lower = input.xp / input.y;
+  int64_t xpy = input.xp / input.y;
   int64_t sqrt_xp = isqrt(input.xp);
   int64_t xy = input.xp * p / input.y;
 
@@ -152,7 +152,7 @@ void check(const Input& input)
   // computes the easy hyperbola terms for p > (x/y)^(1/3).
   check(sqrt_xp < input.y && input.y < square * p &&
         square <= input.y &&
-        input.easy_leaves == (lower < square) &&
+        input.easy_leaves == (xpy < square) &&
         input.easy_leaves == (p > iroot<3>(xy)),
         "The test must use the hyperbola method");
 
@@ -174,8 +174,8 @@ void check(const Input& input)
   };
 
   add(sqrt_xp, reference.mertens[sqrt_xp] * reference.phi[sqrt_xp]);
-  add(lower, -reference.mertens[input.y] * reference.phi[lower]);
-  for (int64_t n = lower + 1; n <= sqrt_xp; n++)
+  add(xpy, -reference.mertens[input.y] * reference.phi[xpy]);
+  for (int64_t n = xpy + 1; n <= sqrt_xp; n++)
     if (reference.lpf[n] >= p)
     {
       int64_t c = reference.lpf[n] > p ? reference.mu[n] : 0;
@@ -183,9 +183,9 @@ void check(const Input& input)
       add(t, -(reference.mertens[t] + c * reference.phi[t]));
     }
 
-  // The hyperbola terms replace the leaves lower < m <= y
+  // The hyperbola terms replace the leaves xpy < m <= y
   int64_t direct = 0;
-  for (int64_t m = lower + 1; m <= input.y; m++)
+  for (int64_t m = xpy + 1; m <= input.y; m++)
     if (reference.lpf[m] > p)
       direct -= reference.mu[m] * reference.phi[input.xp / m];
   for (int64_t i = 1; i <= stop; i++)
