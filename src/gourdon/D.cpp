@@ -174,7 +174,7 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
-  // Primes with easy hyperbola terms, see easy_hyperbola_terms()
+  // Primes with easy hyperbola terms, see easy_hyperbola_sum()
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_root3_xy) + 1);
   UT sum = 0;
 
@@ -194,7 +194,7 @@ T D_OpenMP(T x,
     for (int64_t b = min_b++; b <= pi_sqrty; b = min_b++)
     {
       UT xp = UT(x / primes[b]);
-      sum += easy_hyperbola_terms(xp, primes[b], b, y, mertens_y[b], primes, pi);
+      sum += easy_hyperbola_sum(xp, primes[b], b, y, mertens_y[b], primes, pi);
     }
   }
 

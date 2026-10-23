@@ -121,13 +121,13 @@ T sum_phi_minus_mertens(T xp,
 /// whose positions are >= p^2.
 ///
 template <typename T, typename Primes>
-T easy_hyperbola_terms(T xp,
-                       int64_t p,
-                       int64_t b,
-                       int64_t y,
-                       int64_t mertens_y,
-                       const Primes& primes,
-                       const PiTable& pi)
+T easy_hyperbola_sum(T xp,
+                     int64_t p,
+                     int64_t b,
+                     int64_t y,
+                     int64_t mertens_y,
+                     const Primes& primes,
+                     const PiTable& pi)
 {
   int64_t square = p * p;
   int64_t x_div_p3 = fast_div64(xp, square);
@@ -171,7 +171,7 @@ T easy_hyperbola_terms(T xp,
 ///   - sum_{L < n <= H} (a(n) + c(n)) Phi(X/n),
 /// where a(n) = [lpf(n) >= p], c(n) = mu(n)[lpf(n) > p], E = Phi - M.
 /// Here only the terms whose positions are >= p^2 are computed, see
-/// easy_hyperbola_terms(). Prime n > p have a(n) + c(n) = 0. The
+/// easy_hyperbola_sum(). Prime n > p have a(n) + c(n) = 0. The
 /// remaining terms have n = q*r, p <= q <= r, with weight 1 if q = p
 /// or q = r, and weight 2 otherwise. Events are processed in
 /// decreasing n so sieve counts increase.

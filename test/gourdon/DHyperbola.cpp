@@ -110,7 +110,7 @@ void check_segments(const Input& input, int64_t size,
 
   if (input.easy_leaves)
   {
-    T actual = easy_hyperbola_terms(T(input.xp), p, b, input.y, mertens_y, primes, pi);
+    T actual = easy_hyperbola_sum(T(input.xp), p, b, input.y, mertens_y, primes, pi);
     check(actual == T(easy), "Easy hyperbola terms differ");
   }
 
@@ -208,7 +208,7 @@ void check(const Input& input)
   }
 }
 
-/// D.cpp computes easy_hyperbola_terms() for all primes
+/// D.cpp computes easy_hyperbola_sum() for all primes
 /// (x/y)^(1/3) < p <= sqrt(y), hence these primes must use
 /// the hyperbola method and have easy leaves.
 void check_easy_primes()

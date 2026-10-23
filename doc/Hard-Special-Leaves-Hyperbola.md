@@ -97,7 +97,7 @@ cases:
 
 Hyperbola terms whose position is `< p^2` need only PiTable lookups (the
 *easy hyperbola terms*). They are computed once per prime by
-`easy_hyperbola_terms()`. All other hyperbola terms are computed per
+`easy_hyperbola_sum()`. All other hyperbola terms are computed per
 sieve segment by `hyperbola_sum()`.
 
 For every valid `y`, every prime of C1, `(x/y)^(1/3) < p <= sqrt(y)`,
@@ -130,7 +130,7 @@ faster (C1 disappears) and D is unchanged within noise.
 | `M_p(y)` | `mertens_y[b]` | precomputed once per prime |
 | `E_p(t) = Phi_p(t) - M_p(t)` | `phi_minus_mertens(t, p, b, pi)` | valid for `p^2 <= t < p^3` |
 | `a_p(n) = [lpf(n) >= p]`, `c_p(n) = mu(n)[lpf(n) > p]` | (comments) | |
-| hyperbola terms | `hyperbola_sum()`, `easy_hyperbola_terms()` | the rearranged terms of the leaves `L < m <= y` |
+| hyperbola terms | `hyperbola_sum()`, `easy_hyperbola_sum()` | the rearranged terms of the leaves `L < m <= y` |
 | semiprime events | `SemiprimeEvent{n, weight}`, `SemiprimeEventSorter` | `n = q*r`, `p <= q <= r`, weight `w(q,r)` |
 | `alpha < q <= beta` (Gourdon's inversion) | `min_n < q <= max_n` | |
 | reflected primes `r` | `(min_r, max_r]`, `(min_r2, max_r2]` | |
@@ -181,7 +181,7 @@ M_p(t)   = 1 - (pi(t) - b)
 E_p(t)   = 2 pi(t) - 2b + 1                                                (p <= t < p^2)
 ```
 
-`easy_hyperbola_terms()` uses these three formulas, inline.
+`easy_hyperbola_sum()` uses these three formulas, inline.
 
 ### 3.2 The hyperbola identity with U = y
 
@@ -312,15 +312,15 @@ come from PiTable anyway) are computed once per prime in `D_OpenMP`.
 
 | Term | Position | Hard leaves only (`L >= p^2`) | Easy leaves, `H >= p^2` | Easy leaves, `H < p^2` |
 |---|---|---|---|---|
-| `-M_p(y) Phi_p(L)` | `L` | `hyperbola_sum()` | `easy_hyperbola_terms()` | `easy_hyperbola_terms()` |
-| `M_p(H) Phi_p(H)` | `H` | `hyperbola_sum()` | `hyperbola_sum()` | `easy_hyperbola_terms()` |
-| prime `n`: `E_p(X/n)` | `X/n` | `hyperbola_sum()` | `hyperbola_sum()` (all `X/n >= H >= p^2`) | `n <= X/p^2`: `hyperbola_sum()`; `n > X/p^2`: `easy_hyperbola_terms()` |
+| `-M_p(y) Phi_p(L)` | `L` | `hyperbola_sum()` | `easy_hyperbola_sum()` | `easy_hyperbola_sum()` |
+| `M_p(H) Phi_p(H)` | `H` | `hyperbola_sum()` | `hyperbola_sum()` | `easy_hyperbola_sum()` |
+| prime `n`: `E_p(X/n)` | `X/n` | `hyperbola_sum()` | `hyperbola_sum()` (all `X/n >= H >= p^2`) | `n <= X/p^2`: `hyperbola_sum()`; `n > X/p^2`: `easy_hyperbola_sum()` |
 | events `n = q r` | `X/n` | `hyperbola_sum()` | `hyperbola_sum()` | none (all `n < p^2` are prime) |
 
 `hyperbola_sum()` restricts all positions to `[query_low, high)` with
 `query_low = max(low, p^2)`: `n <= X/query_low` for the prime terms and
 events, `query_low <= L` and `query_low <= H` for the two boundary terms.
-`easy_hyperbola_terms()` computes the complement.
+`easy_hyperbola_sum()` computes the complement.
 
 **Proof that every per-segment term is computed exactly once.** Take a
 position `t >= p^2`, `t < y`, in segment `[low, high)` of a thread with
@@ -343,7 +343,7 @@ limit `>= high > t`. Check the kernel's conditions for `b`:
 4. The prime-only cut-off (`max_m <= p^2 && low >= y`) requires
    `low >= y`, and all hyperbola term positions are `< y`.
 
-### 3.6 Easy hyperbola terms (`easy_hyperbola_terms()`)
+### 3.6 Easy hyperbola terms (`easy_hyperbola_sum()`)
 
 Only for primes with easy leaves (`x/p^3 < y`):
 
@@ -420,7 +420,7 @@ never read.
 | `src/gourdon/AC.cpp` | AC's PiTable up to `y`, primes up to `min(isqrt(x / isqrt(y)), y)` (Section 4.5) |
 | `src/gourdon/AC_default.hpp`, `AC_libdivide.hpp`, `AC_arm_sve.hpp` | A and C2 formulas; C1 was removed (Section 4.5) |
 | `src/PiTable.hpp`, `PiTable.cpp` | `prev_prime(x)`: the largest prime `<= x`, used by AC |
-| `test/gourdon/DHyperbola.cpp` | dense reference test of `hyperbola_sum()`/`easy_hyperbola_terms()` per segment, query order, `max_m`; exhaustive check that every prime `(x/y)^(1/3) < p <= sqrt(y)` uses the hyperbola method with easy leaves (`x <= 30000`) |
+| `test/gourdon/DHyperbola.cpp` | dense reference test of `hyperbola_sum()`/`easy_hyperbola_sum()` per segment, query order, `max_m`; exhaustive check that every prime `(x/y)^(1/3) < p <= sqrt(y)` uses the hyperbola method with easy leaves (`x <= 30000`) |
 | `test/gourdon/SemiprimeEventSorter.cpp` | sorter test |
 | `test/gourdon/D.cpp` | regenerated values; `D_reference()` brute force incl. the easy leaves computed by D; boundary cases; 30 hyperbola cases labelled 0 = not used, 1 = also easy leaves, 2 = hard leaves only |
 | `test/gourdon/AC.cpp` | regenerated values (`AC_old - delta`) |
@@ -438,7 +438,7 @@ never read.
   unambiguous.
 - `sum_phi_minus_mertens(xp, p, b, min_n, max_n, primes, pi)` (line 80):
   Section 3.7. Precondition: `X/max_n >= p^2` and `X/(min_n+1) < p^3`.
-- `easy_hyperbola_terms(xp, p, b, y, mertens_y, primes, pi)` (line 124):
+- `easy_hyperbola_sum(xp, p, b, y, mertens_y, primes, pi)` (line 124):
   Section 3.6. Precondition: `p` uses the hyperbola method and has easy
   leaves. There is no internal test: `D.cpp` calls it for the primes
   `(x/y)^(1/3) < p <= sqrt(y)`, which all satisfy this (Section 10.1).
@@ -821,7 +821,7 @@ Verify each item and report issues with a concrete counterexample.
    check `F <= iroot<3>(xy)` (Section 10.1), on which the easy-terms loop
    of `D.cpp` relies.
 5. Section 3.5: each hyperbola term is computed exactly once, either in
-   `easy_hyperbola_terms()` or in exactly one segment by
+   `easy_hyperbola_sum()` or in exactly one segment by
    `hyperbola_sum()`, across all `LoadBalancerS2` work units (single- and
    multi-threaded segment sizing), `goto next_segment` and the cut-off.
 6. Section 3.7: Gourdon's inversion with floors in
@@ -985,7 +985,7 @@ compute Gourdon's `y` (`pi_gourdon.cpp` and `main.cpp`) are unchanged
   (⟺ `isqrt(xp) >= y`, Section 3.4) first, using
   `xpy = min(fast_div(xp, y), y)` to stay 64-bit safe, and compute
   `isqrt(xp)` only for the primes that use it.
-- **`easy_hyperbola_terms()`** recomputes `L`, `H` and `X/p^2` per prime;
+- **`easy_hyperbola_sum()`** recomputes `L`, `H` and `X/p^2` per prime;
   this is harmless. Its prime loop could use libdivide; probably not
   worth it (0.8% of D).
 - **Test coverage.** Real `x > 2^64` with 128-bit `T` for primes that use
