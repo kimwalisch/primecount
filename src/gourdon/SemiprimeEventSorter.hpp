@@ -32,14 +32,17 @@ public:
   /// D work unit so its scratch allocations are reused between segments
   /// and primes.
   template <typename Event>
-  void sort(Vector<Event>& events, int64_t p, int64_t min_n, int64_t max_n)
+  void sort(Vector<Event>& events,
+            uint64_t p,
+            uint64_t min_n,
+            uint64_t max_n)
   {
     if (events.size() < 2)
       return;
 
-    ASSERT(0 <= min_n && min_n < max_n);
-    uint64_t first = uint64_t(min_n + 1) / 240;
-    uint64_t last = uint64_t(max_n) / 240;
+    ASSERT(min_n < max_n);
+    uint64_t first = (min_n + 1) / 240;
+    uint64_t last = max_n / 240;
     uint64_t words64 = last - first + 1;
     uint64_t count = events.size();
 
@@ -67,9 +70,9 @@ public:
 
     for (const Event& event : events)
     {
-      ASSERT(min_n < event.n && event.n <= max_n);
+      uint64_t n = event.n;
+      ASSERT(min_n < n && n <= max_n);
       ASSERT(event.weight == 1 || event.weight == 2);
-      uint64_t n = uint64_t(event.n);
       uint64_t word = n / 240 - first;
       uint64_t residue = n % 240;
       ASSERT(residue != 0);
@@ -93,7 +96,7 @@ public:
       while (bits)
       {
         int bit = ctz64(bits);
-        int64_t n = int64_t(base + bit_values_[63 - bit]);
+        int64_t n = base + bit_values_[63 - bit];
         int64_t weight = 2 - ((weight1 >> bit) & 1);
         events[written++] = Event{n, weight};
         bits &= bits - 1;
