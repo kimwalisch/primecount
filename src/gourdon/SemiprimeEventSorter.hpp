@@ -26,18 +26,18 @@ namespace primecount {
 class SemiprimeEventSorter : private BitSieve240
 {
 public:
-  /// Events must have distinct n=q*r in (lower, upper], where p<=q<=r
+  /// Events must have distinct n=q*r in (min_n, max_n], where p<=q<=r
   /// are primes, and weight 1 or 2. Retain one sorter per D work unit
   /// so its scratch allocations are reused between segments and primes.
   template <typename Event>
-  void sort(Vector<Event>& events, int64_t p, int64_t lower, int64_t upper)
+  void sort(Vector<Event>& events, int64_t p, int64_t min_n, int64_t max_n)
   {
     if (events.size() < 2)
       return;
 
-    ASSERT(0 <= lower && lower < upper);
-    uint64_t first = uint64_t(lower + 1) / 240;
-    uint64_t last = uint64_t(upper) / 240;
+    ASSERT(0 <= min_n && min_n < max_n);
+    uint64_t first = uint64_t(min_n + 1) / 240;
+    uint64_t last = uint64_t(max_n) / 240;
     uint64_t words64 = last - first + 1;
     std::size_t count = events.size();
 
@@ -62,7 +62,7 @@ public:
 
     for (const Event& event : events)
     {
-      ASSERT(lower < event.n && event.n <= upper);
+      ASSERT(min_n < event.n && event.n <= max_n);
       ASSERT(event.weight == 1 || event.weight == 2);
       uint64_t n = uint64_t(event.n);
       uint64_t word = n / 240 - first;
