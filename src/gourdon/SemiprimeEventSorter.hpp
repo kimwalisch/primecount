@@ -1,7 +1,8 @@
 ///
 /// @file  SemiprimeEventSorter.hpp
-/// @brief Sort distinct semiprime events by decreasing n using two
-///        wheel-compressed bitmaps for presence and weight.
+/// @brief Sort the distinct semiprime events of hyperbola_sum() by
+///        decreasing n using two wheel-compressed bitmaps for presence
+///        and weight, or std::sort if the bitmaps would be too large.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -26,9 +27,10 @@ namespace primecount {
 class SemiprimeEventSorter : private BitSieve240
 {
 public:
-  /// Events must have distinct n=q*r in (min_n, max_n], where p<=q<=r
-  /// are primes, and weight 1 or 2. Retain one sorter per D work unit
-  /// so its scratch allocations are reused between segments and primes.
+  /// Events must have distinct n = q*r in (min_n, max_n], where
+  /// p <= q <= r are primes, and weight 1 or 2. Retain one sorter per
+  /// D work unit so its scratch allocations are reused between segments
+  /// and primes.
   template <typename Event>
   void sort(Vector<Event>& events, int64_t p, int64_t min_n, int64_t max_n)
   {
@@ -41,9 +43,10 @@ public:
     uint64_t words64 = last - first + 1;
     std::size_t count = events.size();
 
-    // Check the full interval before narrowing on 32-bit platforms.
-    // Compare bitmap words with N * floor(log2(N)) without multiplying.
-    // Small primes may produce events that are not coprime to 30.
+    // Fall back to std::sort if small primes p <= 5 produce events
+    // that are not coprime to 30, if the bitmap does not fit into
+    // size_t (32-bit platforms), or if it has more than
+    // N * floor(log2(N)) words, which is checked without multiplying.
     if (p <= 5 ||
         words64 > SIZE_MAX ||
         (words64 - 1) / count >= ilog2(count))
