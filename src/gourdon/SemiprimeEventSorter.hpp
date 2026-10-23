@@ -93,6 +93,7 @@ public:
       uint64_t bits = present_[word];
       uint64_t weight1 = weight1_[word];
       uint64_t base = (first + word) * 240;
+
       while (bits)
       {
         int bit = ctz64(bits);
