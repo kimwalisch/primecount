@@ -14,7 +14,7 @@ choice of `y`. Removing it does not require imposing `y >= x^(2/5)`.**
 The full mixed-band extension on this branch already transfers every possible
 C1 row into D. For smaller `y`, the original C1 row interval is empty even before
 the transfer. This is stronger than the sufficient condition proved in
-[Hard-Special-Leaves-Band.md, Section 10](Hard-Special-Leaves-Band.md).
+[Hard-Special-Leaves-Hyperbola.md, Section 10](Hard-Special-Leaves-Hyperbola.md).
 
 The recommendation is to delete the unreachable C1 implementations and their
 dispatch blocks, preserve the existing tuning and test expectations, and correct
@@ -40,7 +40,7 @@ review and has not yet authorized the algorithm changes.
 
 Relevant mathematical background:
 
-- [Hard-Special-Leaves-Band.md](Hard-Special-Leaves-Band.md), especially
+- [Hard-Special-Leaves-Hyperbola.md](Hard-Special-Leaves-Hyperbola.md), especially
   Sections 3.3, 3.4, 4.3, 4.5, 5, and 10. It describes this branch's full
   mixed-band extension.
 - [Hard_Special_Leaves_Cancellation_2.tex](Hard_Special_Leaves_Cancellation_2.tex),
