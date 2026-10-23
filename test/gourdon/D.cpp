@@ -133,10 +133,10 @@ int64_t D_reference(int64_t x, int64_t y, int64_t k)
     int64_t prime = primes[b];
     if (prime > max_prime) break;
 
-    // Rows with x/p^3 < y and sqrt(x/p) < y < p^3 also
-    // contain their easy leaves (AC does not compute them).
+    // Primes with x/p^3 < y and sqrt(x/p) < y < p^3 also
+    // include their easy leaves (AC does not compute them).
     int64_t xp = x / prime;
-    bool easy_in_band = prime * prime <= y &&
+    bool easy_leaves = prime * prime <= y &&
                         xp / (prime * prime) < y &&
                         prime * prime > y / prime &&
                         isqrt(xp) < y;
@@ -145,7 +145,7 @@ int64_t D_reference(int64_t x, int64_t y, int64_t k)
       if (mu[m] != 0 &&
           lpf[m] > prime &&
           prime * m > y &&
-          (easy_in_band || x / (prime * m) >= prime * prime))
+          (easy_leaves || x / (prime * m) >= prime * prime))
         sum -= mu[m] * phi(x / (prime * m), b - 1);
   }
 
@@ -199,19 +199,20 @@ int main()
         }
   }
 
-  struct BandParams
+  struct HyperbolaParams
   {
     int64_t xp;
     int64_t y;
     int64_t prime;
-    int band;
+    int hyperbola;
   };
 
-  // Bands: 0 = none, 1 = mixed (x/p^3 < y), 2 = hard (x/p^3 >= y).
+  // Hyperbola method: 0 = not used, 1 = also easy leaves (x/p^3 < y),
+  // 2 = hard leaves only (x/p^3 >= y).
   // Include x/(p*y) = p^2, x/(p*y) = sqrt(x/p), prime/semiprime
   // endpoints, and boundaries immediately below, at, and above
   // multiples of the sieve alignment.
-  const Array<BandParams, 30> band_cases = {{
+  const Array<HyperbolaParams, 30> hyperbola_cases = {{
     { 279840, 530, 23, 1 },
     { 279841, 530, 23, 1 },
     { 280370, 530, 23, 2 },
@@ -244,21 +245,21 @@ int main()
     { 1416243, 1682, 29, 2 }
   }};
 
-  for (const BandParams& params : band_cases)
+  for (const HyperbolaParams& params : hyperbola_cases)
   {
     int64_t p = params.prime;
     int64_t x = params.xp * p;
     int64_t sqrt_xp = isqrt(params.xp);
-    int band = 0;
+    int hyperbola = 0;
 
     if (p * p <= params.y &&
         sqrt_xp < params.y &&
         params.y < p * p * p)
-      band = (params.xp / (p * p) < params.y) ? 1 : 2;
+      hyperbola = (params.xp / (p * p) < params.y) ? 1 : 2;
 
-    std::cout << "D band " << params.band << " ("
+    std::cout << "D hyperbola " << params.hyperbola << " ("
               << x << ", " << params.y << ")";
-    check(band == params.band &&
+    check(hyperbola == params.hyperbola &&
           iroot<3>(x) < params.y &&
           params.y <= isqrt(x));
     int64_t expected = D_reference(x, params.y, 8);

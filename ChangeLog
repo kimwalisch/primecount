@@ -1,17 +1,17 @@
 Changes in primecount-9.0, 2026-10-23
 
-* DBand.hpp, D.cpp: Simplify band_row() bounds, limit mertens_y to pi(sqrt(y)).
+* DHyperbola.hpp, D.cpp: Simplify hyperbola_sum() bounds, limit mertens_y to pi(sqrt(y)).
 * D.cpp: Use implicit signed conversions, remove signed_from_unsigned().
 * Gourdon: Share one PiTable between Sigma, Phi0, AC and D.
 * Phi0.cpp: Extract primes from PiTable instead of sieving them again.
 * Sigma.cpp: Limit the prime count lookup table to y.
 * AC.cpp: Limit the primes vector to sqrt(x / sqrt(y)), add PiTable::prev_prime(x).
-* AC_*.hpp: Remove the C1 formula, D computes its easy leaves in the band.
+* AC_*.hpp: Remove the C1 formula, D computes its easy leaves using the hyperbola method.
 * doc/C1-Removal-Analysis.md: Analyze C1 removal without changing Gourdon's y bound.
-* DBand.hpp: Cancel the prime hard leaves in the band (x/(p*y), y] of the rows of D.
-* DBand.hpp: Rows with x/p^3 < y also compute their C1 easy leaves in the band.
+* DHyperbola.hpp: Cancel the prime hard leaves x/(p*y) < m <= y of D using the hyperbola method.
+* DHyperbola.hpp: Primes with x/p^3 < y also compute their C1 easy leaves.
 * D: Skip factor table scans when the remaining factors must be prime.
-* doc/Hard-Special-Leaves-Band.md: Specification of the band cancellation in D.
+* doc/Hard-Special-Leaves-Band.md: Specification of the hyperbola method in D.
 * D_arm_sve.hpp: Fix ambiguous svwhilelt_b64() call on macOS.
 * ci.yml: Compile Linux GCC tests with -march=x86-64, Ubuntu 26.04 enables AVX2.
 * D.cpp, D_*.hpp: Bound the first prime by x^(1/4) instead of x_star.

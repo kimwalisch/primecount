@@ -29,7 +29,7 @@
 #ifndef D_DEFAULT_HPP
 #define D_DEFAULT_HPP
 
-#include "DBand.hpp"
+#include "DHyperbola.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
@@ -121,12 +121,12 @@ T D_thread_default(T x,
         goto next_segment;
 
       // A composite m with all prime factors > prime exceeds
-      // prime^2 and all band terms have positions < y.
+      // prime^2 and all hyperbola terms have positions < y.
       if (max_m <= prime * prime && low >= y)
         break;
 
-      sum += band_row(xp, prime, b, y, low, high, phi[b], mertens_y[b],
-                      primes, pi, count_sieve, events, sorter, max_m);
+      sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b], mertens_y[b],
+                           primes, pi, count_sieve, events, sorter, max_m);
 
       min_m = FactorTable::to_index(min_m);
       max_m = FactorTable::to_index(max_m);

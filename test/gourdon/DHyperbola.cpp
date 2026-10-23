@@ -1,6 +1,6 @@
 ///
-/// @file  DBand.cpp
-/// @brief Check the band terms of D and their query order in each
+/// @file  DHyperbola.cpp
+/// @brief Check the hyperbola terms of D and their query order in each
 ///        sieve segment against dense partial-sieve and Moebius
 ///        prefixes.
 ///
@@ -10,7 +10,7 @@
 /// file in the top level directory.
 ///
 
-#include <DBand.hpp>
+#include <DHyperbola.hpp>
 #include <generate_primes.hpp>
 #include <int128_t.hpp>
 #include <PiTable.hpp>
@@ -27,12 +27,12 @@ struct Input
   int64_t xp;
   int64_t y;
   int64_t prime;
-  bool mixed;
+  bool easy_leaves;
 };
 
-// Mixed bands (x/p^3 < y) also contain easy leaves, the last
-// mixed inputs have sqrt(x/p) < p^2. Rows with x/p^3 = y have
-// a hard band starting at x/(p*y) = p^2.
+// If x/p^3 < y, the leaves x/(p*y) < m <= y also include easy
+// leaves, the last such inputs have sqrt(x/p) < p^2. If x/p^3 = y,
+// they are all hard leaves and x/(p*y) = p^2.
 const Array<Input, 26> inputs = {{
   { 280370, 530, 23, false },
   { 280898, 530, 23, false },
@@ -108,10 +108,10 @@ void check_segments(const Input& input, int64_t size,
   Vector<SemiprimeEvent> events;
   SemiprimeEventSorter sorter;
 
-  if (input.mixed)
+  if (input.easy_leaves)
   {
-    T actual = easy_band_terms(T(input.xp), p, b, input.y, mertens_y, primes, pi);
-    check(actual == T(easy), "Easy band terms differ");
+    T actual = easy_hyperbola_terms(T(input.xp), p, b, input.y, mertens_y, primes, pi);
+    check(actual == T(easy), "Easy hyperbola terms differ");
   }
 
   for (int64_t low = 0; low < stop; low += size)
@@ -121,18 +121,18 @@ void check_segments(const Input& input, int64_t size,
     int64_t max_m = input.y;
     uint64_t previous = 0;
     auto count = [&](uint64_t position) -> uint64_t {
-      check(position < uint64_t(high - low), "Band count escaped its segment");
-      check(position >= previous, "Band counts are not monotonic");
+      check(position < uint64_t(high - low), "Hyperbola count escaped its segment");
+      check(position >= previous, "Hyperbola counts are not monotonic");
       previous = position;
       return reference.phi[low + position] - phi;
     };
 
-    T actual = band_row(T(input.xp), p, b, input.y, low, high, phi, mertens_y,
-                        primes, pi, count, events, sorter, max_m);
+    T actual = hyperbola_sum(T(input.xp), p, b, input.y, low, high, phi, mertens_y,
+                             primes, pi, count, events, sorter, max_m);
     int64_t wanted = expected[high] - expected[low];
     if (actual != T(wanted) || max_m != lower)
     {
-      std::cerr << "Band segment differs: p=" << p << ", low=" << low
+      std::cerr << "Hyperbola segment differs: p=" << p << ", low=" << low
                 << ", high=" << high << ", integer bytes=" << sizeof(T)
                 << ", prime bytes=" << sizeof(Prime) << '\n';
       std::exit(1);
@@ -148,15 +148,15 @@ void check(const Input& input)
   int64_t sqrt_xp = isqrt(input.xp);
   int64_t xy = input.xp * p / input.y;
 
-  // band_row() tests the row itself, whereas
-  // D.cpp uses (x/y)^(1/3) for the mixed bands.
+  // hyperbola_sum() tests the prime itself, whereas D.cpp
+  // computes the easy hyperbola terms for p > (x/y)^(1/3).
   check(sqrt_xp < input.y && input.y < square * p &&
         square <= input.y &&
-        input.mixed == (lower < square) &&
-        input.mixed == (p > iroot<3>(xy)),
-        "The test must enter a band");
+        input.easy_leaves == (lower < square) &&
+        input.easy_leaves == (p > iroot<3>(xy)),
+        "The test must use the hyperbola method");
 
-  // All band terms have positions < y
+  // All hyperbola terms have positions < y
   int64_t stop = input.y;
   Reference reference(stop, p);
   Vector<int64_t> expected(stop + 1);
@@ -164,7 +164,7 @@ void check(const Input& input)
     expected[i] = 0;
 
   // Accumulate independent dense events at their exact query positions.
-  // The band terms below p^2 are computed once per row.
+  // The hyperbola terms below p^2 are computed once per prime.
   int64_t easy = 0;
   auto add = [&](int64_t position, int64_t value) {
     if (position < square)
@@ -183,14 +183,14 @@ void check(const Input& input)
       add(t, -(reference.mertens[t] + c * reference.phi[t]));
     }
 
-  // The band contains the leaves lower < m <= y
+  // The hyperbola terms replace the leaves lower < m <= y
   int64_t direct = 0;
   for (int64_t m = lower + 1; m <= input.y; m++)
     if (reference.lpf[m] > p)
       direct -= reference.mu[m] * reference.phi[input.xp / m];
   for (int64_t i = 1; i <= stop; i++)
     expected[i] += expected[i - 1];
-  check(expected.back() + easy == direct, "Band sum differs from original Moebius leaves");
+  check(expected.back() + easy == direct, "Hyperbola sum differs from original Moebius leaves");
 
   PiTable pi(input.y, 1);
   auto primes32 = pi.get_primes<uint32_t>(input.y, 1);
@@ -208,9 +208,10 @@ void check(const Input& input)
   }
 }
 
-/// D.cpp computes easy_band_terms() for all rows
-/// (x/y)^(1/3) < p <= sqrt(y), these must have a mixed band.
-void check_mixed_rows()
+/// D.cpp computes easy_hyperbola_terms() for all primes
+/// (x/y)^(1/3) < p <= sqrt(y), hence these primes must use
+/// the hyperbola method and have easy leaves.
+void check_easy_primes()
 {
   for (int64_t x = 1; x <= 30000; x++)
   {
@@ -220,7 +221,7 @@ void check_mixed_rows()
       {
         int64_t xp = x / p;
         check(isqrt(xp) < y && p * p > y / p && xp / y < p * p,
-              "Row without mixed band");
+              "Prime without easy hyperbola terms");
       }
     }
   }
@@ -228,8 +229,8 @@ void check_mixed_rows()
 
 int main()
 {
-  check_mixed_rows();
+  check_easy_primes();
   for (const Input& input : inputs)
     check(input);
-  std::cout << "All band segment tests passed successfully!" << std::endl;
+  std::cout << "All hyperbola segment tests passed successfully!" << std::endl;
 }

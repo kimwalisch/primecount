@@ -12,7 +12,7 @@
 /// file in the top level directory.
 ///
 
-#include "DBand.hpp"
+#include "DHyperbola.hpp"
 
 #include <primecount-internal.hpp>
 #include <cpu_arch_macros.hpp>
@@ -162,7 +162,7 @@ T D_OpenMP(T x,
   int64_t xy = x / y;
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
 
-  // Only rows with prime^2 <= y < prime^3 use this prefix
+  // Only primes with prime^2 <= y < prime^3 use this prefix
   Vector<int64_t> mertens_y = phi_vector(y, pi_sqrty, primes, pi);
   for (int64_t b = 1; b <= pi_sqrty; b++)
     mertens_y[b] -= phi_minus_mertens(y, primes[b], b, pi);
@@ -174,7 +174,7 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
-  // Rows whose band has easy leaves, see easy_band_terms()
+  // Primes with easy hyperbola terms, see easy_hyperbola_terms()
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_root3_xy) + 1);
   UT sum = 0;
 
@@ -190,11 +190,11 @@ T D_OpenMP(T x,
       sum += thread.sum;
     }
 
-    // Band terms with positions < prime^2, computed once per row
+    // Hyperbola terms with positions < prime^2, computed once per prime
     for (int64_t b = min_b++; b <= pi_sqrty; b = min_b++)
     {
       UT xp = UT(x / primes[b]);
-      sum += easy_band_terms(xp, primes[b], b, y, mertens_y[b], primes, pi);
+      sum += easy_hyperbola_terms(xp, primes[b], b, y, mertens_y[b], primes, pi);
     }
   }
 

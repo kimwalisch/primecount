@@ -122,8 +122,8 @@ T A_libdivide(T xlow,
 /// pi[sqrt(y)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
-/// D computes the 1st part of the C formula in the band of
-/// the rows pi[(x/y)^(1/3)] < b <= pi[sqrt(y)], see DBand.hpp.
+/// D computes the 1st part of the C formula for the primes
+/// pi[(x/y)^(1/3)] < b <= pi[sqrt(y)], see DHyperbola.hpp.
 ///
 template <typename T,
           typename LibdividePrimes>

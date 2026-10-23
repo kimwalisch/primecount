@@ -1,8 +1,8 @@
 ///
-/// @file  DBand.hpp
-/// @brief Cancel the prime leaves in the band (x/(p*y), y] of the rows
-///        of Gourdon's D formula using a weighted Dirichlet hyperbola
-///        rearrangement.
+/// @file  DHyperbola.hpp
+/// @brief Compute the special leaves x/(p*m) with x/(p*y) < m <= y of
+///        Gourdon's D formula using a weighted Dirichlet hyperbola
+///        rearrangement, in which the prime leaves cancel.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -10,8 +10,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef D_BAND_HPP
-#define D_BAND_HPP
+#ifndef D_HYPERBOLA_HPP
+#define D_HYPERBOLA_HPP
 
 #include "SemiprimeEventSorter.hpp"
 
@@ -111,22 +111,23 @@ T sum_phi_minus_mertens(T xp,
   return sum;
 }
 
-/// Rows (x/y)^(1/3) < p <= sqrt(y) have x < p^3 * y <= p * y^2 and
-/// y^2 <= x, hence sqrt(x/p) < y < p^3. So these rows have a band,
-/// which also contains their easy leaves. The band terms whose
-/// positions are < p^2 only need PiTable lookups. D_thread() skips
-/// the row p in threads whose sieve limit is < p^2, hence these
-/// terms are computed once per row and band_row() only computes the
-/// band terms whose positions are >= p^2.
+/// Primes (x/y)^(1/3) < p <= sqrt(y) have x < p^3 * y <= p * y^2
+/// and y^2 <= x, hence sqrt(x/p) < y < p^3. So hyperbola_sum()
+/// computes their leaves x/(p*y) < m <= y, which also include their
+/// easy leaves. The hyperbola terms whose positions are < p^2 only
+/// need PiTable lookups. D_thread() skips the prime p in threads
+/// whose sieve limit is < p^2, hence these terms are computed once
+/// per prime and hyperbola_sum() only computes the hyperbola terms
+/// whose positions are >= p^2.
 ///
 template <typename T, typename Primes>
-T easy_band_terms(T xp,
-                  int64_t p,
-                  int64_t b,
-                  int64_t y,
-                  int64_t mertens_y,
-                  const Primes& primes,
-                  const PiTable& pi)
+T easy_hyperbola_terms(T xp,
+                       int64_t p,
+                       int64_t b,
+                       int64_t y,
+                       int64_t mertens_y,
+                       const Primes& primes,
+                       const PiTable& pi)
 {
   int64_t square = p * p;
   int64_t x_div_p3 = fast_div64(xp, square);
@@ -156,10 +157,11 @@ T easy_band_terms(T xp,
   return sum;
 }
 
-/// Process the band of the current row p = primes[b] in the current
-/// segment [low, high[. Rows with sqrt(x/p) < y < p^3 have the band
-/// (x/(p*y), y], hence max_m is lowered to x/(p*y) and the caller
-/// processes the remaining leaves using the factor table.
+/// Compute the special leaves x/(p*y) < m <= y of the prime
+/// p = primes[b] in the current segment [low, high[ using the
+/// hyperbola method, if sqrt(x/p) < y < p^3. Then max_m is lowered
+/// to x/(p*y) and the caller processes the remaining leaves using
+/// the factor table.
 ///
 /// Let X = floor(x/p), L = lower = floor(X/y), H = sqrt_xp =
 /// floor(sqrt(X)) and Phi(t) = phi(t, b - 1). The leaves L < m <= y
@@ -169,26 +171,26 @@ T easy_band_terms(T xp,
 ///   - sum_{L < n <= H} (a(n) + c(n)) Phi(X/n),
 /// where a(n) = [lpf(n) >= p], c(n) = mu(n)[lpf(n) > p], E = Phi - M.
 /// Here only the terms whose positions are >= p^2 are computed, see
-/// easy_band_terms(). Prime n > p have a(n) + c(n) = 0. The remaining
-/// terms have n = q*r, p <= q <= r, with weight 1 if q = p or q = r,
-/// and weight 2 otherwise. Events are processed in decreasing n so
-/// sieve counts increase.
+/// easy_hyperbola_terms(). Prime n > p have a(n) + c(n) = 0. The
+/// remaining terms have n = q*r, p <= q <= r, with weight 1 if q = p
+/// or q = r, and weight 2 otherwise. Events are processed in
+/// decreasing n so sieve counts increase.
 ///
 template <typename T, typename Primes, typename Count>
-ALWAYS_INLINE T band_row(T xp,
-                         int64_t p,
-                         int64_t b,
-                         int64_t y,
-                         int64_t low,
-                         int64_t high,
-                         int64_t phi,
-                         int64_t mertens_y,
-                         const Primes& primes,
-                         const PiTable& pi,
-                         const Count& count,
-                         Vector<SemiprimeEvent>& events,
-                         SemiprimeEventSorter& sorter,
-                         int64_t& max_m)
+ALWAYS_INLINE T hyperbola_sum(T xp,
+                              int64_t p,
+                              int64_t b,
+                              int64_t y,
+                              int64_t low,
+                              int64_t high,
+                              int64_t phi,
+                              int64_t mertens_y,
+                              const Primes& primes,
+                              const PiTable& pi,
+                              const Count& count,
+                              Vector<SemiprimeEvent>& events,
+                              SemiprimeEventSorter& sorter,
+                              int64_t& max_m)
 {
   int64_t square = p * p;
   int64_t sqrt_xp = isqrt(xp);
