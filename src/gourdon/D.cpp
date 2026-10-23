@@ -23,7 +23,6 @@
 #include <LoadBalancerS2.hpp>
 #include <macros.hpp>
 #include <min.hpp>
-#include <phi_vector.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
 #include <RelaxedAtomic.hpp>
@@ -162,10 +161,15 @@ T D_OpenMP(T x,
   int64_t xy = x / y;
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
 
-  // Only primes with prime^2 <= y < prime^3 use this prefix
-  Vector<int64_t> mertens_y = phi_vector(y, pi_sqrty, primes, pi);
-  for (int64_t b = k + 1; b <= pi_sqrty; b++)
-    mertens_y[b] -= phi_minus_mertens(y, primes[b], b, pi);
+  // mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n)
+  // Only entries with primes[b]^2 <= y < primes[b]^3 are used.
+  Vector<int64_t> mertens_y(pi_sqrty + 1);
+  int64_t mertens = 1 - pi[y] + pi_sqrty;
+  for (int64_t b = pi_sqrty; b > k; b--)
+  {
+    mertens_y[b] = mertens;
+    mertens += pi[y / primes[b]] - b - 1;
+  }
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.

@@ -1,5 +1,6 @@
 Changes in primecount-9.0, 2026-10-23
 
+* D.cpp: Compute mertens_y directly using a descending recurrence.
 * SemiprimeEventSorter.hpp: Avoid copying discarded bitmap contents when growing buffers.
 * DHyperbola.hpp, D.cpp: Simplify hyperbola_sum() bounds, limit mertens_y to pi(sqrt(y)).
 * D.cpp: Use implicit signed conversions, remove signed_from_unsigned().

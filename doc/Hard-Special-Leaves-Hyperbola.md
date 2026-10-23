@@ -399,11 +399,23 @@ form used by C2 in `AC_*.hpp` (`pi[q_lo] * pi_y - pi[q_hi] * ...`).
 
 ### 3.8 M_p(y)
 
-`D_OpenMP` precomputes `phi(y, b-1)` for all `b <= pi_sqrty` with
-`phi_vector()`. It then subtracts `E_p(y) = phi_minus_mertens(y, ...)`.
-The result is valid only for primes with `p^2 <= y < p^3`, which
-includes all primes that use the hyperbola method. Other entries are
-never read.
+`D_OpenMP` computes this prefix directly, without `phi_vector()`. Let
+`R = pi(sqrt(y))` and `M_b = M_{p_b}(y)`. For `p_b^2 <= y < p_b^3`,
+only 1, primes and squarefree semiprimes contribute, so
+
+```
+M_b = 1 - pi(y) + b + sum_{b < i <= R} (pi(y / p_i) - i)
+M_R = 1 - pi(y) + R
+M_{b-1} = M_b + pi(y / p_b) - b - 1
+```
+
+Starting at `b = R`, the descending loop stores `mertens_y[b]` before
+updating the running value, for every `b > k`. All entries that callers
+can pass are initialized. Values outside `y < p_b^3` need not equal the
+Mertens prefix, as the hyperbola eligibility guard ignores them; entries
+with `b <= k` are never read. The exact values for larger `b` are
+unaffected by these later iterations. This also handles `R <= k`, when
+there are no readers and the loop is empty.
 
 ---
 
@@ -516,11 +528,10 @@ sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b], mertens_y[b],
 - `PiTable pi(y)` and primes up to `y` (master had reduced them to
   `min(y, xy/isqrt(y))`). The hyperbola method needs `pi(t)` for `t < y`,
   `pi(y)` for `M_p(y)`, and primes up to `H < y`.
-- `mertens_y = phi_vector(y, pi_sqrty)`, followed by
-  `mertens_y[b] -= phi_minus_mertens(y, primes[b], b, pi)` for
-  `b <= pi_sqrty`. All readers (the kernels' `hyperbola_sum()` calls and
-  the easy-terms loop) have `b <= pi_sqrty`, and `y^2 <= x` implies
-  `pi_sqrty <= pi[x14]`.
+- `mertens_y` is computed by the descending recurrence of Section 3.8
+  for `k < b <= pi_sqrty`. All readers (the kernels' `hyperbola_sum()`
+  calls and the easy-terms loop) have indices in this range, and
+  `y^2 <= x` implies `pi_sqrty <= pi[x14]`.
 - Accumulation in unsigned `UT` (worker kernels and reduction).
   `D_thread<T>()` implicitly converts the unsigned worker result to signed
   `T` before assigning it to `thread.sum`. The final value is converted
