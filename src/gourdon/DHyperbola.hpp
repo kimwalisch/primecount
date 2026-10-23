@@ -2,7 +2,8 @@
 /// @file  DHyperbola.hpp
 /// @brief Compute the special leaves x/(p*m) with x/(p*y) < m <= y of
 ///        Gourdon's D formula using a weighted Dirichlet hyperbola
-///        rearrangement, in which the prime leaves cancel.
+///        rearrangement, in which the sieve queries of the prime
+///        leaves cancel.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -32,9 +33,8 @@ struct SemiprimeEvent
   int64_t weight;
 };
 
-/// For p = primes[b] and p^2 <= t < p^3, the Moebius prefix sum
-/// over the p-rough integers M(t) = sum_{n <= t, lpf(n) > p} mu(n)
-/// satisfies M(t) = phi(t, b - 1) - phi_minus_mertens(t, p, b, pi).
+/// Returns phi(t, b - 1) - M(t) for p = primes[b] and p^2 <= t < p^3,
+/// where M(t) = sum_{n <= t, lpf(n) > p} mu(n).
 ///
 inline int64_t phi_minus_mertens(int64_t t,
                                  int64_t p,
@@ -71,10 +71,10 @@ ALWAYS_INLINE T sum_pi(T xp,
   return sum;
 }
 
-/// Sum phi_minus_mertens(x / (p * q)) over the primes q in
-/// (min_n, max_n]. Gourdon's inversion equality turns the sums of
-/// pi(x / (p^2 * q)) and pi(sqrt(x / (p * q))) into sums over the
-/// reflected primes r, avoiding two pi lookups per prime q.
+/// Sum phi_minus_mertens(X/q) over the primes q in (min_n, max_n],
+/// where X = x/p and all X/q are in [p^2, p^3[. Gourdon's inversion
+/// equality turns the sums of pi(X/(p*q)) and pi(sqrt(X/q)) into sums
+/// over the reflected primes r, avoiding two pi lookups per prime q.
 ///
 template <typename T, typename Primes>
 T sum_phi_minus_mertens(T xp,
@@ -111,14 +111,12 @@ T sum_phi_minus_mertens(T xp,
   return sum;
 }
 
-/// Primes (x/y)^(1/3) < p <= sqrt(y) have x < p^3 * y <= p * y^2
-/// and y^2 <= x, hence sqrt(x/p) < y < p^3. So hyperbola_sum()
-/// computes their leaves x/(p*y) < m <= y, which also include their
-/// easy leaves. The hyperbola terms whose positions are < p^2 only
-/// need PiTable lookups. D_thread() skips the prime p in threads
-/// whose sieve limit is < p^2, hence these terms are computed once
-/// per prime and hyperbola_sum() only computes the hyperbola terms
-/// whose positions are >= p^2.
+/// Compute the hyperbola terms whose positions are < p^2. These only
+/// need PiTable lookups, and D_thread() skips the prime p in threads
+/// whose sieve limit is < p^2, hence D.cpp computes them once per
+/// prime and hyperbola_sum() skips them. Only for the primes
+/// (x/y)^(1/3) < p <= sqrt(y): x < p^3 * y <= p * y^2 and y^2 <= x
+/// imply sqrt(x/p) < y < p^3, and their leaves include easy leaves.
 ///
 template <typename T, typename Primes>
 T easy_hyperbola_sum(T xp,
@@ -140,6 +138,7 @@ T easy_hyperbola_sum(T xp,
   T sum = 0;
   sum -= T(mertens_y) * T(phi_xpy);
 
+  // If H >= p^2, only the L term has a position < p^2
   if (sqrt_xp < square)
   {
     int64_t phi_sqrt_xp = pi[sqrt_xp] - b + 2;
@@ -172,9 +171,10 @@ T easy_hyperbola_sum(T xp,
 /// where a(n) = [lpf(n) >= p], c(n) = mu(n)[lpf(n) > p], E = Phi - M.
 /// Here only the terms whose positions are >= p^2 are computed, see
 /// easy_hyperbola_sum(). Prime n > p have a(n) + c(n) = 0. The
-/// remaining terms have n = q*r, p <= q <= r, with weight 1 if q = p
-/// or q = r, and weight 2 otherwise. Events are processed in
-/// decreasing n so sieve counts increase.
+/// remaining terms, the events, have n = q*r with p <= q <= r and
+/// weight a(n) + c(n) = 1 if q = p or q = r, and 2 otherwise.
+/// Events are processed in decreasing n, so count() is called with
+/// increasing positions X/n.
 ///
 template <typename T, typename Primes, typename Count>
 ALWAYS_INLINE T hyperbola_sum(T xp,
@@ -214,7 +214,7 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
     sum += T(phi_sqrt_xp) * (phi_sqrt_xp - phi_minus_mertens(sqrt_xp, p, b, pi));
   }
 
-  // n in (L, H] with position X/n inside [max(low, p^2), high[
+  // n in (L, H] with position X/n in [query_low, high[
   int64_t min_n = min(fast_div(xp, high), sqrt_xp);
   min_n = max(min_n, xpy);
   int64_t max_n = min(fast_div(xp, query_low), sqrt_xp);
