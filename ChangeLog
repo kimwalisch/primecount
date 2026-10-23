@@ -1,5 +1,6 @@
-Changes in primecount-9.0, 2026-10-22
+Changes in primecount-9.0, 2026-10-23
 
+* DBand.hpp, D.cpp: Simplify band_row() bounds, limit mertens_y to pi(sqrt(y)).
 * D.cpp: Use implicit signed conversions, remove signed_from_unsigned().
 * Gourdon: Share one PiTable between Sigma, Phi0, AC and D.
 * Phi0.cpp: Extract primes from PiTable instead of sieving them again.

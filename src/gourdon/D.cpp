@@ -158,16 +158,13 @@ T D_OpenMP(T x,
   // Hard special leaves satisfy m > p and
   // p^3 * m <= x, hence p^4 < x.
   int64_t x14 = iroot<4>(x);
-  int64_t pi_x14 = pi[x14];
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t xy = x / y;
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
-  int64_t max_b = max(pi_root3_xy, pi_sqrty);
-  max_b = min(max_b, pi_x14);
 
   // Only rows with prime^2 <= y < prime^3 use this prefix
-  Vector<int64_t> mertens_y = phi_vector(y, max_b, primes, pi);
-  for (int64_t b = 1; b <= max_b; b++)
+  Vector<int64_t> mertens_y = phi_vector(y, pi_sqrty, primes, pi);
+  for (int64_t b = 1; b <= pi_sqrty; b++)
     mertens_y[b] -= phi_minus_mertens(y, primes[b], b, pi);
 
   // These load balancing settings work well on my
@@ -179,7 +176,6 @@ T D_OpenMP(T x,
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
   // Rows whose band has easy leaves, see easy_band_terms()
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_root3_xy) + 1);
-  int64_t last_b = min(pi_sqrty, pi_x14);
   UT sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
@@ -195,7 +191,7 @@ T D_OpenMP(T x,
     }
 
     // Band terms with positions < prime^2, computed once per row
-    for (int64_t b = min_b++; b <= last_b; b = min_b++)
+    for (int64_t b = min_b++; b <= pi_sqrty; b = min_b++)
     {
       UT xp = UT(x / primes[b]);
       sum += easy_band_terms(xp, primes[b], b, y, mertens_y[b], primes, pi);

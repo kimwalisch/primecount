@@ -145,9 +145,9 @@ T easy_band_terms(T xp,
     int64_t mertens_sqrt_xp = 1 - (pi[sqrt_xp] - b);
     sum += T(mertens_sqrt_xp) * T(phi_sqrt_xp);
 
-    // Primes n in (X/p^2, H] have X/n < p^2:
+    // Primes n in (X/p^2, H] have X/n < p^2 (X/p^2 >= L as p^2 <= y):
     // E(X/n) = phi(X/n, b - 1) - M(X/n) = 2 * pi[X/n] - 2b + 1.
-    int64_t pi_min_n = pi[max(x_div_p3, lower)];
+    int64_t pi_min_n = pi[x_div_p3];
     int64_t pi_max_n = pi[sqrt_xp];
     sum += sum_pi(xp, pi_min_n + 1, pi_max_n, primes, pi) * 2;
     sum -= T(pi_max_n - pi_min_n) * T(2 * b - 1);
@@ -198,14 +198,15 @@ ALWAYS_INLINE T band_row(T xp,
   T sum = 0;
   int64_t lower = fast_div64(xp, y);
   max_m = min(max_m, lower);
+  int64_t query_low = max(low, square);
 
-  if (low <= lower && lower < high && lower >= square)
+  if (query_low <= lower && lower < high)
   {
     int64_t phi_lower = phi + count(lower - low);
     sum -= T(phi_lower) * mertens_y;
   }
 
-  if (low <= sqrt_xp && sqrt_xp < high && sqrt_xp >= square)
+  if (query_low <= sqrt_xp && sqrt_xp < high)
   {
     int64_t phi_sqrt_xp = phi + count(sqrt_xp - low);
     sum += T(phi_sqrt_xp) * (phi_sqrt_xp - phi_minus_mertens(sqrt_xp, p, b, pi));
@@ -214,8 +215,7 @@ ALWAYS_INLINE T band_row(T xp,
   // n in (L, H] with position X/n inside [max(low, p^2), high[
   int64_t min_n = min(fast_div(xp, high), sqrt_xp);
   min_n = max(min_n, lower);
-  int64_t max_n = min(fast_div(xp, max(low, int64_t(1))), sqrt_xp);
-  max_n = min(fast_div(xp, square), max_n);
+  int64_t max_n = min(fast_div(xp, query_low), sqrt_xp);
 
   if (min_n < max_n)
   {

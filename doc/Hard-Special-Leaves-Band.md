@@ -299,9 +299,10 @@ The D kernels process row `b` only in threads whose sieve limit is
 | prime `n`: `E_p(X/n)` | `X/n` | `band_row()` | `band_row()` (all `X/n >= H >= p^2`) | `n <= X/p^2`: `band_row()`; `n > X/p^2`: `easy_band_terms()` |
 | events `n = q r` | `X/n` | `band_row()` | `band_row()` | none (all `n < p^2` are prime) |
 
-`band_row()` restricts `n` to `n <= X/p^2` (position `>= p^2`) and checks
-`>= square` for the two boundary terms. `easy_band_terms()` computes the
-complement.
+`band_row()` restricts all positions to `[query_low, high)` with
+`query_low = max(low, p^2)`: `n <= X/query_low` for the prime terms and
+events, `query_low <= L` and `query_low <= H` for the two boundary terms.
+`easy_band_terms()` computes the complement.
 
 **Proof that every per-segment term is computed exactly once.** Take a
 position `t >= p^2`, `t < y`, in segment `[low, high)` of a thread with
@@ -329,8 +330,10 @@ limit `>= high > t`. Check the kernel's conditions for row `b`:
 ```
 - M_p(y) Phi_p(L)                                with Phi_p(L) = pi(L) - b + 2 (p <= L < p^2)
 + M_p(H) Phi_p(H)                                if H < p^2, with the formulas of Section 3.1
-+ sum_{q prime, max(X/p^2, L) < q <= H} (2 pi(X/q) - 2b + 1)    if H < p^2
++ sum_{q prime, X/p^2 < q <= H} (2 pi(X/q) - 2b + 1)    if H < p^2
 ```
+
+The prime sum starts at `X/p^2`, which is `>= L` because `p^2 <= y`.
 
 ### 3.7 Prime terms with positions >= p^2 (`sum_phi_minus_mertens()`)
 
@@ -376,7 +379,7 @@ form used by C2 in `AC_*.hpp` (`pi[q_lo] * pi_y - pi[q_hi] * ...`).
 
 ### 3.8 M_p(y)
 
-`D_OpenMP` precomputes `phi(y, b-1)` for all `b <= max_b` with
+`D_OpenMP` precomputes `phi(y, b-1)` for all `b <= pi_sqrty` with
 `phi_vector()`. It then subtracts `E_p(y) = phi_minus_mertens(y, ...)`.
 The result is valid only for rows with `p^2 <= y < p^3`, which includes
 all band rows. Other entries are never read by band code.
@@ -431,7 +434,7 @@ all band rows. Other entries are never read by band code.
   - The `n` range is computed as
     ```
     min_n = max(min(X/high, H), L)               // clamp with min() BEFORE narrowing to int64
-    max_n = min(min(X/max(low,1), H), X/p^2)
+    max_n = min(X/query_low, H)                  // query_low = max(low, p^2)
     ```
     so `n` in `(min_n, max_n]` ⟺ `X/n` in `[max(low, p^2), high)` and
     `n` in `(L, H]`. The `min(fast_div(xp, high), sqrt_xp)` clamp also
@@ -488,10 +491,11 @@ sum += band_row(xp, prime, b, y, low, high, phi[b], mertens_y[b],
 - `PiTable pi(y)` and primes up to `y` (master had reduced them to
   `min(y, xy/isqrt(y))`). The band needs `pi(t)` for `t < y`, `pi(y)` for
   `M_p(y)`, and primes up to `H < y`.
-- `mertens_y = phi_vector(y, max_b)`, followed by
-  `mertens_y[b] -= phi_minus_mertens(y, primes[b], b, pi)`, where
-  `max_b = min(max(pi_root3_xy, pi_sqrty), pi_x14)`. See Section 11 for
-  a tightening.
+- `mertens_y = phi_vector(y, pi_sqrty)`, followed by
+  `mertens_y[b] -= phi_minus_mertens(y, primes[b], b, pi)` for
+  `b <= pi_sqrty`. All readers (the kernels' `band_row()` calls and the
+  easy-band loop) have `b <= pi_sqrty`, and `y^2 <= x` implies
+  `pi_sqrty <= pi[x14]`.
 - Accumulation in unsigned `UT` (worker kernels and reduction).
   `D_thread<T>()` implicitly converts the unsigned worker result to signed
   `T` before assigning it to `thread.sum`. The final value is converted
@@ -503,10 +507,9 @@ sum += band_row(xp, prime, b, y, low, high, phi[b], mertens_y[b],
   final `D` is in signed range.
 - Easy band terms: in the same OpenMP region, after a thread runs out of
   D work units, it processes
-  `for (b = min_b++; b <= last_b; b = min_b++)` (`RelaxedAtomic`, as in
+  `for (b = min_b++; b <= pi_sqrty; b = min_b++)` (`RelaxedAtomic`, as in
   `S2_easy.cpp`), with
-  `min_b = max(k, pi_root3_xy) + 1` and
-  `last_b = min(pi_sqrty, pi_x14)`. These are exactly the mixed-band rows
+  `min_b = max(k, pi_root3_xy) + 1`. These are exactly the mixed-band rows
   (Section 3.4). Until `60db7d7d`, `min_b` also included
   `pi[band_min_prime(xy, y)]`, which is `<= pi_root3_xy` (Section 10.1).
 
@@ -941,9 +944,6 @@ compute Gourdon's `y` (`pi_gourdon.cpp` and `main.cpp`) are unchanged
   without a band. Test `lower >= y` (⟺ `isqrt(xp) >= y`, Section 3.4)
   first, using `lower = min(fast_div(xp, y), y)` to stay 64-bit safe,
   and compute `isqrt(xp)` only for band rows.
-- **`D_OpenMP` bounds.** `mertens_y` is only read for
-  `b <= last_b = min(pi_sqrty, pi_x14)`. So `phi_vector(y, last_b)`
-  suffices and `max_b` can be dropped.
 - **`easy_band_terms()`** recomputes `L`, `H` and `X/p^2` per row; this is
   harmless. Its prime loop could use libdivide; probably not worth it
   (0.8% of D).
