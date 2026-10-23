@@ -193,7 +193,8 @@ T D_OpenMP(T x,
       sum += thread.sum;
     }
 
-    // Hyperbola terms with positions < prime^2, computed once per prime
+    // Compute hyperbola terms with positions < prime^2 once per prime.
+    // These terms are skipped by the segmented kernels.
     for (int64_t b = min_b++; b <= pi_sqrty; b = min_b++)
     {
       UT xp = UT(x / primes[b]);
