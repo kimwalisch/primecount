@@ -3,6 +3,13 @@
 /// @brief ARM SVE vector division implementation of the A + C
 ///        formulas in Xavier Gourdon's prime counting algorithm.
 ///
+///        primecount's C formula differs from Gourdon's original
+///        C formula: the easy special leaves with
+///        (x/y)^(1/3) < p <= sqrt(y) and x/p^3 < m <= y
+///        are computed as part of the D formula using the hyperbola
+///        method. Here p is a prime and m is a prime or a product
+///        of 2 distinct primes, all greater than p.
+///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING

@@ -16,6 +16,13 @@
 ///        data structures twice. Merging the A & C formulas also
 ///        improves scaling on systems with many CPU cores.
 ///
+///        primecount's C formula differs from Gourdon's original
+///        C formula: the easy special leaves with
+///        (x/y)^(1/3) < p <= sqrt(y) and x/p^3 < m <= y
+///        are computed as part of the D formula using the hyperbola
+///        method. Here p is a prime and m is a prime or a product
+///        of 2 distinct primes, all greater than p.
+///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.pdf
 ///
