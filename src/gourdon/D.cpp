@@ -6,6 +6,15 @@
 ///        This file handles runtime dispatch to optimized SIMD
 ///        implementations, thread scheduling, and load balancing.
 ///
+///        primecount's D formula differs from Gourdon's original
+///        D formula: it also computes part of the easy special
+///        leaves that belong to the C formula in Gourdon's paper.
+///        These are the leaves with (x/y)^(1/3) < p <= sqrt(y)
+///        and x/p^3 < m <= y, where p is a prime and m is a prime
+///        or a product of 2 distinct primes, all greater than p.
+///        They are computed together with the hard special leaves
+///        using the hyperbola method.
+///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING

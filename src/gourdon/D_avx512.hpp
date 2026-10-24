@@ -12,6 +12,15 @@
 ///        ALWAYS_INLINE macro and PRIMECOUNT_TARGET_ATTRIBUTE with
 ///        the same CPU instruction sets as PRIMECOUNT_TARGET_ENTRY.
 ///
+///        primecount's D formula differs from Gourdon's original
+///        D formula: it also computes part of the easy special
+///        leaves that belong to the C formula in Gourdon's paper.
+///        These are the leaves with (x/y)^(1/3) < p <= sqrt(y)
+///        and x/p^3 < m <= y, where p is a prime and m is a prime
+///        or a product of 2 distinct primes, all greater than p.
+///        They are computed together with the hard special leaves
+///        using the hyperbola method.
+///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf

@@ -2,8 +2,23 @@
 /// @file  D_avx2.hpp
 /// @brief AVX2 implementation of the D formula (hard special leaves)
 ///        in Xavier Gourdon's prime counting algorithm. This algorithm
-///        is identical to D_thread_default() in D_default.hpp except for
-///        AVX2 vectorization of index filtering.
+///        is identical to D_thread_default() in D_default.hpp except
+///        for AVX2 vectorization of index filtering.
+///
+///        For performance it is important that all AVX2 helper
+///        functions are inlined by the compiler. We achieve this
+///        by annotating all AVX2 helper functions using the
+///        ALWAYS_INLINE macro and PRIMECOUNT_TARGET_ATTRIBUTE with
+///        the same CPU instruction sets as PRIMECOUNT_TARGET_ENTRY.
+///
+///        primecount's D formula differs from Gourdon's original
+///        D formula: it also computes part of the easy special
+///        leaves that belong to the C formula in Gourdon's paper.
+///        These are the leaves with (x/y)^(1/3) < p <= sqrt(y)
+///        and x/p^3 < m <= y, where p is a prime and m is a prime
+///        or a product of 2 distinct primes, all greater than p.
+///        They are computed together with the hard special leaves
+///        using the hyperbola method.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf

@@ -1,20 +1,21 @@
 ///
 /// @file  D_default.hpp
-/// @brief This is a highly optimized implementation of the D(x, y)
-///        formula in Xavier Gourdon's prime counting algorithm. The D
-///        formula is very similar to the formula of the hard special
-///        leaves in the Deleglise-Rivat algorithm. Hence this
-///        algorithm is very similar to S2_hard.cpp, except that in
-///        this implementation the square free leaves have been more
-///        heavily optimized (branchfree + CPU pipelining).
+/// @brief This is a highly optimized implementation of the D
+///        formula in Xavier Gourdon's prime counting algorithm.
+///        The D formula is very similar to the formula of the hard
+///        special leaves in the Deleglise-Rivat algorithm. Hence
+///        this algorithm is very similar to S2_hard.cpp, except
+///        that in this implementation the square free leaves have
+///        been more heavily optimized (branchfree + CPU pipelining).
 ///
-///        This implementation uses multi-threading with advanced load
-///        balancing, it scales well up to a large number of CPU cores
-///        because the compute threads are completely independent from
-///        each other. This implementation also uses the highly
-///        optimized Sieve class and the FactorTable class which is a
-///        compressed lookup table of moebius function values and
-///        least prime factors.
+///        primecount's D formula differs from Gourdon's original
+///        D formula: it also computes part of the easy special
+///        leaves that belong to the C formula in Gourdon's paper.
+///        These are the leaves with (x/y)^(1/3) < p <= sqrt(y)
+///        and x/p^3 < m <= y, where p is a prime and m is a prime
+///        or a product of 2 distinct primes, all greater than p.
+///        They are computed together with the hard special leaves
+///        using the hyperbola method.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf
