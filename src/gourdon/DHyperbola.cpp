@@ -91,7 +91,7 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
 
   // n in (L, H] with position X/n in [query_low, high[
   int64_t min_n = min(fast_div(xp, high), sqrt_xp);
-  int64_t max_n = min(fast_div(xp, query_low), sqrt_xp);
+  int64_t max_n = min(fast_div64(xp, query_low), sqrt_xp);
   min_n = max(min_n, xpy);
 
   if (min_n < max_n)
