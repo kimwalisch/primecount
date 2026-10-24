@@ -135,9 +135,10 @@ T S2_hard_thread(T x,
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t xp_low = min(fast_div(xp, low1), y);
+      int64_t divisor = max(low1, y);
+      int64_t xp_low = min(fast_div(xp, divisor), y);
       int64_t xp_high = min(fast_div(xp, high), y);
-      int64_t l = pi[min(xp_low, xy / prime)];
+      int64_t l = pi[xp_low];
       int64_t min_hard = max(xp_high, prime);
 
       if (prime >= primes[l])

@@ -80,6 +80,7 @@ int64_t S2_thread(int64_t x,
   {
     // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
+    int64_t x_high = max(x / high, y);
     low1 = max(low, 1);
 
     // For b < min_b there are no special leaves:
@@ -95,7 +96,7 @@ int64_t S2_thread(int64_t x,
     for (; b <= min(pi_sqrty, max_b); b++)
     {
       int64_t prime = primes[b];
-      int64_t min_m = max(x / (prime * high), y / prime);
+      int64_t min_m = x_high / prime;
       int64_t max_m = min(x / (prime * low1), y);
 
       if (prime >= max_m)

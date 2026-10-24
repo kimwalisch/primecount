@@ -1,5 +1,7 @@
 Changes in primecount-9.0, 2026-10-24
 
+* LMO: Combine the cofactor lower-bound divisions.
+* S2_hard.cpp: Combine the cofactor upper-bound divisions.
 * D_*.hpp: Simplify cofactor bounds and skip hyperbola_sum() when low >= y.
 * D.cpp: Compute mertens_y directly using a descending recurrence.
 * SemiprimeEventSorter.hpp: Avoid copying discarded bitmap contents when growing buffers.

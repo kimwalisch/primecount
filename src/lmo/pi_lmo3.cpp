@@ -57,6 +57,7 @@ int64_t S2(int64_t x,
   {
     // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
+    int64_t x_high = max(x / high, y);
 
     std::fill(sieve.begin(), sieve.end(), 1);
 
@@ -73,7 +74,7 @@ int64_t S2(int64_t x,
     for (int64_t b = k + 1; b < pi_y; b++)
     {
       int64_t prime = primes[b];
-      int64_t min_m = max(x / (prime * high), y / prime);
+      int64_t min_m = x_high / prime;
       int64_t max_m = min(x / (prime * low), y);
       int64_t i = 0;
 
