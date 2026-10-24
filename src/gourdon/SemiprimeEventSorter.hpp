@@ -51,12 +51,10 @@ public:
     uint64_t words64 = last - first + 1;
     uint64_t count = events.size();
 
-    // Fall back to std::sort() if the bitmap does not fit
-    // into size_t (32-bit platforms), or if it has more than
+    // Fall back to std::sort if the bitmap has more than
     // N * floor(log2(N)) words, which is checked without
     // multiplying.
-    if (words64 > SIZE_MAX ||
-        (words64 - 1) / count >= ilog2(count))
+    if ((words64 - 1) / count >= ilog2(count))
     {
       std::sort(events.begin(), events.end(), [](const SemiprimeEvent& a,
                                                  const SemiprimeEvent& b) {

@@ -1,5 +1,6 @@
 Changes in primecount-9.0, 2026-10-24
 
+* SemiprimeEventSorter.hpp: Remove the redundant bitmap size_t range check.
 * SemiprimeEventSorter.hpp: Remove the unused prime parameter and small-prime fallback.
 * DHyperbola.cpp: Move implementation-only hyperbola helpers out of the header.
 * SemiprimeEventSorter.hpp: Share SemiprimeEvent and remove the sort() template.
