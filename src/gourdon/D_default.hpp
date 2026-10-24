@@ -31,6 +31,7 @@
 #define D_DEFAULT_HPP
 
 #include "DHyperbola.hpp"
+#include "SemiprimeEventSorter.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>

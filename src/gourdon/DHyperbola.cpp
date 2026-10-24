@@ -1,7 +1,7 @@
 ///
 /// @file  DHyperbola.cpp
-/// @brief Compute the special leaves x/(p*m) with x/(p*y) < m <= y of
-///        Gourdon's D formula using a weighted Dirichlet hyperbola
+/// @brief Compute the special leaves x/(p*m) with x/(p*y) < m <= y
+///        of Gourdon's D formula using a weighted Dirichlet hyperbola
 ///        rearrangement, in which the sieve queries of the prime
 ///        leaves cancel.
 ///
@@ -13,8 +13,18 @@
 ///
 
 #include "DHyperbola.hpp"
+#include "SemiprimeEventSorter.hpp"
 
+#include <fast_div.hpp>
+#include <int128_t.hpp>
+#include <isqrt.hpp>
+#include <macros.hpp>
+#include <min.hpp>
+#include <PiTable.hpp>
 #include <sieve/Sieve.hpp>
+#include <Vector.hpp>
+
+#include <stdint.h>
 
 namespace {
 
@@ -41,20 +51,20 @@ using namespace primecount;
 /// increasing positions X/n.
 ///
 template <typename T, typename Primes>
-T hyperbola_sum(T xp,
-                int64_t p,
-                int64_t b,
-                int64_t y,
-                int64_t low,
-                int64_t high,
-                int64_t phi,
-                int64_t mertens_y,
-                const Primes& primes,
-                const PiTable& pi,
-                Sieve& sieve,
-                Vector<SemiprimeEvent>& events,
-                SemiprimeEventSorter& sorter,
-                int64_t& max_m)
+ALWAYS_INLINE T hyperbola_sum(T xp,
+                              int64_t p,
+                              int64_t b,
+                              int64_t y,
+                              int64_t low,
+                              int64_t high,
+                              int64_t phi,
+                              int64_t mertens_y,
+                              const Primes& primes,
+                              const PiTable& pi,
+                              Sieve& sieve,
+                              Vector<SemiprimeEvent>& events,
+                              SemiprimeEventSorter& sorter,
+                              int64_t& max_m)
 {
   int64_t square = p * p;
   int64_t sqrt_xp = isqrt(xp);

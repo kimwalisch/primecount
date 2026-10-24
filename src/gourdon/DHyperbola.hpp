@@ -1,7 +1,7 @@
 ///
 /// @file  DHyperbola.hpp
-/// @brief Compute the special leaves x/(p*m) with x/(p*y) < m <= y of
-///        Gourdon's D formula using a weighted Dirichlet hyperbola
+/// @brief Compute the special leaves x/(p*m) with x/(p*y) < m <= y
+///        of Gourdon's D formula using a weighted Dirichlet hyperbola
 ///        rearrangement, in which the sieve queries of the prime
 ///        leaves cancel.
 ///
@@ -15,13 +15,10 @@
 #ifndef D_HYPERBOLA_HPP
 #define D_HYPERBOLA_HPP
 
-#include "SemiprimeEventSorter.hpp"
-
 #include <fast_div.hpp>
-#include <imath.hpp>
 #include <int128_t.hpp>
+#include <isqrt.hpp>
 #include <macros.hpp>
-#include <min.hpp>
 #include <PiTable.hpp>
 #include <Vector.hpp>
 
@@ -30,6 +27,7 @@
 namespace primecount {
 
 class Sieve;
+class SemiprimeEventSorter;
 
 struct SemiprimeEvent
 {

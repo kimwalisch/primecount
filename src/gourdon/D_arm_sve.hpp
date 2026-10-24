@@ -35,6 +35,7 @@
 #define D_ARM_SVE_HPP
 
 #include "DHyperbola.hpp"
+#include "SemiprimeEventSorter.hpp"
 
 #include <primecount-internal.hpp>
 #include <BaseFactorTable.hpp>

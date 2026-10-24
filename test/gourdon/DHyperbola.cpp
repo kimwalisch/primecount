@@ -12,8 +12,11 @@
 
 #include <DHyperbola.hpp>
 #include <generate_primes.hpp>
+#include <imath.hpp>
 #include <int128_t.hpp>
+#include <min.hpp>
 #include <PiTable.hpp>
+#include <SemiprimeEventSorter.hpp>
 #include <sieve/Sieve.hpp>
 #include <Vector.hpp>
 

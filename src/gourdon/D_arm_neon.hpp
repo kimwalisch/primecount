@@ -28,6 +28,7 @@
 #define D_ARM_NEON_HPP
 
 #include "DHyperbola.hpp"
+#include "SemiprimeEventSorter.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
