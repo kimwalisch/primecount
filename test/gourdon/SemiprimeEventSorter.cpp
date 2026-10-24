@@ -19,12 +19,6 @@
 
 using namespace primecount;
 
-struct Event
-{
-  int64_t n;
-  int64_t weight;
-};
-
 bool is_prime(int64_t n)
 {
   for (int64_t d = 2; d <= n / d; d++)
@@ -33,9 +27,9 @@ bool is_prime(int64_t n)
   return n >= 2;
 }
 
-Vector<Event> trial_events(int64_t p, int64_t lower, int64_t upper)
+Vector<SemiprimeEvent> trial_events(int64_t p, int64_t lower, int64_t upper)
 {
-  Vector<Event> events;
+  Vector<SemiprimeEvent> events;
   for (int64_t n = lower + 1; n <= upper; n++)
     for (int64_t q = 2; q <= n / q; q++)
       if (n % q == 0)
@@ -48,14 +42,15 @@ Vector<Event> trial_events(int64_t p, int64_t lower, int64_t upper)
   return events;
 }
 
-void check(SemiprimeEventSorter& sorter, Vector<Event>& events,
+void check(SemiprimeEventSorter& sorter, Vector<SemiprimeEvent>& events,
            int64_t p, int64_t lower, int64_t upper)
 {
-  Vector<Event> expected(events.size());
+  Vector<SemiprimeEvent> expected(events.size());
   if (!events.empty())
   {
     std::copy(events.begin(), events.end(), expected.begin());
-    std::sort(expected.begin(), expected.end(), [](const Event& a, const Event& b) {
+    std::sort(expected.begin(), expected.end(), [](const SemiprimeEvent& a,
+                                                   const SemiprimeEvent& b) {
       return a.n > b.n;
     });
     std::reverse(events.begin(), events.end());
@@ -104,7 +99,7 @@ int main()
   for (int64_t lower : starts)
   {
     int64_t upper = lower + 8192;
-    Vector<Event> events;
+    Vector<SemiprimeEvent> events;
     for (int64_t q : factors)
     {
       primesieve::iterator iter(lower / q + 1, upper / q);

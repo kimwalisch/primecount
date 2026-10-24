@@ -25,6 +25,12 @@
 
 namespace primecount {
 
+struct SemiprimeEvent
+{
+  int64_t n;
+  int64_t weight;
+};
+
 class SemiprimeEventSorter : private BitSieve240
 {
 public:
@@ -32,8 +38,7 @@ public:
   /// p <= q <= r are primes, and weight 1 or 2. Retain one sorter per
   /// D work unit so its scratch allocations are reused between segments
   /// and primes.
-  template <typename Event>
-  void sort(Vector<Event>& events,
+  void sort(Vector<SemiprimeEvent>& events,
             uint64_t p,
             uint64_t min_n,
             uint64_t max_n)
@@ -55,7 +60,8 @@ public:
         words64 > SIZE_MAX ||
         (words64 - 1) / count >= ilog2(count))
     {
-      std::sort(events.begin(), events.end(), [](const Event& a, const Event& b) {
+      std::sort(events.begin(), events.end(), [](const SemiprimeEvent& a,
+                                                 const SemiprimeEvent& b) {
         return a.n > b.n;
       });
       return;
@@ -69,7 +75,7 @@ public:
     std::fill(present_.begin(), present_.end(), 0);
     std::fill(weight1_.begin(), weight1_.end(), 0);
 
-    for (const Event& event : events)
+    for (const SemiprimeEvent& event : events)
     {
       uint64_t n = event.n;
       ASSERT(min_n < n && n <= max_n);
@@ -100,7 +106,7 @@ public:
         int bit = ctz64(bits);
         int64_t n = base + bit_values_[63 - bit];
         int64_t weight = 2 - ((weight1 >> bit) & 1);
-        events[written++] = Event{n, weight};
+        events[written++] = SemiprimeEvent{n, weight};
         bits &= bits - 1;
       }
     }

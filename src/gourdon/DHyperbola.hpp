@@ -28,12 +28,7 @@ namespace primecount {
 
 class Sieve;
 class SemiprimeEventSorter;
-
-struct SemiprimeEvent
-{
-  int64_t n;
-  int64_t weight;
-};
+struct SemiprimeEvent;
 
 /// Returns phi(t, b - 1) - M(t) for p = primes[b] and p^2 <= t < p^3,
 /// where M(t) = sum_{n <= t, lpf(n) > p} mu(n).
