@@ -30,17 +30,6 @@ class Sieve;
 class SemiprimeEventSorter;
 struct SemiprimeEvent;
 
-/// Returns phi(t, b - 1) - M(t) for p = primes[b] and p^2 <= t < p^3,
-/// where M(t) = sum_{n <= t, lpf(n) > p} mu(n).
-///
-ALWAYS_INLINE int64_t phi_minus_mertens(int64_t t,
-                                        int64_t p,
-                                        int64_t b,
-                                        const PiTable& pi)
-{
-  return 2 * pi[t] + pi[t / p] + pi[isqrt(t)] - 4 * b + 2;
-}
-
 /// Sum pi(xp / primes[j]) for i <= j <= last
 template <typename T, typename Primes>
 ALWAYS_INLINE T sum_pi(T xp,
@@ -64,47 +53,6 @@ ALWAYS_INLINE T sum_pi(T xp,
   NO_UNROLL_LOOP
   for (; i <= last; i++)
     sum += pi[fast_div64(xp, primes[i])];
-
-  return sum;
-}
-
-/// Sum phi_minus_mertens(X/q) over the primes q in (min_n, max_n],
-/// where X = x/p and all X/q are in [p^2, p^3[. Gourdon's inversion
-/// equality turns the sums of pi(X/(p*q)) and pi(sqrt(X/q)) into sums
-/// over the reflected primes r, avoiding two pi lookups per prime q.
-///
-template <typename T, typename Primes>
-T sum_phi_minus_mertens(T xp,
-                        int64_t p,
-                        int64_t b,
-                        int64_t min_n,
-                        int64_t max_n,
-                        const Primes& primes,
-                        const PiTable& pi)
-{
-  int64_t pi_min_n = pi[min_n];
-  int64_t pi_max_n = pi[max_n];
-
-  if (pi_min_n == pi_max_n)
-    return 0;
-
-  T xpp = xp / p;
-  int64_t min_r = fast_div64(xpp, max_n);
-  int64_t max_r = fast_div64(xpp, min_n + 1);
-  int64_t min_r2 = isqrt(fast_div64(xp, max_n));
-  int64_t max_r2 = isqrt(fast_div64(xp, min_n + 1));
-
-  T sum = sum_pi(xp, pi_min_n + 1, pi_max_n, primes, pi) * 2;
-  sum += sum_pi(xpp, pi[min_r] + 1, pi[max_r], primes, pi);
-  sum += T(pi_max_n) * pi[min_r] - T(pi_min_n) * pi[max_r];
-  sum += T(pi_max_n) * pi[min_r2] - T(pi_min_n) * pi[max_r2];
-  sum -= T(pi_max_n - pi_min_n) * (4 * b - 2);
-
-  for (int64_t j = pi[min_r2] + 1, last = pi[max_r2]; j <= last; j++)
-  {
-    int64_t r = primes[j];
-    sum += pi[fast_div64(xp, r * r)];
-  }
 
   return sum;
 }
