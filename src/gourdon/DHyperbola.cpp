@@ -105,8 +105,13 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
       int64_t q = primes[i];
       int64_t min_j = max(i, pi[min_n / q] + 1);
       int64_t max_j = pi[max_n / q];
+
       for (int64_t j = max_j; j >= min_j; j--)
-        events.push_back(SemiprimeEvent{q * primes[j], (i != b && i != j) + 1});
+      {
+        int64_t n = q * primes[j];
+        int64_t weight = (i != b && i != j) + 1;
+        events.push_back(SemiprimeEvent{n, weight});
+      }
     }
 
     sorter.sort(events, p, min_n, max_n);
