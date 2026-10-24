@@ -54,20 +54,6 @@ namespace {
 
 using namespace primecount;
 
-// Not a lambda, operator() requires the AVX512 target attribute
-struct SieveCountAvx512
-{
-  Sieve& sieve;
-
-  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
-  #endif
-  inline uint64_t operator()(uint64_t stop) const
-  {
-    return sieve.count_avx512(stop);
-  }
-};
-
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
   PRIMECOUNT_TARGET_ATTRIBUTE("avx512f,avx512bw,avx512vl,avx512vpopcntdq,popcnt")
 #endif
@@ -198,7 +184,6 @@ T D_thread_avx512(T x,
   Sieve sieve(low, segment_size, max_b);
   Vector<SemiprimeEvent> events;
   SemiprimeEventSorter sorter;
-  SieveCountAvx512 count_sieve{sieve};
   thread.init_time = get_time();
 
   INDETERMINATE Array<uint32_t, 128> m_indexes32;
@@ -248,7 +233,7 @@ T D_thread_avx512(T x,
 
       if (low < y)
         sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b],
-                             mertens_y[b], primes, pi, count_sieve,
+                             mertens_y[b], primes, pi, sieve,
                              events, sorter, max_m);
 
       min_m = FactorTable::to_index(min_m);

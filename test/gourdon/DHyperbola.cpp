@@ -14,6 +14,7 @@
 #include <generate_primes.hpp>
 #include <int128_t.hpp>
 #include <PiTable.hpp>
+#include <sieve/Sieve.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
@@ -119,16 +120,12 @@ void check_segments(const Input& input, int64_t size,
     int64_t high = min(low + size, stop);
     int64_t phi = reference.phi[low];
     int64_t max_m = input.y;
-    uint64_t previous = 0;
-    auto count = [&](uint64_t position) -> uint64_t {
-      check(position < uint64_t(high - low), "Hyperbola count escaped its segment");
-      check(position >= previous, "Hyperbola counts are not monotonic");
-      previous = position;
-      return reference.phi[low + position] - phi;
-    };
+    Sieve sieve(low, size, b);
+    sieve.pre_sieve(primes, b - 1, low, high);
+    sieve.init_counter(low, high);
 
     T actual = hyperbola_sum(T(input.xp), p, b, input.y, low, high, phi, mertens_y,
-                             primes, pi, count, events, sorter, max_m);
+                             primes, pi, sieve, events, sorter, max_m);
     int64_t wanted = expected[high] - expected[low];
     if (actual != T(wanted) || max_m != xpy)
     {

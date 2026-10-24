@@ -55,20 +55,6 @@ namespace {
 
 using namespace primecount;
 
-// Not a lambda, operator() requires the ARM SVE target attribute
-struct SieveCountArmSve
-{
-  Sieve& sieve;
-
-  #if defined(ENABLE_MULTIARCH_ARM_SVE)
-    PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
-  #endif
-  inline uint64_t operator()(uint64_t stop) const
-  {
-    return sieve.count_arm_sve(stop);
-  }
-};
-
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
@@ -163,7 +149,6 @@ T D_thread_arm_sve(T x,
   Sieve sieve(low, segment_size, max_b);
   Vector<SemiprimeEvent> events;
   SemiprimeEventSorter sorter;
-  SieveCountArmSve count_sieve{sieve};
   thread.init_time = get_time();
 
   INDETERMINATE Array<uint32_t, 128> m_indexes32;
@@ -206,7 +191,7 @@ T D_thread_arm_sve(T x,
 
       if (low < y)
         sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b],
-                             mertens_y[b], primes, pi, count_sieve,
+                             mertens_y[b], primes, pi, sieve,
                              events, sorter, max_m);
 
       min_m = FactorTable::to_index(min_m);

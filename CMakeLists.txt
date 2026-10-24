@@ -143,6 +143,7 @@ set(LIB_SRC src/api.cpp
             src/gourdon/AC.cpp
             src/gourdon/B.cpp
             src/gourdon/D.cpp
+            src/gourdon/DHyperbola.cpp
             src/gourdon/LoadBalancerAC.cpp
             src/gourdon/SegmentedPiTable.cpp
             src/gourdon/Sigma.cpp)

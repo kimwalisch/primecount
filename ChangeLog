@@ -1,5 +1,6 @@
 Changes in primecount-9.0, 2026-10-24
 
+* DHyperbola.cpp: Move hyperbola_sum() out of line and pass Sieve directly.
 * LMO: Combine the cofactor lower-bound divisions.
 * S2_hard.cpp: Combine the cofactor upper-bound divisions.
 * D_*.hpp: Simplify cofactor bounds and skip hyperbola_sum() when low >= y.

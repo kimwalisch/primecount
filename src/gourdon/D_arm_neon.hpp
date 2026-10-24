@@ -140,7 +140,6 @@ T D_thread_arm_neon(T x,
   Sieve sieve(low, segment_size, max_b);
   Vector<SemiprimeEvent> events;
   SemiprimeEventSorter sorter;
-  auto count_sieve = [&sieve](uint64_t stop) { return sieve.count(stop); };
   thread.init_time = get_time();
 
   INDETERMINATE Array<uint32_t, 128> m_indexes32;
@@ -183,7 +182,7 @@ T D_thread_arm_neon(T x,
 
       if (low < y)
         sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b],
-                             mertens_y[b], primes, pi, count_sieve,
+                             mertens_y[b], primes, pi, sieve,
                              events, sorter, max_m);
 
       min_m = FactorTable::to_index(min_m);
