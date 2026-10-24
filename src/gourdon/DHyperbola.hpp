@@ -6,6 +6,7 @@
 ///        leaves cancel.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Chopper Lin, <choppers@126.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
