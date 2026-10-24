@@ -166,7 +166,7 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
       }
     }
 
-    sorter.sort(events, p, min_n, max_n);
+    sorter.sort(events, min_n, max_n);
 
     for (const SemiprimeEvent& event : events)
     {

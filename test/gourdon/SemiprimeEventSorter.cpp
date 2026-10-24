@@ -56,7 +56,7 @@ void check(SemiprimeEventSorter& sorter, Vector<SemiprimeEvent>& events,
     std::reverse(events.begin(), events.end());
     std::rotate(events.begin(), events.begin() + events.size() / 3, events.end());
   }
-  sorter.sort(events, p, lower, upper);
+  sorter.sort(events, lower, upper);
 
   if (events.size() != expected.size())
   {
@@ -79,7 +79,7 @@ int main()
   SemiprimeEventSorter sorter;
 
   // Trial division independently supplies squares and both event weights
-  for (int64_t p : {2, 3, 5, 7, 23})
+  for (int64_t p : {7, 23})
   {
     auto events = trial_events(p, 0, 5000);
     check(sorter, events, p, 0, 5000);

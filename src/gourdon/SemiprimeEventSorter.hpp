@@ -34,12 +34,11 @@ struct SemiprimeEvent
 class SemiprimeEventSorter : private BitSieve240
 {
 public:
-  /// Events must have distinct n = q*r in (min_n, max_n], where
-  /// p <= q <= r are primes, and weight 1 or 2. Retain one sorter per
-  /// D work unit so its scratch allocations are reused between segments
-  /// and primes.
+  /// Events must have distinct n = q*r in (min_n, max_n],
+  /// where 5 < q <= r are primes, and weight 1 or 2. Retain
+  /// one sorter per D work unit so its scratch allocations
+  /// are reused between segments and primes.
   void sort(Vector<SemiprimeEvent>& events,
-            uint64_t p,
             uint64_t min_n,
             uint64_t max_n)
   {
@@ -52,12 +51,11 @@ public:
     uint64_t words64 = last - first + 1;
     uint64_t count = events.size();
 
-    // Fall back to std::sort if small primes p <= 5 produce events
-    // that are not coprime to 30, if the bitmap does not fit into
-    // size_t (32-bit platforms), or if it has more than
-    // N * floor(log2(N)) words, which is checked without multiplying.
-    if (p <= 5 ||
-        words64 > SIZE_MAX ||
+    // Fall back to std::sort() if the bitmap does not fit
+    // into size_t (32-bit platforms), or if it has more than
+    // N * floor(log2(N)) words, which is checked without
+    // multiplying.
+    if (words64 > SIZE_MAX ||
         (words64 - 1) / count >= ilog2(count))
     {
       std::sort(events.begin(), events.end(), [](const SemiprimeEvent& a,
