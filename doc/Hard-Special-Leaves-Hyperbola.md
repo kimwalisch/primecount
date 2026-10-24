@@ -482,8 +482,9 @@ there are no readers and the loop is empty.
 ### 4.3 Kernel integration (identical in all five D kernels)
 
 ```cpp
-int64_t min_m = max(xp_high, y / prime);
-int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
+int64_t divisor = max(low1, prime * prime);
+int64_t min_m = min(fast_div(xp, high), y);
+int64_t max_m = min(fast_div(xp, divisor), y);
 
 if (prime >= max_m)
   goto next_segment;
@@ -493,8 +494,9 @@ if (prime >= max_m)
 if (max_m <= prime * prime && low >= y)
   break;
 
-sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b], mertens_y[b],
-                     primes, pi, count_sieve, events, sorter, max_m);
+if (low < y)
+  sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b], mertens_y[b],
+                       primes, pi, count_sieve, events, sorter, max_m);
 
 // ... unchanged factor table loop over (min_m, max_m] ...
 ```
@@ -513,9 +515,14 @@ sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b], mertens_y[b],
   the factor-table loop computes the leaves `m <= min(max_m, L)`. Their
   positions `X/m >= X/L >= y` come after the positions of all hyperbola
   terms, so counts stay nondecreasing.
-- In the 2-prime loop, `min_m = max3(xp_high, y / prime, prime)`. The
-  `y / prime` bound is needed because primes with `b <= pi_sqrty` can
-  reach this loop through the cut-off.
+- For `low >= y`, all hyperbola terms are outside the segment and
+  `max_m <= floor(X/low) <= L` already, so the helper call is skipped.
+- Both loops combine the upper-bound divisions using
+  `min(floor(X/low1), floor(X/p^2)) = floor(X/max(low1, p^2))`.
+- Since `high <= xy = floor(x/y)`, `xp_high = min(floor(X/high), y)`
+  is always `>= floor(y/p)`. The separate `y / prime` lower bound is
+  therefore redundant in both loops. The 2-prime loop uses
+  `min_m = max(xp_high, prime)`, including when `b <= pi_sqrty`.
 - `count_sieve` is a lambda (`sieve.count`), or the functors
   `SieveCountAvx512` / `SieveCountArmSve`. These must be functors because
   `operator()` needs the SIMD target attribute (see `AGENTS.md` on
@@ -843,7 +850,9 @@ Verify each item and report issues with a concrete counterexample.
    - query order (`L`, `H`, events, then factor-table leaves);
    - `max_m` lowering;
    - the cut-off before `hyperbola_sum()` and its `low >= y` condition;
-   - the 2-prime loop `max3(xp_high, y / prime, prime)`;
+   - the combined upper-bound division and redundant `y / prime` bound;
+   - skipping `hyperbola_sum()` for `low >= y`;
+   - the 2-prime loop `max(xp_high, prime)`;
    - all five kernels are identical in these parts.
 9. `D.cpp`:
    - `mertens_y` validity for every prime that reads it;

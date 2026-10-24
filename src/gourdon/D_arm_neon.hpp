@@ -160,10 +160,9 @@ T D_thread_arm_neon(T x,
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t xp_low = min(fast_div(xp, low1), y);
-      int64_t xp_high = min(fast_div(xp, high), y);
-      int64_t min_m = max(xp_high, y / prime);
-      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
+      int64_t divisor = max(low1, prime * prime);
+      int64_t min_m = min(fast_div(xp, high), y);
+      int64_t max_m = min(fast_div(xp, divisor), y);
 
       if (prime >= max_m)
         goto next_segment;
@@ -173,8 +172,9 @@ T D_thread_arm_neon(T x,
       if (max_m <= prime * prime && low >= y)
         break;
 
-      sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b], mertens_y[b],
-                           primes, pi, count_sieve, events, sorter, max_m);
+      if (low < y)
+        sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b], mertens_y[b],
+                             primes, pi, count_sieve, events, sorter, max_m);
 
       min_m = FactorTable::to_index(min_m);
       max_m = FactorTable::to_index(max_m);
@@ -326,10 +326,10 @@ T D_thread_arm_neon(T x,
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t xp_low = min(fast_div(xp, low1), y);
+      int64_t divisor = max(low1, prime * prime);
       int64_t xp_high = min(fast_div(xp, high), y);
-      int64_t min_m = max3(xp_high, y / prime, prime);
-      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
+      int64_t min_m = max(xp_high, prime);
+      int64_t max_m = min(fast_div(xp, divisor), y);
       int64_t l = pi[max_m];
 
       if (prime >= primes[l])
