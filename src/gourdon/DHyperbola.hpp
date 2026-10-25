@@ -74,7 +74,6 @@ T easy_hyperbola_sum(T xp,
                      const PiTable& pi)
 {
   int64_t square = p * p;
-  int64_t x_div_p3 = fast_div64(xp, square);
   int64_t xpy = fast_div64(xp, y);
   int64_t sqrt_xp = isqrt(xp);
   T sum = 0;
@@ -93,6 +92,7 @@ T easy_hyperbola_sum(T xp,
 
     // Primes n in (X/p^2, H] have X/n < p^2 (X/p^2 >= L as p^2 <= y):
     // E(X/n) = phi(X/n, b - 1) - M(X/n) = 2 * pi[X/n] - 2b + 1.
+    int64_t x_div_p3 = fast_div64(xp, square);
     int64_t pi_min_n = pi[x_div_p3];
     int64_t pi_max_n = pi[sqrt_xp];
     sum += sum_pi(xp, pi_min_n + 1, pi_max_n, primes, pi) * 2;
@@ -111,21 +111,6 @@ uint64_t hyperbola_sum(uint64_t xp,
                        int64_t phi,
                        int64_t mertens_y,
                        const Vector<uint32_t>& primes,
-                       const PiTable& pi,
-                       Sieve& sieve,
-                       Vector<SemiprimeEvent>& events,
-                       SemiprimeEventSorter& sorter,
-                       int64_t& max_m);
-
-uint64_t hyperbola_sum(uint64_t xp,
-                       int64_t p,
-                       int64_t b,
-                       int64_t y,
-                       int64_t low,
-                       int64_t high,
-                       int64_t phi,
-                       int64_t mertens_y,
-                       const Vector<int64_t>& primes,
                        const PiTable& pi,
                        Sieve& sieve,
                        Vector<SemiprimeEvent>& events,

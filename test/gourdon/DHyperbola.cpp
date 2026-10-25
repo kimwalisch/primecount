@@ -194,13 +194,16 @@ void check(const Input& input)
 
   PiTable pi(input.y, 1);
   auto primes32 = pi.get_primes<uint32_t>(input.y, 1);
-  Vector<int64_t> primes64(primes32.size());
-  for (std::size_t i = 0; i < primes32.size(); i++)
-    primes64[i] = primes32[i];
+
+  #if defined(HAVE_INT128_T)
+    Vector<int64_t> primes64(primes32.size());
+    for (std::size_t i = 0; i < primes32.size(); i++)
+      primes64[i] = primes32[i];
+  #endif
+
   for (int64_t size : { 240, 1680 })
   {
     check_segments<uint64_t>(input, size, reference, expected, easy, primes32, pi);
-    check_segments<uint64_t>(input, size, reference, expected, easy, primes64, pi);
     #if defined(HAVE_INT128_T)
       check_segments<uint128_t>(input, size, reference, expected, easy, primes32, pi);
       check_segments<uint128_t>(input, size, reference, expected, easy, primes64, pi);

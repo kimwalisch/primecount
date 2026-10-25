@@ -1,5 +1,7 @@
-Changes in primecount-9.0, 2026-10-24
+Changes in primecount-9.0, 2026-10-25
 
+* DHyperbola.hpp: Compute x/p^3 only when needed by easy_hyperbola_sum().
+* DHyperbola.cpp: Remove the unused 64-bit overload with 64-bit primes.
 * SemiprimeEventSorter.hpp: Remove the redundant bitmap size_t range check.
 * SemiprimeEventSorter.hpp: Remove the unused prime parameter and small-prime fallback.
 * DHyperbola.cpp: Move implementation-only hyperbola helpers out of the header.

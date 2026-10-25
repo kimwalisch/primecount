@@ -203,25 +203,6 @@ uint64_t hyperbola_sum(uint64_t xp,
                          primes, pi, sieve, events, sorter, max_m);
 }
 
-uint64_t hyperbola_sum(uint64_t xp,
-                       int64_t p,
-                       int64_t b,
-                       int64_t y,
-                       int64_t low,
-                       int64_t high,
-                       int64_t phi,
-                       int64_t mertens_y,
-                       const Vector<int64_t>& primes,
-                       const PiTable& pi,
-                       Sieve& sieve,
-                       Vector<SemiprimeEvent>& events,
-                       SemiprimeEventSorter& sorter,
-                       int64_t& max_m)
-{
-  return ::hyperbola_sum(xp, p, b, y, low, high, phi, mertens_y,
-                         primes, pi, sieve, events, sorter, max_m);
-}
-
 #if defined(HAVE_INT128_T)
 
 uint128_t hyperbola_sum(uint128_t xp,
