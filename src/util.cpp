@@ -201,22 +201,22 @@ double get_alpha_gourdon(maxint_t x, double alpha)
   // Use default alpha
   if (alpha < 1)
   {
-    // For x <= 10^11 our default formula does not
+    // For x <= 3e11 our default formula does not
     // generate good alpha values. Hence we use
     // another formula optimized for small values.
-    if (x <= 1e11)
+    if (x <= 3e11)
     {
-      double a = 0.078173;
+      double a = 0.156346;
       double b = 1;
       double logx = std::log((double) x);
       alpha = a * logx + b;
     }
     else
     {
-      double a = 0.007888745747017503;
-      double b = -0.7610431057184933;
-      double c = 25.74106177417062;
-      double d = -288.9823576050215;
+      double a = 0.021078652642134526;
+      double b = -2.0334362096119443;
+      double c = 67.97860096709101;
+      double d = -758.0125793471067;
       double logx = std::log((double) x);
       double logx2 = logx * logx;
       double logx3 = logx * logx * logx;
