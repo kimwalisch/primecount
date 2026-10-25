@@ -229,6 +229,7 @@ T D_thread_avx512(T x,
 
       // A composite m with all prime factors > prime exceeds
       // prime^2 and all hyperbola terms have positions < y.
+      // Hence the remaining leaves are composed of 2 primes.
       if (max_m <= prime * prime && low >= y)
         break;
 
