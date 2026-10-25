@@ -1,65 +1,31 @@
 Changes in primecount-9.0, 2026-10-25
 
-* DHyperbola.hpp: Compute x/p^3 only when needed by easy_hyperbola_sum().
-* DHyperbola.cpp: Remove the unused 64-bit overload with 64-bit primes.
-* SemiprimeEventSorter.hpp: Remove the redundant bitmap size_t range check.
-* SemiprimeEventSorter.hpp: Remove the unused prime parameter and small-prime fallback.
-* DHyperbola.cpp: Move implementation-only hyperbola helpers out of the header.
-* SemiprimeEventSorter.hpp: Share SemiprimeEvent and remove the sort() template.
-* DHyperbola.cpp: Move hyperbola_sum() out of line and pass Sieve directly.
-* LMO: Combine the cofactor lower-bound divisions.
-* S2_hard.cpp: Combine the cofactor upper-bound divisions.
-* D_*.hpp: Simplify cofactor bounds and skip hyperbola_sum() when low >= y.
-* D.cpp: Compute mertens_y directly using a descending recurrence.
-* SemiprimeEventSorter.hpp: Avoid copying discarded bitmap contents when growing buffers.
-* DHyperbola.hpp, D.cpp: Simplify hyperbola_sum() bounds, limit mertens_y to pi(sqrt(y)).
-* D.cpp: Use implicit signed conversions, remove signed_from_unsigned().
-* Gourdon: Share one PiTable between Sigma, Phi0, AC and D.
-* Phi0.cpp: Extract primes from PiTable instead of sieving them again.
-* Sigma.cpp: Limit the prime count lookup table to y.
-* AC.cpp: Limit the primes vector to sqrt(x / sqrt(y)), add PiTable::prev_prime(x).
-* AC_*.hpp: Remove the C1 formula, D computes its easy leaves using the hyperbola method.
-* doc/C1-Removal-Analysis.md: Analyze C1 removal without changing Gourdon's y bound.
-* DHyperbola.hpp: Cancel the prime hard leaves x/(p*y) < m <= y of D using the hyperbola method.
-* DHyperbola.hpp: Primes with x/p^3 < y also compute their C1 easy leaves.
-* D: Skip factor table scans when the remaining factors must be prime.
-* doc/Hard-Special-Leaves-Hyperbola.md: Specification of the hyperbola method in D.
+* Gourdon: Compute part of D using a weighted Dirichlet hyperbola algorithm,
+  cancelling prime-leaf sieve queries and computing the former C1 easy leaves.
+* D: Bound the outer prime loops by x^(1/4) and skip factor-table scans
+  when the remaining cofactors must be prime.
+* Gourdon: Share one PiTable between Sigma, Phi0, AC and D, and extract
+  Phi0's primes from it instead of sieving them again.
+* AC.cpp: Reduce memory usage by limiting the primes vector to the range
+  required by the A and C2 formulas.
+* Gourdon: Remove the z parameter and --alpha-y/--alpha-z options;
+  use --alpha to tune y.
+* Gourdon: Allow y = sqrt(x) and simplify algorithm bounds.
+* Apply --alpha only to the requested computation, without affecting
+  nested pi(x) calls.
+* test.cpp: Support --alpha with --test and parse all options before testing.
+* FactorTable.hpp: Reduce Deleglise-Rivat S2_hard memory using 16-bit
+  prime factor ordinals; share the implementation with Gourdon D.
+* D, S2_hard, LMO: Reduce integer divisions in the cofactor bounds.
+* D_avx2.hpp: Add AVX2 filtering and runtime dispatch for Gourdon D.
 * D_arm_sve.hpp: Fix ambiguous svwhilelt_b64() call on macOS.
-* ci.yml: Compile Linux GCC tests with -march=x86-64, Ubuntu 26.04 enables AVX2.
-* D.cpp, D_*.hpp: Bound the first prime by x^(1/4) instead of x_star.
-* AC.cpp: Limit the prime count lookup table and prime vector to y.
-* test.cpp: Support --alpha in --test, run tests after parsing all options.
-* Pass alpha as function parameter, --alpha no longer affects nested pi(x) computations.
-* AC_*.hpp: Remove redundant y bounds from the C1 formula.
-* Tests: Cover y = sqrt(x) and both FactorTable entry widths.
-* pi_gourdon.cpp: Allow y = x^(1/2) in Gourdon's algorithm, simplify y bounds.
-* util.cpp: Simplify get_x_star_gourdon(), round down x / y^2.
-* Use phi(x, k) instead of phi(x, c) in all prime counting algorithms.
-* print.cpp: Don't print z = x / y in the --status output.
-* Use xy = x / y instead of z = x / y in the LMO and Deleglise-Rivat algorithms.
-* AC.cpp, D.cpp, Phi0.cpp: Remove z parameter, use y instead.
-* D.cpp: Use FactorTable instead of FactorTableD, remove FactorTableD.hpp.
-* util.cpp: Remove alpha_z tuning factor from Gourdon's algorithm, use z = y.
-* CmdOptions.cpp: Remove --alpha-y and --alpha-z, use --alpha for Gourdon's algorithm.
-* test/gourdon: Regenerate D, AC and Phi0 tests using y = z.
-* FactorTable.hpp: Reduce Deleglise-Rivat S2_hard memory using 16-bit prime factor ordinals.
-* D_avx2.hpp: AVX2 filtering for Gourdon's D algorithm.
-* D.cpp: Add AVX2 runtime dispatch.
-* test/gourdon/D_avx2.cpp: Test AVX2 filtering against scalar filtering.
-* CMake: Prefix internal cache variables with PRIMECOUNT_ to avoid name collisions.
-* primecountConfig.cmake.in: Avoid overwriting the LOWER_COMPONENTS variable of consumers.
-* CMake: Require C++14 for the executable and tests, fixes Emscripten build.
-* Vector.hpp: Make Array member functions constexpr.
-* PhiTiny.cpp: Use hardcoded lookup tables, no initialization at startup.
-* AGENTS.md: Document include header order.
-* AGENTS.md: Use UCRT64 for Windows development builds.
-* ci.yml: Migrate Windows GCC CI from MINGW64 to UCRT64.
-* build_windows_binaries.yml: Build Windows x64 binary using UCRT64.
-* Implement SIMD runtime dispatching for MSVC compiler.
-* ci.yml: Check that AVX512 and ARM SVE runtime dispatching are enabled.
-* Simplify SIMD runtime dispatch preprocessor logic.
-* popcnt.hpp: Add ARM NEON popcnt64() for MSVC compiler.
-* Use _mm_popcnt_u64() instead of popcnt64_native() in AVX512 code.
+* PhiTiny.cpp: Use static lookup tables instead of initializing them at startup.
+* CMake: Avoid internal variable name collisions with parent projects.
+* CMake: Fix C++14 compiler mode for the executable and tests, including
+  Emscripten builds.
+* Build Windows x64 binaries and run Windows GCC CI using UCRT64.
+* Add SIMD runtime dispatching support for the MSVC compiler.
+* popcnt.hpp: Use ARM NEON population count with the MSVC ARM64 compiler.
 
 Changes in primecount-8.8, 2026-09-27
 
