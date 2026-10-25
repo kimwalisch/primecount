@@ -16,6 +16,7 @@
 #include "SemiprimeEventSorter.hpp"
 
 #include <fast_div.hpp>
+#include <imath.hpp>
 #include <int128_t.hpp>
 #include <isqrt.hpp>
 #include <macros.hpp>
@@ -30,8 +31,9 @@ namespace {
 
 using namespace primecount;
 
-/// Returns phi(t, b - 1) - M(t) for p = primes[b] and p^2 <= t < p^3,
-/// where M(t) = sum_{n <= t, lpf(n) > p} mu(n).
+/// Contribution of integers with at most two prime factors to
+/// phi(t, b - 1) - M(t), where p = primes[b], t >= p^2 and
+/// M(t) = sum_{n <= t, lpf(n) > p} mu(n).
 ///
 ALWAYS_INLINE int64_t phi_minus_mertens(int64_t t,
                                         int64_t p,
@@ -42,7 +44,7 @@ ALWAYS_INLINE int64_t phi_minus_mertens(int64_t t,
 }
 
 /// Sum phi_minus_mertens(X/q) over the primes q in (min_n, max_n],
-/// where X = x/p and all X/q are in [p^2, p^3[. Gourdon's inversion
+/// where X = xp and all X/q are >= p^2. Gourdon's inversion
 /// equality turns the sums of pi(X/(p*q)) and pi(sqrt(X/q)) into sums
 /// over the reflected primes r, avoiding two pi lookups per prime q.
 ///
@@ -84,21 +86,27 @@ T sum_phi_minus_mertens(T xp,
 
 /// Compute the special leaves x/(p*y) < m <= y of the prime
 /// p = primes[b] in the current segment [low, high[ using the
-/// hyperbola method, if sqrt(x/p) < y < p^3. Then max_m is lowered
+/// hyperbola method, if sqrt(x/p) < y < p^4. Then max_m is lowered
 /// to x/(p*y) and the caller processes the remaining leaves using
 /// the factor table.
 ///
 /// Let X = floor(x/p), L = xpy = floor(X/y), H = sqrt_xp =
 /// floor(sqrt(X)) and Phi(t) = phi(t, b - 1). The leaves L < m <= y
 /// contribute
-///   M(H) Phi(H) - M(y) Phi(L)
-///   + sum_{L < n <= H} a(n) E(X/n)
-///   - sum_{L < n <= H} (a(n) + c(n)) Phi(X/n),
-/// where a(n) = [lpf(n) >= p], c(n) = mu(n)[lpf(n) > p], E = Phi - M.
+///   [Phi(H) - Q(H)] Phi(H) - [M2(y) + T3(y)] Phi(L)
+///   + sum_{L < n <= H} a(n) Q(X/n)
+///   - sum_{L < n <= H} (a(n) + c(n)) Phi(X/n)
+///   + sum_{H < n <= y, Omega(n) = 3} (a(n) - c(n)) Phi(X/n),
+/// where a(n) = [lpf(n) >= p], c(n) = mu(n)[lpf(n) > p], Q is
+/// phi_minus_mertens(), M2 is the two-factor Moebius prefix and T3
+/// counts all triple products with factors >= p. Their sum at y is
+/// passed as mertens_y. The last sum transposes the triple correction
+/// to Q, avoiding a triple-counting sum at every prime leaf.
 /// Here only the terms whose positions are >= p^2 are computed, see
 /// easy_hyperbola_sum(). Prime n > p have a(n) + c(n) = 0. The
-/// remaining terms, the events, have n = q*r with p <= q <= r and
-/// weight a(n) + c(n) = 1 if q = p or q = r, and 2 otherwise.
+/// squarefree triples with factors > p cancel too; other triples
+/// have weight 1. Semiprimes have weight 1 if a factor is p or the
+/// factors are equal, and 2 otherwise.
 /// Events are processed in decreasing n, so count() is called with
 /// increasing positions X/n.
 ///
@@ -121,7 +129,11 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
   int64_t square = p * p;
   int64_t sqrt_xp = isqrt(xp);
 
-  if (sqrt_xp >= y || square <= y / p)
+  if (sqrt_xp >= y)
+    return 0;
+
+  bool triples = square <= y / p;
+  if (triples && square <= y / square)
     return 0;
 
   int64_t xpy = fast_div64(xp, y);
@@ -133,6 +145,45 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
   {
     int64_t phi_xpy = phi + sieve.count(xpy - low);
     sum -= T(phi_xpy) * mertens_y;
+  }
+
+  // Triple corrections have positions X/n <= H and precede
+  // the H boundary and the reflected semiprime events.
+  if (triples && query_low <= sqrt_xp && high > xpy)
+  {
+    int64_t min_n = min(fast_div(xp, high), y);
+    int64_t max_n = min(fast_div(xp, query_low), y);
+    min_n = max(min_n, sqrt_xp);
+    events.clear();
+
+    for (int64_t i = b, last = pi[iroot<3>(max_n)]; i <= last; i++)
+    {
+      int64_t q = primes[i];
+      int64_t max_j = pi[isqrt(max_n / q)];
+
+      for (int64_t j = i; j <= max_j; j++)
+      {
+        int64_t qr = q * primes[j];
+        int64_t min_k = max(j, pi[min_n / qr] + 1);
+        int64_t max_k = pi[max_n / qr];
+
+        for (int64_t k = max_k; k >= min_k; k--)
+        {
+          int64_t n = qr * primes[k];
+          int64_t weight = (i != b && i != j && j != k) + 1;
+          events.push_back(SemiprimeEvent{n, weight});
+        }
+      }
+    }
+
+    sorter.sort(events, min_n, max_n);
+
+    for (const SemiprimeEvent& event : events)
+    {
+      int64_t xpn = fast_div64(xp, event.n);
+      int64_t phi_xpn = phi + sieve.count(xpn - low);
+      sum += T(event.weight) * phi_xpn;
+    }
   }
 
   if (query_low <= sqrt_xp && sqrt_xp < high)
@@ -163,6 +214,41 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
         int64_t n = q * primes[j];
         int64_t weight = (i != b && i != j) + 1;
         events.push_back(SemiprimeEvent{n, weight});
+      }
+    }
+
+    if (triples)
+    {
+      int64_t max_i3 = pi[iroot<3>(max_n)];
+      for (int64_t i = b; i <= max_i3; i++)
+      {
+        int64_t q = primes[i];
+        int64_t max_j = pi[isqrt(max_n / q)];
+
+        for (int64_t j = i; j <= max_j; j++)
+        {
+          int64_t r = primes[j];
+          int64_t qr = q * r;
+          int64_t min_k = max(j, pi[min_n / qr] + 1);
+          int64_t max_k = pi[max_n / qr];
+
+          if (i == b || i == j)
+          {
+            for (int64_t k = max_k; k >= min_k; k--)
+              events.push_back(SemiprimeEvent{qr * primes[k], 1});
+          }
+          else
+          {
+            if (min_k == j && j <= max_k)
+              events.push_back(SemiprimeEvent{qr * r, 1});
+
+            // Only the cheap Q terms survive for q < r < s, q > p
+            int64_t min_s = max(min_n / qr, r);
+            int64_t max_s = max_n / qr;
+            if (min_s < max_s)
+              sum += sum_phi_minus_mertens(xp / qr, p, b, min_s, max_s, primes, pi);
+          }
+        }
       }
     }
 

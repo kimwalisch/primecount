@@ -78,22 +78,31 @@ struct Reference
 {
   Vector<uint32_t> lpf;
   Vector<int8_t> mu;
+  Vector<uint8_t> factors;
   Vector<int64_t> phi;
-  Vector<int64_t> mertens;
+  Vector<int64_t> surrogate;
 
   Reference(int64_t limit, int64_t prime)
   {
     auto primes = generate_primes<uint32_t>(limit);
     lpf = generate_lpf(limit, primes);
     mu = generate_moebius(limit, primes);
+    factors.resize(limit + 1);
     phi.resize(limit + 1);
-    mertens.resize(limit + 1);
+    surrogate.resize(limit + 1);
+    factors[0] = 0;
+    factors[1] = 0;
     phi[0] = 0;
-    mertens[0] = 0;
+    surrogate[0] = 0;
     for (int64_t n = 1; n <= limit; n++)
     {
-      phi[n] = phi[n - 1] + (n == 1 || lpf[n] >= prime);
-      mertens[n] = mertens[n - 1] + (lpf[n] > prime ? mu[n] : 0);
+      if (n > 1)
+        factors[n] = factors[n / lpf[n]] + 1;
+      int64_t a = n == 1 || lpf[n] >= prime;
+      int64_t c = lpf[n] > prime ? mu[n] : 0;
+      phi[n] = phi[n - 1] + a;
+      // Triples replace their Moebius weight by the rough indicator
+      surrogate[n] = surrogate[n - 1] + (factors[n] == 3 ? a : c);
     }
   }
 };
@@ -107,7 +116,7 @@ void check_segments(const Input& input, int64_t size,
   int64_t b = pi[p];
   int64_t xpy = input.xp / input.y;
   int64_t stop = expected.size() - 1;
-  int64_t mertens_y = reference.mertens[input.y];
+  int64_t mertens_y = reference.surrogate[input.y];
   Vector<SemiprimeEvent> events;
   SemiprimeEventSorter sorter;
 
@@ -131,7 +140,8 @@ void check_segments(const Input& input, int64_t size,
     int64_t wanted = expected[high] - expected[low];
     if (actual != T(wanted) || max_m != xpy)
     {
-      std::cerr << "Hyperbola segment differs: p=" << p << ", low=" << low
+      std::cerr << "Hyperbola segment differs: p=" << p << ", X=" << input.xp
+                << ", y=" << input.y << ", low=" << low
                 << ", high=" << high << ", integer bytes=" << sizeof(T)
                 << ", prime bytes=" << sizeof(Prime) << '\n';
       std::exit(1);
@@ -149,7 +159,7 @@ void check(const Input& input)
 
   // hyperbola_sum() tests the prime itself, whereas D.cpp
   // computes the easy hyperbola terms for p > (x/y)^(1/3).
-  check(sqrt_xp < input.y && input.y < square * p &&
+  check(sqrt_xp < input.y && input.y < square * square &&
         square <= input.y &&
         input.easy_leaves == (xpy < square) &&
         input.easy_leaves == (p > iroot<3>(xy)),
@@ -172,14 +182,22 @@ void check(const Input& input)
       expected[position + 1] += value;
   };
 
-  add(sqrt_xp, reference.mertens[sqrt_xp] * reference.phi[sqrt_xp]);
-  add(xpy, -reference.mertens[input.y] * reference.phi[xpy]);
+  add(sqrt_xp, reference.surrogate[sqrt_xp] * reference.phi[sqrt_xp]);
+  add(xpy, -reference.surrogate[input.y] * reference.phi[xpy]);
   for (int64_t n = xpy + 1; n <= sqrt_xp; n++)
     if (reference.lpf[n] >= p)
     {
       int64_t c = reference.lpf[n] > p ? reference.mu[n] : 0;
       int64_t t = input.xp / n;
-      add(t, -(reference.mertens[t] + c * reference.phi[t]));
+      add(t, -(reference.surrogate[t] + c * reference.phi[t]));
+    }
+
+  for (int64_t n = sqrt_xp + 1; n <= input.y; n++)
+    if (reference.lpf[n] >= p && reference.factors[n] == 3)
+    {
+      int64_t c = reference.lpf[n] > p ? reference.mu[n] : 0;
+      int64_t t = input.xp / n;
+      add(t, (1 - c) * reference.phi[t]);
     }
 
   // The hyperbola terms replace the leaves xpy < m <= y
@@ -210,6 +228,76 @@ void check(const Input& input)
   }
 }
 
+void check_three_primes()
+{
+  for (int64_t p : { 7, 11, 23 })
+  {
+    int64_t cube = p * p * p;
+    int64_t fourth = cube * p;
+    auto primes = generate_primes<uint32_t>(4 * p);
+    std::size_t b = 1;
+    while (primes[b] != p)
+      b++;
+    int64_t q = primes[b + 1];
+    int64_t r = primes[b + 2];
+    int64_t s = primes[b + 3];
+
+    // Boundaries include p^3, p^2*q, p*q^2, q^3, q^2*r,
+    // q*r^2 and three distinct factors strictly greater than p.
+    for (int64_t end : { cube, p * p * q, p * q * q, q * q * q,
+                         q * q * r, q * r * r, q * r * s, fourth })
+      for (int64_t delta : { -1, 0, 1 })
+      {
+        int64_t y = end + delta;
+        if (y >= fourth)
+          continue;
+        int64_t xp = (y * y + p - 1) / p;
+        check({ xp, y, p, xp / y < p * p });
+        check({ y * y - 1, y, p, false });
+      }
+
+    // H crosses p^3 exactly, including the adjacent floors
+    const Array<int64_t, 5> offsets = { -1, 0, 1, 2 * cube, 2 * cube + 1 };
+    for (int64_t delta : offsets)
+      check({ cube * cube + delta, 2 * cube, p, false });
+  }
+}
+
+template <typename T, typename Prime>
+void check_rejected(const Input& input, const Vector<Prime>& primes, const PiTable& pi)
+{
+  int64_t b = pi[input.prime];
+  int64_t max_m = input.y;
+  Sieve sieve(0, 240, b);
+  Vector<SemiprimeEvent> events;
+  SemiprimeEventSorter sorter;
+  T actual = hyperbola_sum(T(input.xp), input.prime, b, input.y, 0, 240, 0, 0,
+                           primes, pi, sieve, events, sorter, max_m);
+  check(actual == 0 && max_m == input.y, "Ineligible hyperbola terms were computed");
+}
+
+void check_rejected()
+{
+  int64_t p = 11;
+  int64_t cube = p * p * p;
+  int64_t fourth = cube * p;
+  for (const Input& input : { Input{ cube * cube, cube, p, false },
+                             Input{ fourth * fourth / p, fourth, p, false },
+                             Input{ fourth * fourth / p, fourth + 1, p, false } })
+  {
+    PiTable pi(input.y, 1);
+    auto primes32 = pi.get_primes<uint32_t>(input.y, 1);
+    check_rejected<uint64_t>(input, primes32, pi);
+    #if defined(HAVE_INT128_T)
+      Vector<int64_t> primes64(primes32.size());
+      for (std::size_t i = 0; i < primes32.size(); i++)
+        primes64[i] = primes32[i];
+      check_rejected<uint128_t>(input, primes32, pi);
+      check_rejected<uint128_t>(input, primes64, pi);
+    #endif
+  }
+}
+
 /// D.cpp computes easy_hyperbola_sum() for all primes
 /// (x/y)^(1/3) < p <= sqrt(y), hence these primes must use
 /// the hyperbola method and have easy leaves.
@@ -234,5 +322,7 @@ int main()
   check_easy_primes();
   for (const Input& input : inputs)
     check(input);
+  check_three_primes();
+  check_rejected();
   std::cout << "All hyperbola segment tests passed successfully!" << std::endl;
 }

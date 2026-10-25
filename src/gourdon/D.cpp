@@ -170,14 +170,29 @@ T D_OpenMP(T x,
   int64_t xy = x / y;
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
 
-  // mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n)
-  // Only entries with primes[b]^2 <= y < primes[b]^3 are used.
+  // Two-factor Moebius prefixes, adjusted for triple products below.
+  // Only entries with primes[b]^2 <= y < primes[b]^4 are used.
   Vector<int64_t> mertens_y(pi_sqrty + 1);
   int64_t mertens = 1 - pi[y] + pi_sqrty;
   for (int64_t b = pi_sqrty; b > k; b--)
   {
     mertens_y[b] = mertens;
     mertens += pi[y / primes[b]] - b - 1;
+  }
+
+  // For three-prime leaves the boundary prefix is Phi(y) - Q(y),
+  // which adds all triple products to the two-factor Moebius sum.
+  int64_t max_triple_prime = iroot<3>(y);
+  int64_t min_triple_prime = max(iroot<4>(y), xy / y);
+  int64_t min_triple_b = max(k, pi[min(min_triple_prime, max_triple_prime)]);
+  int64_t triples = 0;
+
+  for (int64_t b = pi[max_triple_prime]; b > min_triple_b; b--)
+  {
+    int64_t yp = y / primes[b];
+    for (int64_t i = b, last = pi[isqrt(yp)]; i <= last; i++)
+      triples += pi[yp / primes[i]] - i + 1;
+    mertens_y[b] += triples;
   }
 
   // These load balancing settings work well on my

@@ -199,6 +199,25 @@ int main()
         }
   }
 
+  // Triples cross H, including repeated factors and three distinct
+  // factors greater than the sieving prime 23.
+  for (int64_t n : { ipow<3>(23), ipow<3>(29), 29 * 31 * 37 })
+    for (int64_t delta : { -1, 0, 1 })
+    {
+      int64_t x = 23 * n * n + delta;
+      int64_t y = 48668;
+      int64_t expected = D_reference(x, y, 8);
+      const PiTable pi(y, threads);
+      int64_t res = D(x, y, 8, pi, threads);
+      std::cout << "D triple(" << x << ", " << y << ") = " << res;
+      check(res == expected);
+
+      #ifdef HAVE_INT128_T
+        int128_t res2 = D((int128_t) x, y, 8, pi, threads);
+        check(res2 == expected);
+      #endif
+    }
+
   struct HyperbolaParams
   {
     int64_t xp;
@@ -224,7 +243,7 @@ int main()
     { 559682, 1058, 23, 2 },
     { 560739, 1058, 23, 2 },
     { 560740, 1058, 23, 2 },
-    { 7653060, 12167, 23, 0 },
+    { 7653060, 12167, 23, 2 },
     { 292140, 541, 23, 2 },
     { 807302, 899, 23, 2 },
     { 864017, 1200, 23, 2 },
@@ -254,7 +273,7 @@ int main()
 
     if (p * p <= params.y &&
         sqrt_xp < params.y &&
-        params.y < p * p * p)
+        params.y < p * p * p * p)
       hyperbola = (params.xp / (p * p) < params.y) ? 1 : 2;
 
     std::cout << "D hyperbola " << params.hyperbola << " ("
