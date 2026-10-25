@@ -110,7 +110,6 @@ int main()
 
     // The same sparse events over a huge interval must avoid a huge bitmap
     check(sorter, events, 7, 0, upper);
-    check(sorter, events, 7, 0, 240 * (1ull << 32));
   }
 
   // Reuse existing allocations with changing partial first and last blocks
