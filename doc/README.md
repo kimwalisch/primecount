@@ -13,4 +13,5 @@
 * [Easy-Special-Leaves.pdf](Easy-Special-Leaves.pdf)
 * [Hard-Special-Leaves.pdf](Hard-Special-Leaves.pdf)
 * [Hard-Special-Leaves-SIMD-Filtering.pdf](Hard-Special-Leaves-SIMD-Filtering.pdf)
+* [Hard-Special-Leaves-Hyperbola-Three-Primes.md](Hard-Special-Leaves-Hyperbola-Three-Primes.md)
 * [References.md](References.md)
