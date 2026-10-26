@@ -86,15 +86,16 @@ T easy_hyperbola_sum(T xp,
   // If H >= p^2, only the L term has a position < p^2
   if (sqrt_xp < square)
   {
-    int64_t phi_sqrt_xp = pi[sqrt_xp] - b + 2;
-    int64_t mertens_sqrt_xp = 1 - (pi[sqrt_xp] - b);
+    int64_t pi_sqrt_xp = pi[sqrt_xp];
+    int64_t phi_sqrt_xp = pi_sqrt_xp - b + 2;
+    int64_t mertens_sqrt_xp = 1 - (pi_sqrt_xp - b);
     sum += T(mertens_sqrt_xp) * phi_sqrt_xp;
 
     // Primes n in (X/p^2, H] have X/n < p^2 (X/p^2 >= L as p^2 <= y):
     // E(X/n) = phi(X/n, b - 1) - M(X/n) = 2 * pi[X/n] - 2b + 1.
     int64_t x_div_p3 = fast_div64(xp, square);
     int64_t pi_min_n = pi[x_div_p3];
-    int64_t pi_max_n = pi[sqrt_xp];
+    int64_t pi_max_n = pi_sqrt_xp;
     sum += sum_pi(xp, pi_min_n + 1, pi_max_n, primes, pi) * 2;
     sum -= T(pi_max_n - pi_min_n) * (2 * b - 1);
   }

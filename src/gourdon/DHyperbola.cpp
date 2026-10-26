@@ -67,13 +67,18 @@ T sum_phi_minus_mertens(T xp,
   int64_t min_r2 = isqrt(fast_div64(xp, max_n));
   int64_t max_r2 = isqrt(fast_div64(xp, min_n + 1));
 
+  int64_t pi_min_r = pi[min_r];
+  int64_t pi_max_r = pi[max_r];
+  int64_t pi_min_r2 = pi[min_r2];
+  int64_t pi_max_r2 = pi[max_r2];
+
   T sum = sum_pi(xp, pi_min_n + 1, pi_max_n, primes, pi) * 2;
-  sum += sum_pi(xpp, pi[min_r] + 1, pi[max_r], primes, pi);
-  sum += T(pi_max_n) * pi[min_r] - T(pi_min_n) * pi[max_r];
-  sum += T(pi_max_n) * pi[min_r2] - T(pi_min_n) * pi[max_r2];
+  sum += sum_pi(xpp, pi_min_r + 1, pi_max_r, primes, pi);
+  sum += T(pi_max_n) * pi_min_r - T(pi_min_n) * pi_max_r;
+  sum += T(pi_max_n) * pi_min_r2 - T(pi_min_n) * pi_max_r2;
   sum -= T(pi_max_n - pi_min_n) * (4 * b - 2);
 
-  for (int64_t j = pi[min_r2] + 1, last = pi[max_r2]; j <= last; j++)
+  for (int64_t j = pi_min_r2 + 1; j <= pi_max_r2; j++)
   {
     int64_t r = primes[j];
     sum += pi[fast_div64(xp, r * r)];
