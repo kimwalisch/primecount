@@ -18,6 +18,7 @@
 #include <ctz.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
+#include <popcnt.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
@@ -65,23 +66,29 @@ public:
 
     present_.clear();
     weight1_.clear();
+
     present_.resize(words64);
     weight1_.resize(words64);
 
     std::fill(present_.begin(), present_.end(), 0);
     std::fill(weight1_.begin(), weight1_.end(), 0);
 
+    // Insert the events into two bitmaps: present_ marks all
+    // events and weight1_ marks the events with weight 1.
+    // Since all events are coprime to 30, each 64-bit word
+    // covers 240 integers. The bitmaps store m = high - n
+    // instead of n, so that increasing m (word and bit)
+    // corresponds to decreasing n.
+    uint64_t high = (last + 1) * 240;
+
     for (const SemiprimeEvent& event : events)
     {
       uint64_t n = event.n;
       ASSERT(min_n < n && n <= max_n);
       ASSERT(event.weight == 1 || event.weight == 2);
-      uint64_t word = n / 240 - first;
-      uint64_t residue = n % 240;
-      ASSERT(residue != 0);
-
-      // Reverse the bits so ctz64 enumerates n in decreasing order
-      uint64_t bit = set_bit_[240 - residue];
+      uint64_t m = high - n;
+      uint64_t word = m / 240;
+      uint64_t bit = set_bit_[m % 240];
       ASSERT(bit != 0);
       ASSERT((present_[word] & bit) == 0);
       present_[word] |= bit;
@@ -89,27 +96,56 @@ public:
         weight1_[word] |= bit;
     }
 
+    // Extra space for the unconditional writes below
+    events.resize(count + 4);
     uint64_t written = 0;
 
-    for (uint64_t word = words64; word-- > 0;)
+    // Read the bitmaps word by word in increasing order of
+    // m, i.e. in decreasing order of n, and write the events
+    // back into the events vector, which is now sorted.
+    for (uint64_t word = 0; word < words64; word++)
     {
       uint64_t bits = present_[word];
+      uint64_t bit_count = popcnt64(bits);
       uint64_t weight1 = weight1_[word];
-      uint64_t base = (first + word) * 240;
+      uint64_t base = high - word * 240;
+      SemiprimeEvent* out = &events[written];
+      written += bit_count;
 
-      while (bits)
+      // Decode the events of the current word 4 at a time,
+      // from the lowest to the highest set bit. The last
+      // iteration may decode up to 3 dummy events, which are
+      // later overwritten or discarded. Decoding 4 events
+      // unconditionally avoids most branch mispredictions.
+      NO_UNROLL_LOOP
+      NO_VECTORIZE_LOOP
+      for (uint64_t i = 0; i < bit_count; i += 4)
       {
-        int bit = ctz64(bits);
-        int64_t n = base + bit_values_[63 - bit];
-        int64_t weight = 2 - ((weight1 >> bit) & 1);
-        events[written++] = SemiprimeEvent{n, weight};
-        bits &= bits - 1;
+        out[i + 0] = next_event(bits, base, weight1); bits &= bits - 1;
+        out[i + 1] = next_event(bits, base, weight1); bits &= bits - 1;
+        out[i + 2] = next_event(bits, base, weight1); bits &= bits - 1;
+        out[i + 3] = next_event(bits, base, weight1); bits &= bits - 1;
       }
     }
+
+    events.resize(count);
     ASSERT(written == events.size());
   }
 
 private:
+  /// Decode the event of the lowest set bit.
+  /// If bits = 0, a dummy event is returned.
+  ALWAYS_INLINE static SemiprimeEvent
+  next_event(uint64_t bits,
+             uint64_t base,
+             uint64_t weight1)
+  {
+    int bit = ctz64(bits | (1ull << 63));
+    int64_t n = base - bit_values_[bit];
+    int64_t weight = 2 - ((weight1 >> bit) & 1);
+    return SemiprimeEvent{n, weight};
+  }
+
   Vector<uint64_t> present_;
   Vector<uint64_t> weight1_;
 };
