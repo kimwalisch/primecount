@@ -11,6 +11,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <FactorTable.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
@@ -221,6 +222,16 @@ double get_alpha_gourdon(maxint_t x, double alpha)
       double logx2 = logx * logx;
       double logx3 = logx * logx * logx;
       alpha = a * logx3 + b * logx2 + c * logx + d;
+
+      // If y = x^(1/3) * alpha is too large for 16-bit factor
+      // table entries, D uses 32-bit factor table entries
+      // which doubles its memory usage. Hence we reduce alpha
+      // by 30%, according to our benchmarks this causes a
+      // slowdown of at most 3%.
+      double x13 = (double) iroot<3>(x);
+      int64_t y = (int64_t) (x13 * alpha);
+      if (y > FactorTable<uint16_t>::max())
+        alpha *= 0.7;
     }
   }
 
