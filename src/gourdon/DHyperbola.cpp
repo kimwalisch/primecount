@@ -99,8 +99,8 @@ T sum_phi_minus_mertens(T xp,
 /// [max(low, p^2), high[ are computed here, see easy_hyperbola_sum().
 /// Prime n have a(n) + c(n) = 0, the other n (events) are q*r with
 /// p <= q <= r and a(n) + c(n) = 1 if q = p or q = r, else 2. Events
-/// are processed in decreasing n, as count() and phi_minus_mertens()
-/// require increasing positions X/n.
+/// are processed in decreasing n, as count() and the incremental
+/// phi_minus_mertens() computation require increasing positions X/n.
 ///
 template <typename T, typename Primes>
 ALWAYS_INLINE T hyperbola_sum(T xp,
