@@ -193,9 +193,12 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
 
       // Compute phi_minus_mertens(xpn) by incrementally updating
       // pi(xpn/p) and pi(sqrt(xpn)) instead of computing them from
-      // scratch. The loops iterate amortized O(1) times per event,
-      // hence the runtime complexity is unchanged, but most of the
-      // time they don't iterate at all, which saves operations.
+      // scratch. Summed over all segments, the loops iterate at
+      // most pi(y/p) + pi(sqrt(y)) times for the prime p, and over
+      // all primes this is amortized O(1) per event (not per
+      // segment). Hence the runtime complexity is unchanged, but
+      // most of the time they don't iterate at all, which saves
+      // operations.
 
       NO_UNROLL_LOOP
       NO_VECTORIZE_LOOP
