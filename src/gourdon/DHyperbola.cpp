@@ -94,13 +94,13 @@ T sum_phi_minus_mertens(T xp,
 ///   M(H) Phi(H) - M(y) Phi(L)
 ///   + sum_{L < n <= H} a(n) E(X/n)
 ///   - sum_{L < n <= H} (a(n) + c(n)) Phi(X/n),
-/// where a(n) = [lpf(n) >= p], c(n) = mu(n)[lpf(n) > p], E = Phi - M.
-/// Here only the terms whose positions are >= p^2 are computed, see
-/// easy_hyperbola_sum(). Prime n > p have a(n) + c(n) = 0. The
-/// remaining terms, the events, have n = q*r with p <= q <= r and
-/// weight a(n) + c(n) = 1 if q = p or q = r, and 2 otherwise.
-/// Events are processed in decreasing n, so count() is called with
-/// increasing positions X/n.
+/// where a(n) = [lpf(n) >= p], c(n) = mu(n)[lpf(n) > p] and
+/// E = Phi - M. Only terms whose position (Phi argument) is in
+/// [max(low, p^2), high[ are computed here, see easy_hyperbola_sum().
+/// Prime n have a(n) + c(n) = 0, the other n (events) are q*r with
+/// p <= q <= r and a(n) + c(n) = 1 if q = p or q = r, else 2. Events
+/// are processed in decreasing n, as count() and phi_minus_mertens()
+/// require increasing positions X/n.
 ///
 template <typename T, typename Primes>
 ALWAYS_INLINE T hyperbola_sum(T xp,
@@ -166,15 +166,54 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
       }
     }
 
+    if (events.empty())
+      return sum;
+
     sorter.sort(events, min_n, max_n);
+
+    // The positions t = X/n increase, hence the
+    // indexes pi(t/p) and pi(sqrt(t)) never decrease.
+    int64_t t = fast_div64(xp, events[0].n);
+    int64_t pi_tp = pi[t / p];
+    int64_t pi_sqrt = pi[isqrt(t)];
+    int64_t next_tp = primes[pi_tp + 1] * p;
+    int64_t r = primes[pi_sqrt + 1];
+    int64_t next_sqrt = r * r;
 
     for (const SemiprimeEvent& event : events)
     {
       int64_t xpn = fast_div64(xp, event.n);
       int64_t phi_xpn = phi + sieve.count(xpn - low);
-      sum += phi_minus_mertens(xpn, p, b, pi);
-      sum -= T(event.weight) * phi_xpn;
+      sum -= event.weight * phi_xpn;
+
+      // Compute phi_minus_mertens(xpn) by incrementally updating
+      // pi(xpn/p) and pi(sqrt(xpn)) instead of computing them from
+      // scratch. The loops iterate amortized O(1) times per event,
+      // hence the runtime complexity is unchanged, but most of the
+      // time they don't iterate at all, which saves operations.
+
+      NO_UNROLL_LOOP
+      NO_VECTORIZE_LOOP
+      while (xpn >= next_tp)
+      {
+        pi_tp++;
+        next_tp = primes[pi_tp + 1] * p;
+      }
+
+      NO_UNROLL_LOOP
+      NO_VECTORIZE_LOOP
+      while (xpn >= next_sqrt)
+      {
+        pi_sqrt++;
+        r = primes[pi_sqrt + 1];
+        next_sqrt = r * r;
+      }
+
+      // phi_minus_mertens(xpn), its -4b + 2 term is added below
+      sum += 2 * pi[xpn] + pi_tp + pi_sqrt;
     }
+
+    sum -= events.size() * T(4 * b - 2);
   }
 
   return sum;
