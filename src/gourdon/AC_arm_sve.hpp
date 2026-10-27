@@ -405,11 +405,10 @@ T AC_OpenMP_arm_sve(T x,
         }
 
         int64_t min_c2 = max3(k, pi_root3_xy, pi_sqrty);
-        int64_t min_c2_prime = min(xhigh / y, x_star);
+        int64_t min_c2_prime = min(xy / high, x_star);
         min_c2 = max3(min_c2, pi_sqrt_low, pi[min_c2_prime]) + 1;
         int64_t x_div_high2 = fast_div64(xhigh, high);
-        int64_t min_a = min(x_div_high2, x13);
-        min_a = pi[max(x_star, min_a)] + 1;
+        int64_t min_a = pi[in_between(x_star, x_div_high2, x13)] + 1;
 
         // Upper bound of A & C2 formulas:
         // x / (p * q) >= low
