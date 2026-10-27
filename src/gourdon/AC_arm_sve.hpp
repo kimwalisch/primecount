@@ -187,6 +187,7 @@ T C1_hyperbola_arm_sve(T xlow,
 
   // If H >= p^2, only the L term has a position < p^2
   uint64_t x_div_prime3 = fast_div64(xp, square);
+
   if (x_div_prime3 >= square)
     return sum;
 
