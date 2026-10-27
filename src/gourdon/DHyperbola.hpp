@@ -16,7 +16,6 @@
 #define D_HYPERBOLA_HPP
 
 #include <int128_t.hpp>
-#include <isqrt.hpp>
 #include <PiTable.hpp>
 #include <Vector.hpp>
 
@@ -27,30 +26,6 @@ namespace primecount {
 class Sieve;
 class SemiprimeEventSorter;
 struct SemiprimeEvent;
-
-/// mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n)
-/// for k < b <= pi[sqrt(y)]. Only entries with
-/// primes[b]^2 <= y < primes[b]^3 are correct, these are
-/// the entries used by the hyperbola method in D and AC.
-///
-template <typename Primes>
-Vector<int64_t> generate_mertens_y(int64_t y,
-                                   int64_t k,
-                                   const Primes& primes,
-                                   const PiTable& pi)
-{
-  int64_t pi_sqrty = pi[isqrt(y)];
-  Vector<int64_t> mertens_y(pi_sqrty + 1);
-  int64_t mertens = 1 - pi[y] + pi_sqrty;
-
-  for (int64_t b = pi_sqrty; b > k; b--)
-  {
-    mertens_y[b] = mertens;
-    mertens += pi[y / primes[b]] - b - 1;
-  }
-
-  return mertens_y;
-}
 
 uint64_t hyperbola_sum(uint64_t xp,
                        int64_t p,

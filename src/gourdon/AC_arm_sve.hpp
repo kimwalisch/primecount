@@ -22,12 +22,12 @@
 #ifndef AC_ARM_SVE_HPP
 #define AC_ARM_SVE_HPP
 
-#include "DHyperbola.hpp"
 #include "LoadBalancerAC.hpp"
 #include "SegmentedPiTable.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
+#include <generate_primes.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>

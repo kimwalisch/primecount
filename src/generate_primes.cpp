@@ -13,6 +13,7 @@
 #include <int128_t.hpp>
 #include <isqrt.hpp>
 #include <macros.hpp>
+#include <PiTable.hpp>
 #include <primesieve.hpp>
 #include <Vector.hpp>
 
@@ -118,6 +119,54 @@ Vector<uint32_t> generate_lpf(int64_t max,
     lpf[primes[i]] = primes[i];
 
   return lpf;
+}
+
+/// Returns a vector with the values
+/// mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n)
+/// for k < b <= pi[sqrt(y)]. Only entries with
+/// primes[b]^2 <= y < primes[b]^3 are correct, these are
+/// the entries used by the hyperbola method in D and AC.
+///
+Vector<int64_t> generate_mertens_y(int64_t y,
+                                   int64_t k,
+                                   const Vector<uint32_t>& primes,
+                                   const PiTable& pi)
+{
+  int64_t pi_sqrty = pi[isqrt(y)];
+  Vector<int64_t> mertens_y(pi_sqrty + 1);
+  int64_t mertens = 1 - pi[y] + pi_sqrty;
+
+  for (int64_t b = pi_sqrty; b > k; b--)
+  {
+    mertens_y[b] = mertens;
+    mertens += pi[y / primes[b]] - b - 1;
+  }
+
+  return mertens_y;
+}
+
+/// Returns a vector with the values
+/// mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n)
+/// for k < b <= pi[sqrt(y)]. Only entries with
+/// primes[b]^2 <= y < primes[b]^3 are correct, these are
+/// the entries used by the hyperbola method in D and AC.
+///
+Vector<int64_t> generate_mertens_y(int64_t y,
+                                   int64_t k,
+                                   const Vector<int64_t>& primes,
+                                   const PiTable& pi)
+{
+  int64_t pi_sqrty = pi[isqrt(y)];
+  Vector<int64_t> mertens_y(pi_sqrty + 1);
+  int64_t mertens = 1 - pi[y] + pi_sqrty;
+
+  for (int64_t b = pi_sqrty; b > k; b--)
+  {
+    mertens_y[b] = mertens;
+    mertens += pi[y / primes[b]] - b - 1;
+  }
+
+  return mertens_y;
 }
 
 } // namespace

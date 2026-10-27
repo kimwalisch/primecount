@@ -23,11 +23,10 @@
 /// file in the top level directory.
 ///
 
-#include "DHyperbola.hpp"
-
 #include <primecount-internal.hpp>
 #include <cpu_arch_macros.hpp>
 #include <FactorTable.hpp>
+#include <generate_primes.hpp>
 #include <gourdon.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>

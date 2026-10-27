@@ -17,6 +17,8 @@
 
 namespace primecount {
 
+class PiTable;
+
 /// defined in generate_primes.cpp
 Vector<uint32_t> generate_primes_u32(int64_t max);
 Vector<int64_t> generate_primes_i64(int64_t max);
@@ -48,6 +50,12 @@ Vector<int8_t> generate_moebius(int64_t max, const Vector<uint32_t>& primes);
 /// factors of the integers <= max.
 ///
 Vector<uint32_t> generate_lpf(int64_t max, const Vector<uint32_t>& primes);
+
+/// Returns a vector with the values
+/// mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n).
+///
+Vector<int64_t> generate_mertens_y(int64_t y, int64_t k, const Vector<uint32_t>& primes, const PiTable& pi);
+Vector<int64_t> generate_mertens_y(int64_t y, int64_t k, const Vector<int64_t>& primes, const PiTable& pi);
 
 } // namespace
 
