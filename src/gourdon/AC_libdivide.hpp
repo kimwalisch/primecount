@@ -307,7 +307,7 @@ T AC_OpenMP_libdivide(T x,
   int64_t sqrty = isqrt(y);
   int64_t pi_sqrty = pi[sqrty];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
-  Vector<int64_t> mertens_y = generate_mertens_y(y, k, primes, pi);
+  auto mertens_y = generate_mertens_y(y, k, primes, pi);
 
   // Initialize libdivide vector from primes vector
   Vector<libdivide::branchfree_divider<uint64_t>> lprimes;

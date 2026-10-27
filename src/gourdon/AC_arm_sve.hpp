@@ -33,7 +33,6 @@
 #include <macros.hpp>
 #include <min.hpp>
 #include <PiTable.hpp>
-#include <Vector.hpp>
 
 #include <stdint.h>
 #include <arm_sve.h>
@@ -339,7 +338,7 @@ T AC_OpenMP_arm_sve(T x,
   int64_t sqrty = isqrt(y);
   int64_t pi_sqrty = pi[sqrty];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
-  Vector<int64_t> mertens_y = generate_mertens_y(y, k, primes, pi);
+  auto mertens_y = generate_mertens_y(y, k, primes, pi);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the

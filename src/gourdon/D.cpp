@@ -34,7 +34,6 @@
 #include <macros.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
-#include <Vector.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -161,13 +160,12 @@ T D_OpenMP(T x,
            int threads,
            bool is_print)
 {
-  using UT = typename pstd::make_unsigned<T>::type;
+  auto mertens_y = generate_mertens_y(y, k, primes, pi);
 
   // Hard special leaves satisfy m > p and
   // p^3 * m <= x, hence p^4 < x.
   int64_t x14 = iroot<4>(x);
   int64_t xy = x / y;
-  Vector<int64_t> mertens_y = generate_mertens_y(y, k, primes, pi);
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -176,6 +174,7 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
+  using UT = typename pstd::make_unsigned<T>::type;
   UT sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
