@@ -13,7 +13,9 @@
 ///        and x/p^3 < m <= y, where p is a prime and m is a prime
 ///        or a product of 2 distinct primes, all greater than p.
 ///        They are computed together with the hard special leaves
-///        using the hyperbola method.
+///        using the hyperbola method. The hyperbola terms at
+///        positions < p^2 only need pi[x] lookups, they are
+///        computed by the C1 formula in AC.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -31,10 +33,9 @@
 #include <int128_t.hpp>
 #include <LoadBalancerS2.hpp>
 #include <macros.hpp>
-#include <min.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
-#include <RelaxedAtomic.hpp>
+#include <Vector.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -166,19 +167,8 @@ T D_OpenMP(T x,
   // Hard special leaves satisfy m > p and
   // p^3 * m <= x, hence p^4 < x.
   int64_t x14 = iroot<4>(x);
-  int64_t pi_sqrty = pi[isqrt(y)];
   int64_t xy = x / y;
-  int64_t pi_root3_xy = pi[iroot<3>(xy)];
-
-  // mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n)
-  // Only entries with primes[b]^2 <= y < primes[b]^3 are used.
-  Vector<int64_t> mertens_y(pi_sqrty + 1);
-  int64_t mertens = 1 - pi[y] + pi_sqrty;
-  for (int64_t b = pi_sqrty; b > k; b--)
-  {
-    mertens_y[b] = mertens;
-    mertens += pi[y / primes[b]] - b - 1;
-  }
+  Vector<int64_t> mertens_y = generate_mertens_y(y, k, primes, pi);
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -187,7 +177,6 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
-  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_root3_xy) + 1);
   UT sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
@@ -200,14 +189,6 @@ T D_OpenMP(T x,
       thread.sum = D_thread<T>(x, y, xy, k, x14, primes, pi, factor, mertens_y, thread);
       thread.stop_time = get_time();
       sum += thread.sum;
-    }
-
-    // Compute hyperbola terms with positions < prime^2 once per prime.
-    // These terms are skipped by the segmented kernels.
-    for (int64_t b = min_b++; b <= pi_sqrty; b = min_b++)
-    {
-      UT xp = UT(x / primes[b]);
-      sum += easy_hyperbola_sum(xp, primes[b], b, y, mertens_y[b], primes, pi);
     }
   }
 

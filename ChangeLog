@@ -1,7 +1,9 @@
-Changes in primecount-9.0, 2026-10-25
+Changes in primecount-9.0, 2026-10-27
 
 * Gourdon: Compute part of D using a weighted Dirichlet hyperbola algorithm,
   cancelling prime-leaf sieve queries and computing the former C1 easy leaves.
+* AC_*.hpp: New C1_hyperbola formula computes D's hyperbola terms at
+  positions < p^2 using the segmented pi(x) lookup table.
 * D: Bound the outer prime loops by x^(1/4) and skip factor-table scans
   when the remaining cofactors must be prime.
 * Gourdon: Share one PiTable between Sigma, Phi0, AC and D, and extract

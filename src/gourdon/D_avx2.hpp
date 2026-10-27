@@ -18,7 +18,9 @@
 ///        and x/p^3 < m <= y, where p is a prime and m is a prime
 ///        or a product of 2 distinct primes, all greater than p.
 ///        They are computed together with the hard special leaves
-///        using the hyperbola method.
+///        using the hyperbola method. The hyperbola terms at
+///        positions < p^2 only need pi[x] lookups, they are
+///        computed by the C1 formula in AC.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf

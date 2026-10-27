@@ -12,6 +12,7 @@
 #include <gourdon.hpp>
 #include <generate_primes.hpp>
 #include <imath.hpp>
+#include <min.hpp>
 #include <PiTable.hpp>
 #include <Vector.hpp>
 
@@ -54,28 +55,28 @@ std::array<D_formula_params, 69> test_cases =
   { 100000, 276, 7, 0 },
   { 1000000, 207, 8, 2465 },
   { 1000000, 101, 8, 2465 },
-  { 1000000, 1000, 8, 11215 },
+  { 1000000, 1000, 8, 2440 },
   { 10000000, 485, 8, 132692 },
   { 10000000, 216, 8, 112667 },
-  { 10000000, 3010, 8, 199723 },
+  { 10000000, 3010, 8, 103933 },
   { 100000000, 1131, 8, 2413042 },
   { 100000000, 465, 8, 2141021 },
-  { 100000000, 9744, 8, 2542718 },
+  { 100000000, 9744, 8, 1578792 },
   { 1000000000, 2619, 8, 30871820 },
   { 1000000000, 1001, 8, 30228636 },
-  { 1000000000, 31000, 8, 27700392 },
+  { 1000000000, 31000, 8, 18587418 },
   { 10000000000, 6029, 8, 351726346 },
   { 10000000000, 2155, 8, 365911138 },
-  { 10000000000, 99084, 8, 279536758 },
+  { 10000000000, 99084, 8, 193456936 },
   { 100000000000, 13825, 8, 3738964518 },
   { 100000000000, 4642, 8, 4018018477 },
-  { 100000000000, 315588, 8, 2648288971 },
-  { 1000000000000, 76500, 8, 32914684646 },
+  { 100000000000, 315588, 8, 1878639143 },
+  { 1000000000000, 76500, 8, 32757868104 },
   { 1000000000000, 10001, 8, 42262337684 },
-  { 1000000000000, 1000000, 8, 25185974064 },
-  { 10000000000000, 241615, 8, 307179531887 },
-  { 100000000000000, 660067, 8, 2902060663462 },
-  { 1000000000000000, 1724700, 8, 27502746342885 },
+  { 1000000000000, 1000000, 8, 17868718449 },
+  { 10000000000000, 241615, 8, 303456143864 },
+  { 100000000000000, 660067, 8, 2869550596058 },
+  { 1000000000000000, 1724700, 8, 27197301173564 },
   // Small inputs, including y = 1
   { 2, 1, 0, 0 },
   { 3, 1, 0, 0 },
@@ -87,20 +88,20 @@ std::array<D_formula_params, 69> test_cases =
   { 352842, 528, 8, 0 },
   { 352843, 528, 8, 93 },
   { 352844, 528, 8, 93 },
-  { 352842, 529, 8, 1617 },
-  { 352843, 529, 8, 1618 },
-  { 352844, 529, 8, 1618 },
-  { 352842, 530, 8, 1617 },
-  { 352843, 530, 8, 1618 },
-  { 352844, 530, 8, 1618 },
+  { 352842, 529, 8, 0 },
+  { 352843, 529, 8, 93 },
+  { 352844, 529, 8, 93 },
+  { 352842, 530, 8, 0 },
+  { 352843, 530, 8, 182 },
+  { 352844, 530, 8, 182 },
   // y = sqrt(x) and its neighbors
-  { 1000000, 999, 8, 11215 },
-  { 100000000, 9999, 8, 2528919 },
-  { 100000000, 10000, 8, 2528919 },
-  { 148035889, 12167, 8, 4040900 },
-  { 148035890, 12167, 8, 4040900 },
-  { 148048055, 12167, 8, 4041242 },
-  { 148048056, 12167, 8, 4041242 },
+  { 1000000, 999, 8, 2440 },
+  { 100000000, 9999, 8, 1572881 },
+  { 100000000, 10000, 8, 1574066 },
+  { 148035889, 12167, 8, 2388463 },
+  { 148035890, 12167, 8, 2388463 },
+  { 148048055, 12167, 8, 2388691 },
+  { 148048056, 12167, 8, 2388691 },
   // Prime fourth powers with the minimum y
   { 707280, 90, 8, 953 },
   { 707281, 90, 8, 953 },
@@ -120,6 +121,48 @@ void check(bool OK)
     std::exit(1);
 }
 
+/// The hyperbola terms at positions < p^2 of the leaves
+/// x/(p*y) < m <= y, these are computed by AC's C1 formula.
+/// Brute force using phi(t, b - 1) and the Moebius prefix
+/// M(t) = sum_{n <= t, lpf(n) > p} mu(n).
+///
+int64_t C1_reference(int64_t xp,
+                     int64_t y,
+                     int64_t prime,
+                     int64_t b,
+                     const Vector<uint32_t>& lpf,
+                     const Vector<int8_t>& mu)
+{
+  int64_t square = prime * prime;
+  int64_t xpy = xp / y;
+  int64_t sqrt_xp = isqrt(xp);
+  Vector<int64_t> mertens(y + 1);
+  mertens[0] = 0;
+
+  for (int64_t n = 1; n <= y; n++)
+    mertens[n] = mertens[n - 1] + (lpf[n] > prime ? mu[n] : 0);
+
+  int64_t sum = 0;
+  auto add = [&](int64_t position, int64_t value) {
+    if (position < square)
+      sum += value;
+  };
+
+  add(sqrt_xp, mertens[sqrt_xp] * phi(sqrt_xp, b - 1));
+  add(xpy, -mertens[y] * phi(xpy, b - 1));
+
+  // Only n > xp / p^2 have positions xp / n < p^2
+  for (int64_t n = max(xpy, xp / square) + 1; n <= sqrt_xp; n++)
+    if (lpf[n] >= prime)
+    {
+      int64_t c = lpf[n] > prime ? mu[n] : 0;
+      int64_t t = xp / n;
+      add(t, -(mertens[t] + c * phi(t, b - 1)));
+    }
+
+  return sum;
+}
+
 int64_t D_reference(int64_t x, int64_t y, int64_t k)
 {
   auto primes = generate_primes<uint32_t>(y);
@@ -134,7 +177,8 @@ int64_t D_reference(int64_t x, int64_t y, int64_t k)
     if (prime > max_prime) break;
 
     // Primes with x/p^3 < y and sqrt(x/p) < y < p^3 also
-    // include their easy leaves (AC does not compute them).
+    // include their easy leaves, except for the hyperbola
+    // terms at positions < p^2 (AC's C1 formula).
     int64_t xp = x / prime;
     bool easy_leaves = prime * prime <= y &&
                         xp / (prime * prime) < y &&
@@ -147,6 +191,9 @@ int64_t D_reference(int64_t x, int64_t y, int64_t k)
           prime * m > y &&
           (easy_leaves || x / (prime * m) >= prime * prime))
         sum -= mu[m] * phi(x / (prime * m), b - 1);
+
+    if (easy_leaves)
+      sum -= C1_reference(xp, y, prime, b, lpf, mu);
   }
 
   return sum;

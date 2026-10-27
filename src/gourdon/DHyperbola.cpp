@@ -30,6 +30,33 @@ namespace {
 
 using namespace primecount;
 
+/// Sum pi(xp / primes[j]) for i <= j <= last
+template <typename T, typename Primes>
+ALWAYS_INLINE T sum_pi(T xp,
+                       int64_t i,
+                       int64_t last,
+                       const Primes& primes,
+                       const PiTable& pi)
+{
+  T sum = 0;
+
+  // Unroll loop to increase instruction level parallelism
+  for (; i + 3 <= last; i += 4)
+  {
+    int64_t xpq0 = fast_div64(xp, primes[i]);
+    int64_t xpq1 = fast_div64(xp, primes[i + 1]);
+    int64_t xpq2 = fast_div64(xp, primes[i + 2]);
+    int64_t xpq3 = fast_div64(xp, primes[i + 3]);
+    sum += pi[xpq0] + pi[xpq1] + pi[xpq2] + pi[xpq3];
+  }
+
+  NO_UNROLL_LOOP
+  for (; i <= last; i++)
+    sum += pi[fast_div64(xp, primes[i])];
+
+  return sum;
+}
+
 /// Returns phi(t, b - 1) - M(t) for p = primes[b] and p^2 <= t < p^3,
 /// where M(t) = sum_{n <= t, lpf(n) > p} mu(n).
 ///
@@ -101,7 +128,9 @@ T sum_phi_minus_mertens(T xp,
 ///   - sum_{L < n <= H} (a(n) + c(n)) Phi(X/n),
 /// where a(n) = [lpf(n) >= p], c(n) = mu(n)[lpf(n) > p] and
 /// E = Phi - M. Only terms whose position (Phi argument) is in
-/// [max(low, p^2), high[ are computed here, see easy_hyperbola_sum().
+/// [max(low, p^2), high[ are computed here, the terms at positions
+/// < p^2 are computed by the C1 formula, see C1_hyperbola() in
+/// AC_default.hpp.
 /// Prime n have a(n) + c(n) = 0, the other n (events) are q*r with
 /// p <= q <= r and a(n) + c(n) = 1 if q = p or q = r, else 2. Events
 /// are processed in decreasing n, as count() and the incremental

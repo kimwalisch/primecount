@@ -1,8 +1,9 @@
 ///
 /// @file  DHyperbola.cpp
 /// @brief Check the hyperbola terms of D and their query order in each
-///        sieve segment against dense partial-sieve and Moebius
-///        prefixes.
+///        sieve segment, and the hyperbola terms of AC's C1 formula
+///        in each SegmentedPiTable segment, against dense
+///        partial-sieve and Moebius prefixes.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -10,12 +11,14 @@
 /// file in the top level directory.
 ///
 
+#include <AC_default.hpp>
 #include <DHyperbola.hpp>
 #include <generate_primes.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <PiTable.hpp>
+#include <SegmentedPiTable.hpp>
 #include <SemiprimeEventSorter.hpp>
 #include <sieve/Sieve.hpp>
 #include <Vector.hpp>
@@ -37,7 +40,7 @@ struct Input
 // If x/p^3 < y, the leaves x/(p*y) < m <= y also include easy
 // leaves, the last such inputs have sqrt(x/p) < p^2. If x/p^3 = y,
 // they are all hard leaves and x/(p*y) = p^2.
-const Array<Input, 25> inputs = {{
+const Array<Input, 30> inputs = {{
   { 280370, 530, 23, false },
   { 280899, 530, 23, false },
   { 559681, 1058, 23, true },
@@ -62,7 +65,15 @@ const Array<Input, 25> inputs = {{
   { 250000, 600, 23, true },
   { 200000, 900, 23, true },
   { 150000, 1800, 23, true },
-  { 700000, 1500, 29, true }
+  { 700000, 1500, 29, true },
+  // C1 boundaries: x/(p*y) = 384 and sqrt(x/p) = 512 are segment
+  // boundaries, sqrt(x/p) = 523 and x/p^3 = 509 are prime and
+  // sqrt(x/p) = p^2 for x/p = p^4.
+  { 230400, 600, 23, true },
+  { 262144, 600, 23, true },
+  { 273529, 600, 23, true },
+  { 269261, 600, 23, true },
+  { 279841, 600, 23, true }
 }};
 
 void check(bool ok, const char* message)
@@ -101,7 +112,7 @@ struct Reference
 template <typename T, typename Prime>
 void check_segments(const Input& input, int64_t size,
                     const Reference& reference, const Vector<int64_t>& expected,
-                    int64_t easy, const Vector<Prime>& primes, const PiTable& pi)
+                    const Vector<Prime>& primes, const PiTable& pi)
 {
   int64_t p = input.prime;
   int64_t b = pi[p];
@@ -110,12 +121,6 @@ void check_segments(const Input& input, int64_t size,
   int64_t mertens_y = reference.mertens[input.y];
   Vector<SemiprimeEvent> events;
   SemiprimeEventSorter sorter;
-
-  if (input.easy_leaves)
-  {
-    T actual = easy_hyperbola_sum(T(input.xp), p, b, input.y, mertens_y, primes, pi);
-    check(actual == T(easy), "Easy hyperbola terms differ");
-  }
 
   for (int64_t low = 0; low < stop; low += size)
   {
@@ -139,6 +144,40 @@ void check_segments(const Input& input, int64_t size,
   }
 }
 
+/// AC's C1 formula computes the hyperbola terms at
+/// positions < p^2 in each segment [low, high[.
+template <typename T, typename XP, typename Prime>
+void check_c1_segments(const Input& input, int64_t size,
+                       const Vector<int64_t>& easy, int64_t mertens_y,
+                       const Vector<Prime>& primes, const PiTable& pi)
+{
+  int64_t p = input.prime;
+  int64_t b = pi[p];
+  int64_t stop = easy.size() - 1;
+  T x = T(input.xp) * p;
+  SegmentedPiTable segmentedPi;
+
+  for (int64_t low = 0; low < stop; low += size)
+  {
+    int64_t high = min(low + size, stop);
+    segmentedPi.init(low, high, stop);
+    T xlow = x / max(low, 1);
+    T xhigh = x / high;
+
+    T actual = C1_hyperbola(xlow, xhigh, XP(input.xp), input.y, b, mertens_y,
+                            primes, pi, segmentedPi);
+    int64_t wanted = easy[high] - easy[low];
+    if (actual != T(wanted))
+    {
+      std::cerr << "C1 hyperbola segment differs: p=" << p << ", low=" << low
+                << ", high=" << high << ", integer bytes=" << sizeof(T)
+                << ", xp bytes=" << sizeof(XP) << ", prime bytes="
+                << sizeof(Prime) << '\n';
+      std::exit(1);
+    }
+  }
+}
+
 void check(const Input& input)
 {
   int64_t p = input.prime;
@@ -147,8 +186,8 @@ void check(const Input& input)
   int64_t sqrt_xp = isqrt(input.xp);
   int64_t xy = input.xp * p / input.y;
 
-  // hyperbola_sum() tests the prime itself, whereas D.cpp
-  // computes the easy hyperbola terms for p > (x/y)^(1/3).
+  // hyperbola_sum() tests the prime itself, whereas AC computes
+  // the C1 hyperbola terms for p > (x/y)^(1/3).
   check(sqrt_xp < input.y && input.y < square * p &&
         square <= input.y &&
         input.easy_leaves == (xpy < square) &&
@@ -163,11 +202,13 @@ void check(const Input& input)
     expected[i] = 0;
 
   // Accumulate independent dense events at their exact query positions.
-  // The hyperbola terms below p^2 are computed once per prime.
-  int64_t easy = 0;
+  // The hyperbola terms below p^2 are computed by AC's C1 formula.
+  Vector<int64_t> easy(stop + 1);
+  for (int64_t i = 0; i <= stop; i++)
+    easy[i] = 0;
   auto add = [&](int64_t position, int64_t value) {
     if (position < square)
-      easy += value;
+      easy[position + 1] += value;
     else
       expected[position + 1] += value;
   };
@@ -188,11 +229,17 @@ void check(const Input& input)
     if (reference.lpf[m] > p)
       direct -= reference.mu[m] * reference.phi[input.xp / m];
   for (int64_t i = 1; i <= stop; i++)
+  {
     expected[i] += expected[i - 1];
-  check(expected.back() + easy == direct, "Hyperbola sum differs from original Moebius leaves");
+    easy[i] += easy[i - 1];
+  }
+  check(expected.back() + easy.back() == direct, "Hyperbola sum differs from original Moebius leaves");
 
   PiTable pi(input.y, 1);
   auto primes32 = pi.get_primes<uint32_t>(input.y, 1);
+  int64_t mertens_y = reference.mertens[input.y];
+  Vector<int64_t> mertens = generate_mertens_y(input.y, 8, primes32, pi);
+  check(mertens[pi[p]] == mertens_y, "generate_mertens_y() differs");
 
   #if defined(HAVE_INT128_T)
     Vector<int64_t> primes64(primes32.size());
@@ -202,15 +249,27 @@ void check(const Input& input)
 
   for (int64_t size : { 240, 1680 })
   {
-    check_segments<uint64_t>(input, size, reference, expected, easy, primes32, pi);
+    check_segments<uint64_t>(input, size, reference, expected, primes32, pi);
     #if defined(HAVE_INT128_T)
-      check_segments<uint128_t>(input, size, reference, expected, easy, primes32, pi);
-      check_segments<uint128_t>(input, size, reference, expected, easy, primes64, pi);
+      check_segments<uint128_t>(input, size, reference, expected, primes32, pi);
+      check_segments<uint128_t>(input, size, reference, expected, primes64, pi);
     #endif
+  }
+
+  if (input.easy_leaves)
+  {
+    for (int64_t size : { 128, 1024 })
+    {
+      check_c1_segments<uint64_t, uint64_t>(input, size, easy, mertens_y, primes32, pi);
+      #if defined(HAVE_INT128_T)
+        check_c1_segments<uint128_t, uint64_t>(input, size, easy, mertens_y, primes32, pi);
+        check_c1_segments<uint128_t, uint128_t>(input, size, easy, mertens_y, primes64, pi);
+      #endif
+    }
   }
 }
 
-/// D.cpp computes easy_hyperbola_sum() for all primes
+/// AC computes C1_hyperbola() for all primes
 /// (x/y)^(1/3) < p <= sqrt(y), hence these primes must use
 /// the hyperbola method and have easy leaves.
 void check_easy_primes()
@@ -223,7 +282,7 @@ void check_easy_primes()
       {
         int64_t xp = x / p;
         check(isqrt(xp) < y && p * p > y / p && xp / y < p * p,
-              "Prime without easy hyperbola terms");
+              "C1 prime without hyperbola terms below p^2");
       }
     }
   }

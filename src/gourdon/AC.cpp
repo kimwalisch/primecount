@@ -10,9 +10,12 @@
 ///        primecount's C formula differs from Gourdon's original
 ///        C formula: the easy special leaves with
 ///        (x/y)^(1/3) < p <= sqrt(y) and x/p^3 < m <= y
-///        are computed as part of the D formula using the hyperbola
-///        method. Here p is a prime and m is a prime or a product
-///        of 2 distinct primes, all greater than p.
+///        are computed together with the hard special leaves using
+///        the hyperbola method. Here p is a prime and m is a prime
+///        or a product of 2 distinct primes, all greater than p.
+///        The C1 formula computes the hyperbola terms at positions
+///        < p^2, which only need pi[x] lookups, and the D formula
+///        computes the other hyperbola terms.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -105,7 +108,11 @@ int64_t AC(int64_t x,
 
   // The A and C2 formulas use the primes p > sqrt(y) and
   // q <= sqrt(x / p), hence all primes are <= sqrt(x / sqrt(y)).
+  // The C1 formula uses the primes q <= sqrt(x / p) < p^2,
+  // hence p > x^(1/5) and q <= sqrt(x / (x^(1/5) + 1)).
   int64_t max_prime = min(isqrt(x / isqrt(y)), y);
+  int64_t max_c1_prime = min(isqrt(x / (iroot<5>(x) + 1)), y);
+  max_prime = max(max_prime, max_c1_prime);
   int64_t x_star = get_x_star_gourdon(x, y);
   auto primes = pi.get_primes<uint32_t>(max_prime, threads);
   int64_t sum = AC_OpenMP((uint64_t) x, y, k, x_star, pi, primes, threads, is_print);
@@ -139,7 +146,11 @@ int128_t AC(int128_t x,
 
   // The A and C2 formulas use the primes p > sqrt(y) and
   // q <= sqrt(x / p), hence all primes are <= sqrt(x / sqrt(y)).
+  // The C1 formula uses the primes q <= sqrt(x / p) < p^2,
+  // hence p > x^(1/5) and q <= sqrt(x / (x^(1/5) + 1)).
   int64_t max_prime = min(isqrt(x / isqrt(y)), y);
+  int64_t max_c1_prime = min(isqrt(x / (iroot<5>(x) + 1)), y);
+  max_prime = max(max_prime, max_c1_prime);
   int64_t x_star = get_x_star_gourdon(x, y);
   int128_t sum;
 
