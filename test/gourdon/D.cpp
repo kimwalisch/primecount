@@ -10,6 +10,10 @@
 
 #include <primecount.hpp>
 #include <gourdon.hpp>
+#include <generate_primes.hpp>
+#include <imath.hpp>
+#include <PiTable.hpp>
+#include <Vector.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -31,7 +35,7 @@ struct D_formula_params
 /// 1) The default alpha
 /// 2) The minimum alpha=1
 /// 3) The maximum alpha
-std::array<D_formula_params, 65> test_cases =
+std::array<D_formula_params, 69> test_cases =
 {{
   { 10, 3, 0, 0 },
   { 10, 3, 0, 0 },
@@ -50,28 +54,28 @@ std::array<D_formula_params, 65> test_cases =
   { 100000, 276, 7, 0 },
   { 1000000, 207, 8, 2465 },
   { 1000000, 101, 8, 2465 },
-  { 1000000, 1000, 8, 1246 },
+  { 1000000, 1000, 8, 2440 },
   { 10000000, 485, 8, 132692 },
   { 10000000, 216, 8, 112667 },
-  { 10000000, 3010, 8, 67108 },
+  { 10000000, 3010, 8, 103933 },
   { 100000000, 1131, 8, 2413042 },
   { 100000000, 465, 8, 2141021 },
-  { 100000000, 9744, 8, 1204711 },
+  { 100000000, 9744, 8, 1578792 },
   { 1000000000, 2619, 8, 30871820 },
   { 1000000000, 1001, 8, 30228636 },
-  { 1000000000, 31000, 8, 15033924 },
+  { 1000000000, 31000, 8, 18587418 },
   { 10000000000, 6029, 8, 351726346 },
   { 10000000000, 2155, 8, 365911138 },
-  { 10000000000, 99084, 8, 158874158 },
+  { 10000000000, 99084, 8, 193456936 },
   { 100000000000, 13825, 8, 3738964518 },
   { 100000000000, 4642, 8, 4018018477 },
-  { 100000000000, 315588, 8, 1556900264 },
-  { 1000000000000, 76500, 8, 32856197918 },
+  { 100000000000, 315588, 8, 1878639143 },
+  { 1000000000000, 76500, 8, 32757868104 },
   { 1000000000000, 10001, 8, 42262337684 },
-  { 1000000000000, 1000000, 8, 14815465134 },
-  { 10000000000000, 241615, 8, 304739017794 },
-  { 100000000000000, 660067, 8, 2876480095175 },
-  { 1000000000000000, 1724700, 8, 27248002319287 },
+  { 1000000000000, 1000000, 8, 17868718449 },
+  { 10000000000000, 241615, 8, 303456143864 },
+  { 100000000000000, 660067, 8, 2869550596058 },
+  { 1000000000000000, 1724700, 8, 27197301173564 },
   // Small inputs, including y = 1
   { 2, 1, 0, 0 },
   { 3, 1, 0, 0 },
@@ -87,12 +91,16 @@ std::array<D_formula_params, 65> test_cases =
   { 352843, 529, 8, 93 },
   { 352844, 529, 8, 93 },
   { 352842, 530, 8, 0 },
-  { 352843, 530, 8, 93 },
-  { 352844, 530, 8, 93 },
+  { 352843, 530, 8, 182 },
+  { 352844, 530, 8, 182 },
   // y = sqrt(x) and its neighbors
-  { 1000000, 999, 8, 1246 },
-  { 100000000, 9999, 8, 1181490 },
-  { 100000000, 10000, 8, 1181490 },
+  { 1000000, 999, 8, 2440 },
+  { 100000000, 9999, 8, 1572881 },
+  { 100000000, 10000, 8, 1574066 },
+  { 148035889, 12167, 8, 2388463 },
+  { 148035890, 12167, 8, 2388463 },
+  { 148048055, 12167, 8, 2388691 },
+  { 148048056, 12167, 8, 2388691 },
   // Prime fourth powers with the minimum y
   { 707280, 90, 8, 953 },
   { 707281, 90, 8, 953 },
@@ -112,20 +120,200 @@ void check(bool OK)
     std::exit(1);
 }
 
+/// The hyperbola terms at positions < p^2 of the leaves
+/// x/(p*y) < m <= y, these are computed by AC's C1 formula.
+/// Brute force using phi(t, b - 1) and the Moebius prefix
+/// M(t) = sum_{n <= t, lpf(n) > p} mu(n).
+///
+int64_t C1_reference(int64_t xp,
+                     int64_t y,
+                     int64_t prime,
+                     int64_t b,
+                     const Vector<uint32_t>& lpf,
+                     const Vector<int8_t>& mu)
+{
+  int64_t square = prime * prime;
+  int64_t xpy = xp / y;
+  int64_t sqrt_xp = isqrt(xp);
+  Vector<int64_t> mertens(y + 1);
+  mertens[0] = 0;
+
+  for (int64_t n = 1; n <= y; n++)
+    mertens[n] = mertens[n - 1] + (lpf[n] > prime ? mu[n] : 0);
+
+  int64_t sum = 0;
+  auto add = [&](int64_t position, int64_t value) {
+    if (position < square)
+      sum += value;
+  };
+
+  add(sqrt_xp, mertens[sqrt_xp] * phi(sqrt_xp, b - 1));
+  add(xpy, -mertens[y] * phi(xpy, b - 1));
+
+  // Only n > xp / p^2 >= xp / y have positions xp / n < p^2
+  for (int64_t n = xp / square + 1; n <= sqrt_xp; n++)
+    if (lpf[n] >= prime)
+    {
+      int64_t c = lpf[n] > prime ? mu[n] : 0;
+      int64_t t = xp / n;
+      add(t, -(mertens[t] + c * phi(t, b - 1)));
+    }
+
+  return sum;
+}
+
+int64_t D_reference(int64_t x, int64_t y, int64_t k)
+{
+  auto primes = generate_primes<uint32_t>(y);
+  auto lpf = generate_lpf(y, primes);
+  auto mu = generate_moebius(y, primes);
+  int64_t max_prime = iroot<4>(x);
+  int64_t sum = 0;
+
+  for (std::size_t b = k + 1; b < primes.size(); b++)
+  {
+    int64_t prime = primes[b];
+    if (prime > max_prime) break;
+
+    // Primes with x/p^3 < y and sqrt(x/p) < y < p^3 also
+    // include their easy leaves, except for the hyperbola
+    // terms at positions < p^2 (AC's C1 formula).
+    int64_t xp = x / prime;
+    bool easy_leaves = prime * prime <= y &&
+                        xp / (prime * prime) < y &&
+                        prime * prime > y / prime &&
+                        isqrt(xp) < y;
+
+    for (int64_t m = prime + 1; m <= y; m++)
+      if (mu[m] != 0 &&
+          lpf[m] > prime &&
+          prime * m > y &&
+          (easy_leaves || x / (prime * m) >= prime * prime))
+        sum -= mu[m] * phi(x / (prime * m), b - 1);
+
+    if (easy_leaves)
+      sum -= C1_reference(xp, y, prime, b, lpf, mu);
+  }
+
+  return sum;
+}
+
 int main()
 {
   int threads = get_num_threads();
 
   for (const D_formula_params& params : test_cases)
   {
-    int64_t res = D(params.x, params.y, params.k, threads);
+    const PiTable pi(params.y, threads);
+    int64_t res = D(params.x, params.y, params.k, pi, threads);
     std::cout << "D_64bit(" << params.x << ", " << params.y << ", " << params.k << ") = " << res;
     check(res == params.res);
 
     #ifdef HAVE_INT128_T
-      int128_t res2 = D((int128_t) params.x, params.y, params.k, threads);
+      int128_t res2 = D((int128_t) params.x, params.y, params.k, pi, threads);
       std::cout << "D_128bit(" << params.x << ", " << params.y << ", " << params.k << ") = " << res2;
       check(res2 == params.res);
+    #endif
+  }
+
+  // Check the transition from square-free to prime leaves, including
+  // the first square-free composite m beyond each prime squared.
+  const Array<int64_t, 5> primes = { 23, 29, 31, 37, 41 };
+
+  for (std::size_t i = 0; i + 2 < primes.size(); i++)
+  {
+    int64_t p = primes[i];
+    int64_t q = primes[i + 1];
+    int64_t r = primes[i + 2];
+
+    for (int64_t center : { ipow<5>(p), p * p * p * q * r })
+      for (int64_t delta : { -1, 0, 1 })
+        for (int64_t y : { p * p - 1, p * p, p * p + 1,
+                           q * r - 1, q * r, q * r + 1 })
+        {
+          int64_t x = center + delta;
+          int64_t expected = D_reference(x, y, 8);
+          const PiTable pi(y, threads);
+          int64_t res = D(x, y, 8, pi, threads);
+          std::cout << "D boundary(" << x << ", " << y << ") = " << res;
+          check(res == expected);
+
+          #ifdef HAVE_INT128_T
+            int128_t res2 = D((int128_t) x, y, 8, pi, threads);
+            check(res2 == expected);
+          #endif
+        }
+  }
+
+  struct HyperbolaParams
+  {
+    int64_t xp;
+    int64_t y;
+    int64_t prime;
+    int hyperbola;
+  };
+
+  // Hyperbola method: 0 = not used, 1 = also easy leaves (x/p^3 < y),
+  // 2 = hard leaves only (x/p^3 >= y).
+  // Include x/(p*y) = p^2, x/(p*y) = sqrt(x/p), prime/semiprime
+  // endpoints, and boundaries immediately below, at, and above
+  // multiples of the sieve alignment.
+  const Array<HyperbolaParams, 30> hyperbola_cases = {{
+    { 279840, 530, 23, 1 },
+    { 279841, 530, 23, 1 },
+    { 280370, 530, 23, 2 },
+    { 280898, 530, 23, 2 },
+    { 280899, 530, 23, 2 },
+    { 280900, 530, 23, 0 },
+    { 280901, 530, 23, 0 },
+    { 559681, 1058, 23, 1 },
+    { 559682, 1058, 23, 2 },
+    { 560739, 1058, 23, 2 },
+    { 560740, 1058, 23, 2 },
+    { 7653060, 12167, 23, 0 },
+    { 292140, 541, 23, 2 },
+    { 807302, 899, 23, 2 },
+    { 864017, 1200, 23, 2 },
+    { 396017, 720, 23, 2 },
+    { 444888, 767, 23, 2 },
+    { 444889, 767, 23, 2 },
+    { 444890, 767, 23, 2 },
+    { 707280, 941, 23, 2 },
+    { 707281, 941, 23, 2 },
+    { 707282, 941, 23, 2 },
+    { 808200, 999, 23, 2 },
+    { 808201, 999, 23, 2 },
+    { 808202, 999, 23, 2 },
+    { 921599, 1200, 23, 2 },
+    { 921600, 1200, 23, 2 },
+    { 921601, 1200, 23, 2 },
+    { 1414562, 1682, 29, 2 },
+    { 1416243, 1682, 29, 2 }
+  }};
+
+  for (const HyperbolaParams& params : hyperbola_cases)
+  {
+    int64_t p = params.prime;
+    int64_t x = params.xp * p;
+    int64_t sqrt_xp = isqrt(params.xp);
+    int hyperbola = 0;
+
+    if (p * p <= params.y &&
+        sqrt_xp < params.y &&
+        params.y < p * p * p)
+      hyperbola = (params.xp / (p * p) < params.y) ? 1 : 2;
+
+    std::cout << "D hyperbola " << params.hyperbola << " ("
+              << x << ", " << params.y << ")";
+    check(hyperbola == params.hyperbola &&
+          iroot<3>(x) < params.y &&
+          params.y <= isqrt(x));
+    int64_t expected = D_reference(x, params.y, 8);
+    const PiTable pi(params.y, threads);
+    check(D(x, params.y, 8, pi, threads) == expected);
+
+    #ifdef HAVE_INT128_T
+      check(D((int128_t) x, params.y, 8, pi, threads) == expected);
     #endif
   }
 

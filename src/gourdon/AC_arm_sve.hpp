@@ -3,6 +3,15 @@
 /// @brief ARM SVE vector division implementation of the A + C
 ///        formulas in Xavier Gourdon's prime counting algorithm.
 ///
+///        primecount's C formula differs from Gourdon's original
+///        C formula: for the primes (x/y)^(1/3) < p <= sqrt(y),
+///        the easy special leaves x/p^3 < m <= y are computed
+///        together with the hard special leaves x/(p*y) < m <= x/p^3
+///        using the hyperbola method, where m is a prime or a
+///        product of 2 distinct primes > p. The C1 formula computes
+///        the hyperbola terms at positions < p^2, which only need
+///        pi[x] lookups, and the D formula computes the other terms.
+///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
@@ -17,6 +26,7 @@
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
+#include <generate_primes.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
@@ -50,30 +60,30 @@ ALWAYS_INLINE T sum_pi_arm_sve(XP xp,
   T sum = 0;
   uint64_t size = last - i + 1;
   uint64_t lanes = svcntd();
-  svbool_t first = svptrue_pat_b64(SV_VL1);
+  svbool_t lane0_pg = svptrue_pat_b64(SV_VL1);
   svbool_t all = svptrue_b64();
 
   NO_UNROLL_LOOP
   for (; i + lanes * 2 <= last + 1; i += lanes * 2)
   {
-    svuint64_t q0 = sve_div64(all, xp, &primes[i]);
-    svuint64_t q1 = sve_div64(all, xp, &primes[i + lanes]);
+    svuint64_t xpq0 = sve_div64(all, xp, &primes[i]);
+    svuint64_t xpq1 = sve_div64(all, xp, &primes[i + lanes]);
 
     NO_UNROLL_LOOP
     for (uint64_t j = 0; j < lanes; j += 2)
     {
-      uint64_t q00 = svlastb_u64(first, q0);
-      uint64_t q01 = svlasta_u64(first, q0);
-      uint64_t q10 = svlastb_u64(first, q1);
-      uint64_t q11 = svlasta_u64(first, q1);
+      uint64_t xpq00 = svlastb_u64(lane0_pg, xpq0);
+      uint64_t xpq01 = svlasta_u64(lane0_pg, xpq0);
+      uint64_t xpq10 = svlastb_u64(lane0_pg, xpq1);
+      uint64_t xpq11 = svlasta_u64(lane0_pg, xpq1);
 
-      sum += segmentedPi[q00] +
-             segmentedPi[q01] +
-             segmentedPi[q10] +
-             segmentedPi[q11];
+      sum += segmentedPi[xpq00] +
+             segmentedPi[xpq01] +
+             segmentedPi[xpq10] +
+             segmentedPi[xpq11];
 
-      q0 = svext_u64(q0, q0, 2);
-      q1 = svext_u64(q1, q1, 2);
+      xpq0 = svext_u64(xpq0, xpq0, 2);
+      xpq1 = svext_u64(xpq1, xpq1, 2);
     }
   }
 
@@ -81,15 +91,15 @@ ALWAYS_INLINE T sum_pi_arm_sve(XP xp,
   for (; i <= last; i += lanes)
   {
     svbool_t pg = svwhilelt_b64(i, last + 1);
-    svuint64_t q = sve_div64(pg, xp, &primes[i]);
+    svuint64_t xpq = sve_div64(pg, xp, &primes[i]);
     uint64_t active = svcntp_b64(pg, pg);
 
     NO_UNROLL_LOOP
     for (uint64_t j = 0; j < active; j++)
     {
-      uint64_t quotient = svlastb_u64(first, q);
+      uint64_t quotient = svlastb_u64(lane0_pg, xpq);
       sum += segmentedPi[quotient];
-      q = svext_u64(q, q, 1);
+      xpq = svext_u64(xpq, xpq, 1);
     }
   }
 
@@ -139,13 +149,10 @@ T A_arm_sve(T xlow,
 
 /// Compute the 1st part of the C formula using ARM SVE.
 /// pi[(x/y)^(1/3)] < b <= pi[sqrt(y)]
-/// x / (primes[b] * m) <= y
-/// low <= x / (primes[b] * m) < high
+/// low <= position < high
 ///
-/// m is either a prime or a product of 2 distinct primes.
-/// In both cases m is coprime to the first b primes and m <= y.
-/// Since each prime factor of m is > (x / y)^(1/3) and y <= sqrt(x),
-/// m cannot contain more than 2 prime factors.
+/// This computes the hyperbola terms at positions < p^2,
+/// see C1_hyperbola() in AC_default.hpp.
 ///
 template <typename T,
           typename XP,
@@ -153,63 +160,58 @@ template <typename T,
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   PRIMECOUNT_TARGET_ATTRIBUTE("+sve")
 #endif
-T C1_arm_sve(T xlow,
-             T xhigh,
-             XP xp,
-             uint64_t b,
-             uint64_t y,
-             const Primes& primes,
-             const PiTable& pi,
-             const SegmentedPiTable& segmentedPi)
+T C1_hyperbola_arm_sve(T xlow,
+                       T xhigh,
+                       XP xp,
+                       uint64_t y,
+                       uint64_t b,
+                       int64_t mertens_y,
+                       const Primes& primes,
+                       const PiTable& pi,
+                       const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
+  uint64_t low = segmentedPi.low();
+  uint64_t high = segmentedPi.high();
   uint64_t prime = primes[b];
-  uint64_t max_m = min(xlow / prime, y);
-  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
-  uint64_t min_m = fast_div64(xhigh, prime);
-  min_m = max3(min_m, x_div_prime3, y / prime);
+  uint64_t square = prime * prime;
+  uint64_t xpy = fast_div64(xp, y);
 
-  if (min_m >= max_m)
-    return 0;
+  if (xpy >= low && xpy < high)
+  {
+    uint64_t phi_xpy = segmentedPi[xpy] - b + 2;
+    sum -= T(mertens_y) * phi_xpy;
+  }
 
-  // m = primes[i]
-  uint64_t min_i = pi[min_m] + 1;
-  uint64_t max_i = pi[max_m];
+  // If H >= p^2, only the L term has a position < p^2
+  uint64_t x_div_prime3 = fast_div64(xp, square);
+
+  if (x_div_prime3 >= square)
+    return sum;
+
+  uint64_t sqrt_xp = isqrt(xp);
+
+  if (sqrt_xp >= low && sqrt_xp < high)
+  {
+    // M(H) * phi(H, b - 1) = (1 - u) * (u + 2)
+    // = 2 - u * (u + 1) with u = pi[H] - b
+    uint64_t u = segmentedPi[sqrt_xp] - b;
+    sum += 2 - T(u) * (u + 1);
+  }
+
+  // Primes X/p^2 < q <= H with low <= X/q < high
+  uint64_t min_q = max(fast_div64(xhigh, prime), x_div_prime3);
+  uint64_t max_q = min(xlow / prime, sqrt_xp);
+
+  if (min_q >= max_q)
+    return sum;
+
+  uint64_t min_i = pi[min_q] + 1;
+  uint64_t max_i = pi[max_q];
 
   // for (i = min_i; i <= max_i; i++)
-  //   sum -= segmentedPi[xp / primes[i]] - b + 2;
-  sum -= sum_pi_arm_sve<T, 1>(xp, min_i, max_i, b, primes, segmentedPi);
-
-  // m = primes[i] * primes[j]
-  uint64_t max_q = isqrt(max_m);
-
-  if (prime < max_q)
-  {
-    uint64_t min_q_i = b + 1;
-    uint64_t max_q_i = pi[max_q];
-
-    NO_UNROLL_LOOP
-    for (uint64_t i = min_q_i; i <= max_q_i; i++)
-    {
-      uint64_t q = primes[i];
-      uint64_t min_r = max(q, min_m / q);
-      uint64_t max_r = max_m / q;
-
-      if (min_r >= max_r)
-        continue;
-
-      uint64_t min_j = pi[min_r] + 1;
-      uint64_t max_j = pi[max_r];
-      XP xpq = xp / q;
-
-      // for (j = min_j; j <= max_j; j++)
-      //   sum += segmentedPi[xpq / primes[j]] - b + 2;
-      if (xpq <= pstd::numeric_limits<uint64_t>::max())
-        sum += sum_pi_arm_sve<T, 1>(uint64_t(xpq), min_j, max_j, b, primes, segmentedPi);
-      else
-        sum += sum_pi_arm_sve<T, 1>(xpq, min_j, max_j, b, primes, segmentedPi);
-    }
-  }
+  //   sum += segmentedPi[xp / primes[i]] * 2 - 2 * b + 1;
+  sum += sum_pi_arm_sve<T, 2>(xp, min_i, max_i, 2 * b + 1, primes, segmentedPi);
 
   return sum;
 }
@@ -331,10 +333,11 @@ T AC_OpenMP_arm_sve(T x,
   INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
   int64_t pi_y = pi[y];
-  int64_t max_clustered_global = primes[pi_y];
+  int64_t max_clustered_global = pi.prev_prime(y);
   int64_t sqrty = isqrt(y);
   int64_t pi_sqrty = pi[sqrty];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
+  auto mertens_y = generate_mertens_y(y, k, primes, pi);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -380,6 +383,7 @@ T AC_OpenMP_arm_sve(T x,
         T xlow = x / max(low, 1);
         T xhigh = x / high;
 
+        // The C1 hyperbola terms have positions < p^2 <= y
         if (low < y)
         {
           int64_t min_c1 = max(k, pi_root3_xy);
@@ -392,18 +396,17 @@ T AC_OpenMP_arm_sve(T x,
             T xp = x / primes[b];
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum -= C1_arm_sve(xlow, xhigh, uint64_t(xp), b, y, primes, pi, segmentedPi);
+              sum += C1_hyperbola_arm_sve(xlow, xhigh, uint64_t(xp), y, b, mertens_y[b], primes, pi, segmentedPi);
             else
-              sum -= C1_arm_sve(xlow, xhigh, xp, b, y, primes, pi, segmentedPi);
+              sum += C1_hyperbola_arm_sve(xlow, xhigh, xp, y, b, mertens_y[b], primes, pi, segmentedPi);
           }
         }
 
         int64_t min_c2 = max3(k, pi_root3_xy, pi_sqrty);
-        int64_t min_c2_prime = min(xhigh / y, x_star);
+        int64_t min_c2_prime = min(xy / high, x_star);
         min_c2 = max3(min_c2, pi_sqrt_low, pi[min_c2_prime]) + 1;
         int64_t x_div_high2 = fast_div64(xhigh, high);
-        int64_t min_a = min(x_div_high2, x13);
-        min_a = pi[max(x_star, min_a)] + 1;
+        int64_t min_a = pi[in_between(x_star, x_div_high2, x13)] + 1;
 
         // Upper bound of A & C2 formulas:
         // x / (p * q) >= low

@@ -3,9 +3,18 @@
 /// @brief Setup and dispatch for the A + C formulas (easy special
 ///        leaves) in Xavier Gourdon's prime counting algorithm.
 ///
-///        This file prepares the prime count lookup table and primes,
-///        dispatches to the scalar or SIMD implementation, and
-///        prints algorithm details and the result when requested.
+///        This file prepares the primes, dispatches to the scalar or
+///        SIMD implementation, and prints algorithm details and the
+///        result when requested.
+///
+///        primecount's C formula differs from Gourdon's original
+///        C formula: for the primes (x/y)^(1/3) < p <= sqrt(y),
+///        the easy special leaves x/p^3 < m <= y are computed
+///        together with the hard special leaves x/(p*y) < m <= x/p^3
+///        using the hyperbola method, where m is a prime or a
+///        product of 2 distinct primes > p. The C1 formula computes
+///        the hyperbola terms at positions < p^2, which only need
+///        pi[x] lookups, and the D formula computes the other terms.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -16,7 +25,9 @@
 #include <primecount-internal.hpp>
 #include <cpu_arch_macros.hpp>
 #include <gourdon.hpp>
+#include <imath.hpp>
 #include <int128_t.hpp>
+#include <min.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
 
@@ -78,9 +89,11 @@ namespace primecount {
 int64_t AC(int64_t x,
            int64_t y,
            int64_t k,
+           const PiTable& pi,
            int threads,
            bool is_print)
 {
+  ASSERT(uint64_t(y) < pi.size());
   double time;
 
   if (is_print)
@@ -92,15 +105,13 @@ int64_t AC(int64_t x,
     time = get_time();
   }
 
+  // The A, C1 and C2 formulas use the primes q <= sqrt(x / p)
+  // only for p > x^(1/5): A uses p > x^(1/4), C2 uses p^2 > y
+  // and p^3 > x / y, C1 uses q only if sqrt(x / p) < p^2.
+  int64_t x15 = iroot<5>(x);
+  int64_t max_prime = min(isqrt(x / (x15 + 1)), y);
   int64_t x_star = get_x_star_gourdon(x, y);
-
-  // The A and C algorithms use the large PiTable only
-  // for initialization. The inner-most loops of those
-  // algorithms use the small SegmentedPiTable instead
-  // which fits into the CPU's cache.
-  PiTable pi(y, threads);
-
-  auto primes = pi.get_primes<uint32_t>(y, threads);
+  auto primes = pi.get_primes<uint32_t>(max_prime, threads);
   int64_t sum = AC_OpenMP((uint64_t) x, y, k, x_star, pi, primes, threads, is_print);
 
   if (is_print)
@@ -114,9 +125,11 @@ int64_t AC(int64_t x,
 int128_t AC(int128_t x,
             int64_t y,
             int64_t k,
+            const PiTable& pi,
             int threads,
             bool is_print)
 {
+  ASSERT(uint64_t(y) < pi.size());
   double time;
 
   if (is_print)
@@ -128,24 +141,23 @@ int128_t AC(int128_t x,
     time = get_time();
   }
 
+  // The A, C1 and C2 formulas use the primes q <= sqrt(x / p)
+  // only for p > x^(1/5): A uses p > x^(1/4), C2 uses p^2 > y
+  // and p^3 > x / y, C1 uses q only if sqrt(x / p) < p^2.
+  int64_t x15 = (int64_t) iroot<5>(x);
+  int64_t max_prime = min(isqrt(x / (x15 + 1)), y);
   int64_t x_star = get_x_star_gourdon(x, y);
-
-  // The A and C algorithms use the large PiTable only
-  // for initialization. The inner-most loops of those
-  // algorithms use the small SegmentedPiTable instead
-  // which fits into the CPU's cache.
-  PiTable pi(y, threads);
   int128_t sum;
 
   // uses less memory
-  if (y <= pstd::numeric_limits<uint32_t>::max())
+  if (max_prime <= pstd::numeric_limits<uint32_t>::max())
   {
-    auto primes = pi.get_primes<uint32_t>(y, threads);
+    auto primes = pi.get_primes<uint32_t>(max_prime, threads);
     sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
   else
   {
-    auto primes = pi.get_primes<int64_t>(y, threads);
+    auto primes = pi.get_primes<int64_t>(max_prime, threads);
     sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
 

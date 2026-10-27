@@ -209,6 +209,21 @@ void PiTable::init_count(uint64_t low,
   }
 }
 
+/// Returns the largest prime <= x, or 0 if x < 2
+int64_t PiTable::prev_prime(uint64_t x) const
+{
+  int64_t count = operator[](x);
+
+  if (count == 0)
+    return 0;
+
+  // x is prime if PrimePi(x - 1) < PrimePi(x)
+  while (operator[](x - 1) == count)
+    x--;
+
+  return x;
+}
+
 /// Returns a vector with the primes <= x.
 /// The primes vector uses 1-indexing i.e. primes[1] = 2.
 ///

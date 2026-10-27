@@ -21,6 +21,7 @@
 #include <imath.hpp>
 #include <macros.hpp>
 #include <PhiTiny.hpp>
+#include <PiTable.hpp>
 #include <print.hpp>
 
 #include <stdint.h>
@@ -71,11 +72,12 @@ int64_t pi_gourdon_64(int64_t x,
   // the CPU and memory (i.e. the B algorithm) we would overload
   // both the CPU and operating system.
 
-  int64_t sigma = Sigma(x, y, threads, is_print);
-  int64_t phi0 = Phi0(x, y, k, threads, is_print);
-  int64_t ac = AC(x, y, k, threads, is_print);
+  const PiTable pi(y, threads);
+  int64_t sigma = Sigma(x, y, pi, threads, is_print);
+  int64_t phi0 = Phi0(x, y, k, pi, threads, is_print);
+  int64_t ac = AC(x, y, k, pi, threads, is_print);
   int64_t b = B(x, y, threads, is_print);
-  int64_t d = D(x, y, k, threads, is_print);
+  int64_t d = D(x, y, k, pi, threads, is_print);
   int64_t pix = ac - b + d + phi0 + sigma;
 
   verify_pix("pi_gourdon_64", x, pix);
@@ -133,11 +135,12 @@ int128_t pi_gourdon_128(int128_t x,
   // the CPU and memory (i.e. the B algorithm) we would overload
   // both the CPU and operating system.
 
-  int128_t sigma = Sigma(x, y, threads, is_print);
-  int128_t phi0 = Phi0(x, y, k, threads, is_print);
-  int128_t ac = AC(x, y, k, threads, is_print);
+  const PiTable pi(y, threads);
+  int128_t sigma = Sigma(x, y, pi, threads, is_print);
+  int128_t phi0 = Phi0(x, y, k, pi, threads, is_print);
+  int128_t ac = AC(x, y, k, pi, threads, is_print);
   int128_t b = B(x, y, threads, is_print);
-  int128_t d = D(x, y, k, threads, is_print);
+  int128_t d = D(x, y, k, pi, threads, is_print);
   int128_t pix = ac - b + d + phi0 + sigma;
 
   verify_pix("pi_gourdon_128", x, pix);

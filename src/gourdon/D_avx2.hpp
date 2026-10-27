@@ -2,8 +2,23 @@
 /// @file  D_avx2.hpp
 /// @brief AVX2 implementation of the D formula (hard special leaves)
 ///        in Xavier Gourdon's prime counting algorithm. This algorithm
-///        is identical to D_thread_default() in D_default.hpp except for
-///        AVX2 vectorization of index filtering.
+///        is identical to D_thread_default() in D_default.hpp except
+///        for AVX2 vectorization of index filtering.
+///
+///        For performance it is important that all AVX2 helper
+///        functions are inlined by the compiler. We achieve this
+///        by annotating all AVX2 helper functions using the
+///        ALWAYS_INLINE macro and PRIMECOUNT_TARGET_ATTRIBUTE with
+///        the same CPU instruction sets as PRIMECOUNT_TARGET_ENTRY.
+///
+///        primecount's D formula differs from Gourdon's original
+///        D formula: for the primes (x/y)^(1/3) < p <= sqrt(y),
+///        the hard special leaves x/(p*y) < m <= x/p^3 are computed
+///        together with the easy special leaves x/p^3 < m <= y
+///        of Gourdon's C formula using the hyperbola method, where
+///        m is a prime or a product of 2 distinct primes > p. The
+///        hyperbola terms at positions < p^2 only need pi[x]
+///        lookups, they are computed by the C1 formula in AC.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf
@@ -17,6 +32,9 @@
 
 #ifndef D_AVX2_HPP
 #define D_AVX2_HPP
+
+#include "DHyperbola.hpp"
+#include "SemiprimeEventSorter.hpp"
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
@@ -110,6 +128,7 @@ T D_thread_avx2(T x,
                 const Primes& primes,
                 const PiTable& pi,
                 const FactorTable& factor,
+                const Vector<int64_t>& mertens_y,
                 ThreadData& thread)
 {
   T sum = 0;
@@ -129,6 +148,8 @@ T D_thread_avx2(T x,
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
+  Vector<SemiprimeEvent> events;
+  SemiprimeEventSorter sorter;
   thread.init_time = get_time();
 
   INDETERMINATE Array<uint32_t, 128> m_indexes32;
@@ -157,13 +178,23 @@ T D_thread_avx2(T x,
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t xp_low = min(fast_div(xp, low1), y);
-      int64_t xp_high = min(fast_div(xp, high), y);
-      int64_t min_m = max(xp_high, y / prime);
-      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
+      int64_t divisor = max(low1, prime * prime);
+      int64_t min_m = min(fast_div(xp, high), y);
+      int64_t max_m = min(fast_div(xp, divisor), y);
 
       if (prime >= max_m)
         goto next_segment;
+
+      // A composite m with all prime factors > prime exceeds
+      // prime^2 and all hyperbola terms have positions < y.
+      // Hence the remaining leaves are composed of 2 primes.
+      if (max_m <= prime * prime && low >= y)
+        break;
+
+      if (low < y)
+        sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b],
+                             mertens_y[b], primes, pi, sieve,
+                             events, sorter, max_m);
 
       min_m = FactorTable::to_index(min_m);
       max_m = FactorTable::to_index(max_m);
@@ -311,7 +342,7 @@ T D_thread_avx2(T x,
       sieve.cross_off_count(prime, b);
     }
 
-    // For pi_sqrty < b <= pi_x14
+    // For the remaining b <= pi_x14
     // Find all special leaves in the current segment
     // that are composed of 2 primes:
     // low <= x / (primes[b] * primes[l]) < high
@@ -319,10 +350,10 @@ T D_thread_avx2(T x,
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t xp_low = min(fast_div(xp, low1), y);
+      int64_t divisor = max(low1, prime * prime);
       int64_t xp_high = min(fast_div(xp, high), y);
       int64_t min_m = max(xp_high, prime);
-      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
+      int64_t max_m = min(fast_div(xp, divisor), y);
       int64_t l = pi[max_m];
 
       if (prime >= primes[l])

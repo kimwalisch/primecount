@@ -68,6 +68,9 @@ public:
     return count + popcnt64(bits & bitmask);
   }
 
+  /// Returns the largest prime <= x, or 0 if x < 2
+  int64_t prev_prime(uint64_t x) const;
+
   /// Returns a vector with the primes <= x.
   /// The primes vector uses 1-indexing i.e. primes[1] = 2.
   ///

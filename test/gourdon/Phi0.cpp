@@ -10,6 +10,7 @@
 
 #include <primecount.hpp>
 #include <gourdon.hpp>
+#include <PiTable.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -87,12 +88,13 @@ int main()
 
   for (const Phi0_formula_params& params : test_cases)
   {
-    int64_t res = Phi0(params.x, params.y, params.k, threads);
+    const PiTable pi(params.y, threads);
+    int64_t res = Phi0(params.x, params.y, params.k, pi, threads);
     std::cout << "Phi0_64bit(" << params.x << ", " << params.y << ", " << params.k << ") = " << res;
     check(res == params.res);
 
     #ifdef HAVE_INT128_T
-      int128_t res2 = Phi0((int128_t) params.x, params.y, params.k, threads);
+      int128_t res2 = Phi0((int128_t) params.x, params.y, params.k, pi, threads);
       std::cout << "Phi0_128bit(" << params.x << ", " << params.y << ", " << params.k << ") = " << res2;
       check(res2 == params.res);
     #endif
@@ -104,7 +106,8 @@ int main()
     int128_t x = ((int128_t) 10000000000) * ((int128_t) 10000000000);
     int64_t y = 100615703;
     int64_t k = 8;
-    int128_t res1 = Phi0(x, y, k, threads);
+    const PiTable pi(y, threads);
+    int128_t res1 = Phi0(x, y, k, pi, threads);
     int128_t res2 = 3742831815767347;
 
     std::cout << "Phi0_128bit(" << x << ", " << y << ", " << k << ") = " << res1;

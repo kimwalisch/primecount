@@ -11,6 +11,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <FactorTable.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
@@ -201,26 +202,36 @@ double get_alpha_gourdon(maxint_t x, double alpha)
   // Use default alpha
   if (alpha < 1)
   {
-    // For x <= 10^11 our default formula does not
+    // For x <= 3e11 our default formula does not
     // generate good alpha values. Hence we use
     // another formula optimized for small values.
-    if (x <= 1e11)
+    if (x <= 3e11)
     {
-      double a = 0.078173;
+      double a = 0.156346;
       double b = 1;
       double logx = std::log((double) x);
       alpha = a * logx + b;
     }
     else
     {
-      double a = 0.007888745747017503;
-      double b = -0.7610431057184933;
-      double c = 25.74106177417062;
-      double d = -288.9823576050215;
+      double a = 0.021078652642134526;
+      double b = -2.0334362096119443;
+      double c = 67.97860096709101;
+      double d = -758.0125793471067;
       double logx = std::log((double) x);
       double logx2 = logx * logx;
       double logx3 = logx * logx * logx;
       alpha = a * logx3 + b * logx2 + c * logx + d;
+
+      // If y = x^(1/3) * alpha is too large for 16-bit factor
+      // table entries, D uses 32-bit factor table entries
+      // which doubles its memory usage. Hence we reduce alpha
+      // by 30%, according to our benchmarks this causes a
+      // slowdown of at most 3%.
+      double x13 = (double) iroot<3>(x);
+      int64_t y = (int64_t) (x13 * alpha);
+      if (y > FactorTable<uint16_t>::max())
+        alpha *= 0.7;
     }
   }
 

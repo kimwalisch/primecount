@@ -19,9 +19,10 @@
 #include <gourdon.hpp>
 #include <primecount-internal.hpp>
 #include <PhiTiny.hpp>
-#include <generate_primes.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <macros.hpp>
+#include <PiTable.hpp>
 #include <print.hpp>
 #include <Vector.hpp>
 
@@ -60,13 +61,14 @@ T Phi0_thread(T x,
 }
 
 /// Parallel computation of the ordinary leaves.
-/// Run time: O(y * log(log(y)))
+/// Run time: O(y)
 /// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
 X Phi0_OpenMP(X x,
               Y y,
               int64_t k,
+              const PiTable& pi,
               int threads)
 {
   // These load balancing settings work well on my
@@ -74,7 +76,7 @@ X Phi0_OpenMP(X x,
   int64_t thread_threshold = (int64_t) 1e6;
   threads = ideal_num_threads(y, threads, thread_threshold);
 
-  auto primes = generate_primes<Y>(y);
+  auto primes = pi.get_primes<Y>(y, threads);
   int64_t pi_y = primes.size() - 1;
   X phi0 = phi_tiny(x, k);
 
@@ -95,9 +97,11 @@ namespace primecount {
 int64_t Phi0(int64_t x,
              int64_t y,
              int64_t k,
+             const PiTable& pi,
              int threads,
              bool is_print)
 {
+  ASSERT(uint64_t(y) < pi.size());
   double time;
 
   if (is_print)
@@ -108,7 +112,7 @@ int64_t Phi0(int64_t x,
     time = get_time();
   }
 
-  int64_t phi0 = Phi0_OpenMP(x, (uint32_t) y, k, threads);
+  int64_t phi0 = Phi0_OpenMP(x, (uint32_t) y, k, pi, threads);
 
   if (is_print)
     print("Phi0", phi0, time);
@@ -121,9 +125,11 @@ int64_t Phi0(int64_t x,
 int128_t Phi0(int128_t x,
               int64_t y,
               int64_t k,
+              const PiTable& pi,
               int threads,
               bool is_print)
 {
+  ASSERT(uint64_t(y) < pi.size());
   double time;
 
   if (is_print)
@@ -138,9 +144,9 @@ int128_t Phi0(int128_t x,
 
   // uses less memory
   if (y <= pstd::numeric_limits<uint32_t>::max())
-    phi0 = Phi0_OpenMP(x, (uint32_t) y, k, threads);
+    phi0 = Phi0_OpenMP(x, (uint32_t) y, k, pi, threads);
   else
-    phi0 = Phi0_OpenMP(x, y, k, threads);
+    phi0 = Phi0_OpenMP(x, y, k, pi, threads);
 
   if (is_print)
     print("Phi0", phi0, time);

@@ -10,6 +10,7 @@
 
 #include <primecount.hpp>
 #include <gourdon.hpp>
+#include <PiTable.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -88,12 +89,13 @@ int main()
 
   for (const Sigma_formula_params& params : test_cases)
   {
-    int64_t res = Sigma(params.x, params.y, threads);
+    const PiTable pi(params.y, threads);
+    int64_t res = Sigma(params.x, params.y, pi, threads);
     std::cout << "Sigma_64bit(" << params.x << ", " << params.y << ") = " << res;
     check(res == params.res);
 
     #ifdef HAVE_INT128_T
-      int128_t res2 = Sigma((int128_t) params.x, params.y, threads);
+      int128_t res2 = Sigma((int128_t) params.x, params.y, pi, threads);
       std::cout << "Sigma_128bit(" << params.x << ", " << params.y << ") = " << res2;
       check(res2 == params.res);
     #endif
@@ -104,7 +106,8 @@ int main()
     // Test Sigma(1e20) and compare with known correct value
     int128_t x = ((int128_t) 10000000000) * ((int128_t) 10000000000);
     int64_t y = 100615703;
-    int128_t res1 = Sigma(x, y, threads);
+    const PiTable pi(y, threads);
+    int128_t res1 = Sigma(x, y, pi, threads);
     int128_t res2 = 49384621237095387;
 
     std::cout << "Sigma(" << x << ", " << y << ") = " << res1;

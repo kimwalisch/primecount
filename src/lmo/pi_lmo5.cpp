@@ -78,6 +78,7 @@ int64_t S2(int64_t x,
   {
     // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
+    int64_t x_high = max(x / high, y);
     int64_t low1 = max(low, 1);
 
     sieve.pre_sieve(primes, k, low, high);
@@ -91,7 +92,7 @@ int64_t S2(int64_t x,
     for (; b <= pi_sqrty; b++)
     {
       int64_t prime = primes[b];
-      int64_t min_m = max(x / (prime * high), y / prime);
+      int64_t min_m = x_high / prime;
       int64_t max_m = min(x / (prime * low1), y);
 
       if (prime >= max_m)
