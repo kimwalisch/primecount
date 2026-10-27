@@ -38,8 +38,8 @@ struct Input
 };
 
 // If x/p^3 < y, the leaves x/(p*y) < m <= y also include easy
-// leaves, the last such inputs have sqrt(x/p) < p^2. If x/p^3 = y,
-// they are all hard leaves and x/(p*y) = p^2.
+// leaves, the inputs from 279840 on have sqrt(x/p) <= p^2. If
+// x/p^3 = y, they are all hard leaves and x/(p*y) = p^2.
 const Array<Input, 30> inputs = {{
   { 280370, 530, 23, false },
   { 280899, 530, 23, false },

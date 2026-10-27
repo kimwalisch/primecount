@@ -13,15 +13,13 @@
 ///        the same CPU instruction sets as PRIMECOUNT_TARGET_ENTRY.
 ///
 ///        primecount's D formula differs from Gourdon's original
-///        D formula: it also computes part of the easy special
-///        leaves that belong to the C formula in Gourdon's paper.
-///        These are the leaves with (x/y)^(1/3) < p <= sqrt(y)
-///        and x/p^3 < m <= y, where p is a prime and m is a prime
-///        or a product of 2 distinct primes, all greater than p.
-///        They are computed together with the hard special leaves
-///        using the hyperbola method. The hyperbola terms at
-///        positions < p^2 only need pi[x] lookups, they are
-///        computed by the C1 formula in AC.
+///        D formula: for the primes (x/y)^(1/3) < p <= sqrt(y),
+///        the hard special leaves x/(p*y) < m <= x/p^3 are computed
+///        together with the easy special leaves x/p^3 < m <= y
+///        of Gourdon's C formula using the hyperbola method, where
+///        m is a prime or a product of 2 distinct primes > p. The
+///        hyperbola terms at positions < p^2 only need pi[x]
+///        lookups, they are computed by the C1 formula in AC.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf

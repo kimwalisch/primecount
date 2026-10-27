@@ -17,14 +17,13 @@
 ///        improves scaling on systems with many CPU cores.
 ///
 ///        primecount's C formula differs from Gourdon's original
-///        C formula: the easy special leaves with
-///        (x/y)^(1/3) < p <= sqrt(y) and x/p^3 < m <= y
-///        are computed together with the hard special leaves using
-///        the hyperbola method. Here p is a prime and m is a prime
-///        or a product of 2 distinct primes, all greater than p.
-///        The C1 formula computes the hyperbola terms at positions
-///        < p^2, which only need pi[x] lookups, and the D formula
-///        computes the other hyperbola terms.
+///        C formula: for the primes (x/y)^(1/3) < p <= sqrt(y),
+///        the easy special leaves x/p^3 < m <= y are computed
+///        together with the hard special leaves x/(p*y) < m <= x/p^3
+///        using the hyperbola method, where m is a prime or a
+///        product of 2 distinct primes > p. The C1 formula computes
+///        the hyperbola terms at positions < p^2, which only need
+///        pi[x] lookups, and the D formula computes the other terms.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.pdf
@@ -141,10 +140,11 @@ T A(T xlow,
 ///
 /// The leaves x/(p*y) < m <= y of these primes p, which include
 /// the easy leaves x/p^3 < m <= y, are computed using the
-/// hyperbola method, see DHyperbola.hpp. Here we compute the
-/// hyperbola terms at positions < p^2 for X = x/p, L = X/y and
-/// H = sqrt(X): -M(y) * phi(L, b - 1) and, if H < p^2,
-/// M(H) * phi(H, b - 1) and E(X/q) for the primes X/p^2 < q <= H.
+/// hyperbola method, see hyperbola_sum() in DHyperbola.cpp.
+/// Here we compute the hyperbola terms at positions < p^2 for
+/// X = x/p, L = X/y and H = sqrt(X): -M(y) * phi(L, b - 1) and,
+/// if H < p^2, M(H) * phi(H, b - 1) and E(X/q) for the primes
+/// X/p^2 < q <= H.
 /// For p <= t < p^2: phi(t, b - 1) = pi[t] - b + 2,
 /// M(t) = 1 - (pi[t] - b) and E(t) = 2 * pi[t] - 2b + 1.
 ///

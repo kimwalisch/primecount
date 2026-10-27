@@ -1,9 +1,9 @@
 ///
 /// @file  DHyperbola.cpp
 /// @brief Compute the special leaves x/(p*m) with x/(p*y) < m <= y
-///        of Gourdon's D formula using a weighted Dirichlet hyperbola
-///        rearrangement, in which the sieve queries of the prime
-///        leaves cancel.
+///        of primecount's D formula using a weighted Dirichlet
+///        hyperbola rearrangement, in which the sieve queries of the
+///        prime leaves cancel.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 /// Copyright (C) 2026 Chopper Lin, <choppers@126.com>
