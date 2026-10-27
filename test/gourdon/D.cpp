@@ -12,7 +12,6 @@
 #include <gourdon.hpp>
 #include <generate_primes.hpp>
 #include <imath.hpp>
-#include <min.hpp>
 #include <PiTable.hpp>
 #include <Vector.hpp>
 
@@ -151,8 +150,8 @@ int64_t C1_reference(int64_t xp,
   add(sqrt_xp, mertens[sqrt_xp] * phi(sqrt_xp, b - 1));
   add(xpy, -mertens[y] * phi(xpy, b - 1));
 
-  // Only n > xp / p^2 have positions xp / n < p^2
-  for (int64_t n = max(xpy, xp / square) + 1; n <= sqrt_xp; n++)
+  // Only n > xp / p^2 >= xp / y have positions xp / n < p^2
+  for (int64_t n = xp / square + 1; n <= sqrt_xp; n++)
     if (lpf[n] >= prime)
     {
       int64_t c = lpf[n] > prime ? mu[n] : 0;

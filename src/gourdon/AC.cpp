@@ -106,13 +106,11 @@ int64_t AC(int64_t x,
     time = get_time();
   }
 
-  // The A and C2 formulas use the primes p > sqrt(y) and
-  // q <= sqrt(x / p), hence all primes are <= sqrt(x / sqrt(y)).
-  // The C1 formula uses the primes q <= sqrt(x / p) < p^2,
-  // hence p > x^(1/5) and q <= sqrt(x / (x^(1/5) + 1)).
-  int64_t max_prime = min(isqrt(x / isqrt(y)), y);
-  int64_t max_c1_prime = min(isqrt(x / (iroot<5>(x) + 1)), y);
-  max_prime = max(max_prime, max_c1_prime);
+  // The A, C1 and C2 formulas use the primes q <= sqrt(x / p)
+  // only for p > x^(1/5): A uses p > x^(1/4), C2 uses p^2 > y
+  // and p^3 > x / y, C1 uses q only if sqrt(x / p) < p^2.
+  int64_t x15 = iroot<5>(x);
+  int64_t max_prime = min(isqrt(x / (x15 + 1)), y);
   int64_t x_star = get_x_star_gourdon(x, y);
   auto primes = pi.get_primes<uint32_t>(max_prime, threads);
   int64_t sum = AC_OpenMP((uint64_t) x, y, k, x_star, pi, primes, threads, is_print);
@@ -144,13 +142,11 @@ int128_t AC(int128_t x,
     time = get_time();
   }
 
-  // The A and C2 formulas use the primes p > sqrt(y) and
-  // q <= sqrt(x / p), hence all primes are <= sqrt(x / sqrt(y)).
-  // The C1 formula uses the primes q <= sqrt(x / p) < p^2,
-  // hence p > x^(1/5) and q <= sqrt(x / (x^(1/5) + 1)).
-  int64_t max_prime = min(isqrt(x / isqrt(y)), y);
-  int64_t max_c1_prime = min(isqrt(x / (iroot<5>(x) + 1)), y);
-  max_prime = max(max_prime, max_c1_prime);
+  // The A, C1 and C2 formulas use the primes q <= sqrt(x / p)
+  // only for p > x^(1/5): A uses p > x^(1/4), C2 uses p^2 > y
+  // and p^3 > x / y, C1 uses q only if sqrt(x / p) < p^2.
+  int64_t x15 = (int64_t) iroot<5>(x);
+  int64_t max_prime = min(isqrt(x / (x15 + 1)), y);
   int64_t x_star = get_x_star_gourdon(x, y);
   int128_t sum;
 

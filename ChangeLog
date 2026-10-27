@@ -9,7 +9,7 @@ Changes in primecount-9.0, 2026-10-27
 * Gourdon: Share one PiTable between Sigma, Phi0, AC and D, and extract
   Phi0's primes from it instead of sieving them again.
 * AC.cpp: Reduce memory usage by limiting the primes vector to the range
-  required by the A and C2 formulas.
+  required by the A, C1 and C2 formulas.
 * Gourdon: Remove the z parameter and --alpha-y/--alpha-z options;
   use --alpha to tune y.
 * Gourdon: Allow y = sqrt(x) and simplify algorithm bounds.
