@@ -60,30 +60,30 @@ ALWAYS_INLINE T sum_pi_arm_sve(XP xp,
   T sum = 0;
   uint64_t size = last - i + 1;
   uint64_t lanes = svcntd();
-  svbool_t first = svptrue_pat_b64(SV_VL1);
+  svbool_t lane0_pg = svptrue_pat_b64(SV_VL1);
   svbool_t all = svptrue_b64();
 
   NO_UNROLL_LOOP
   for (; i + lanes * 2 <= last + 1; i += lanes * 2)
   {
-    svuint64_t q0 = sve_div64(all, xp, &primes[i]);
-    svuint64_t q1 = sve_div64(all, xp, &primes[i + lanes]);
+    svuint64_t xpq0 = sve_div64(all, xp, &primes[i]);
+    svuint64_t xpq1 = sve_div64(all, xp, &primes[i + lanes]);
 
     NO_UNROLL_LOOP
     for (uint64_t j = 0; j < lanes; j += 2)
     {
-      uint64_t q00 = svlastb_u64(first, q0);
-      uint64_t q01 = svlasta_u64(first, q0);
-      uint64_t q10 = svlastb_u64(first, q1);
-      uint64_t q11 = svlasta_u64(first, q1);
+      uint64_t xpq00 = svlastb_u64(lane0_pg, xpq0);
+      uint64_t xpq01 = svlasta_u64(lane0_pg, xpq0);
+      uint64_t xpq10 = svlastb_u64(lane0_pg, xpq1);
+      uint64_t xpq11 = svlasta_u64(lane0_pg, xpq1);
 
-      sum += segmentedPi[q00] +
-             segmentedPi[q01] +
-             segmentedPi[q10] +
-             segmentedPi[q11];
+      sum += segmentedPi[xpq00] +
+             segmentedPi[xpq01] +
+             segmentedPi[xpq10] +
+             segmentedPi[xpq11];
 
-      q0 = svext_u64(q0, q0, 2);
-      q1 = svext_u64(q1, q1, 2);
+      xpq0 = svext_u64(xpq0, xpq0, 2);
+      xpq1 = svext_u64(xpq1, xpq1, 2);
     }
   }
 
@@ -91,15 +91,15 @@ ALWAYS_INLINE T sum_pi_arm_sve(XP xp,
   for (; i <= last; i += lanes)
   {
     svbool_t pg = svwhilelt_b64(i, last + 1);
-    svuint64_t q = sve_div64(pg, xp, &primes[i]);
+    svuint64_t xpq = sve_div64(pg, xp, &primes[i]);
     uint64_t active = svcntp_b64(pg, pg);
 
     NO_UNROLL_LOOP
     for (uint64_t j = 0; j < active; j++)
     {
-      uint64_t quotient = svlastb_u64(first, q);
+      uint64_t quotient = svlastb_u64(lane0_pg, xpq);
       sum += segmentedPi[quotient];
-      q = svext_u64(q, q, 1);
+      xpq = svext_u64(xpq, xpq, 1);
     }
   }
 

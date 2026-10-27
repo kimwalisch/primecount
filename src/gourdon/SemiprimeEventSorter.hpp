@@ -49,13 +49,13 @@ public:
     ASSERT(min_n < max_n);
     uint64_t first = (min_n + 1) / 240;
     uint64_t last = max_n / 240;
-    uint64_t words64 = last - first + 1;
+    uint64_t word_count = last - first + 1;
     uint64_t count = events.size();
 
     // Fall back to std::sort if the bitmap has more than
     // N * floor(log2(N)) words, which is checked without
     // multiplying.
-    if ((words64 - 1) / count >= ilog2(count))
+    if ((word_count - 1) / count >= ilog2(count))
     {
       std::sort(events.begin(), events.end(), [](const SemiprimeEvent& a,
                                                  const SemiprimeEvent& b) {
@@ -67,8 +67,8 @@ public:
     present_.clear();
     weight1_.clear();
 
-    present_.resize(words64);
-    weight1_.resize(words64);
+    present_.resize(word_count);
+    weight1_.resize(word_count);
 
     std::fill(present_.begin(), present_.end(), 0);
     std::fill(weight1_.begin(), weight1_.end(), 0);
@@ -76,8 +76,8 @@ public:
     // Insert the events into two bitmaps: present_ marks all
     // events and weight1_ marks the events with weight 1.
     // Since all events are coprime to 30, each 64-bit word
-    // covers 240 integers. The bitmaps store m = high - n
-    // instead of n, so that increasing m (word and bit)
+    // covers 240 integers. The bitmaps store offset = high - n
+    // instead of n, so that increasing offset (word and bit)
     // corresponds to decreasing n.
     uint64_t high = (last + 1) * 240;
 
@@ -86,9 +86,9 @@ public:
       uint64_t n = event.n;
       ASSERT(min_n < n && n <= max_n);
       ASSERT(event.weight == 1 || event.weight == 2);
-      uint64_t m = high - n;
-      uint64_t word = m / 240;
-      uint64_t bit = set_bit_[m % 240];
+      uint64_t offset = high - n;
+      uint64_t word = offset / 240;
+      uint64_t bit = set_bit_[offset % 240];
       ASSERT(bit != 0);
       ASSERT((present_[word] & bit) == 0);
       present_[word] |= bit;
@@ -101,9 +101,9 @@ public:
     uint64_t written = 0;
 
     // Read the bitmaps word by word in increasing order of
-    // m, i.e. in decreasing order of n, and write the events
-    // back into the events vector, which is now sorted.
-    for (uint64_t word = 0; word < words64; word++)
+    // offset, i.e. in decreasing order of n, and write the
+    // events back into the events vector in sorted order.
+    for (uint64_t word = 0; word < word_count; word++)
     {
       uint64_t bits = present_[word];
       uint64_t bit_count = popcnt64(bits);
@@ -140,9 +140,9 @@ private:
              uint64_t base,
              uint64_t weight1)
   {
-    int bit = ctz64(bits | (1ull << 63));
-    int64_t n = base - bit_values_[bit];
-    int64_t weight = 2 - ((weight1 >> bit) & 1);
+    int bit_index = ctz64(bits | (1ull << 63));
+    int64_t n = base - bit_values_[bit_index];
+    int64_t weight = 2 - ((weight1 >> bit_index) & 1);
     return SemiprimeEvent{n, weight};
   }
 
