@@ -23,6 +23,7 @@
 #include <macros.hpp>
 
 #include <stdint.h>
+#include <type_traits>
 
 #if defined(_MSC_VER) && \
     (defined(_M_X64) || defined(_M_ARM64)) && \
@@ -136,8 +137,9 @@ inline uint64_t udiv128_64(uint64_t numhi,
 
 /// Divides 64-bit numerators n < 2^63 by a divisor d > 1 using
 /// a multiplication by the divisor's precomputed reciprocal,
-/// based on Ben Joffe's fast floor division algorithm:
-/// https://www.benjoffe.com/fast-floordiv
+/// based on Granlund and Montgomery's "Division by Invariant
+/// Integers using Multiplication" (1994):
+/// https://gmplib.org/~tege/divcnst-pldi94.pdf
 ///
 /// For d > 1, s = floor(log2(d - 1)) and m = ceil(2^(64+s) / d)
 /// the error e = m * d - 2^(64+s) < d <= 2^(s+1). Hence for
@@ -171,7 +173,9 @@ struct FastDivider
 #pragma pack(pop)
 
 /// Requires n <= FastDivider::max()
-ALWAYS_INLINE uint64_t operator/(uint64_t n, const FastDivider& d)
+template <typename T>
+ALWAYS_INLINE typename std::enable_if<pstd::is_same<T, uint64_t>::value, T>::type
+operator/(T n, const FastDivider& d)
 {
   ASSERT(n <= FastDivider::max());
   return mulhi_u64(n, d.multiplier) >> d.shift;
