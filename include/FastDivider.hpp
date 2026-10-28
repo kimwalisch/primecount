@@ -1,13 +1,21 @@
 ///
 /// @file  FastDivider.hpp
-/// @brief Fast division of 64-bit numerators < 2^63 by divisors
-///        that are used many times. FastDivider replaces the
-///        integer division by a multiplication with the divisor's
-///        precomputed reciprocal and a right shift. This is much
-///        faster than the CPU's integer division instruction,
-///        especially on older CPUs. FastDivider is not supported
-///        on 32-bit CPUs, cmake/FastDivider.cmake checks whether
-///        the compiler supports FastDivider.
+/// @brief Fast division of unsigned 64-bit numerators < 2^63 by
+///        unsigned 64-bit divisors that are used many times.
+///        A multiplication and a right shift replace the CPU's
+///        integer division instruction, which is much slower,
+///        especially on older CPUs.
+///
+///        FastDivider uses the round-up reciprocal method
+///        described in these papers:
+///
+///        Robert Alverson, "Integer Division Using Reciprocals",
+///        Proceedings 10th Symposium on Computer Arithmetic, 1991.
+///        https://www.acsel-lab.com/arithmetic/arith10/papers/ARITH10_Alverson.pdf
+///
+///        Torbjorn Granlund and Peter L. Montgomery, "Division by
+///        Invariant Integers using Multiplication", PLDI 1994.
+///        https://gmplib.org/~tege/divcnst-pldi94.pdf
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -136,10 +144,7 @@ inline uint64_t udiv128_64(uint64_t numhi,
 }
 
 /// Divides 64-bit numerators n < 2^63 by a divisor d > 1 using
-/// a multiplication by the divisor's precomputed reciprocal,
-/// based on Granlund and Montgomery's "Division by Invariant
-/// Integers using Multiplication" (1994):
-/// https://gmplib.org/~tege/divcnst-pldi94.pdf
+/// a multiplication by the divisor's precomputed reciprocal.
 ///
 /// For d > 1, s = floor(log2(d - 1)) and m = ceil(2^(64+s) / d)
 /// the error e = m * d - 2^(64+s) < d <= 2^(s+1). Hence for
