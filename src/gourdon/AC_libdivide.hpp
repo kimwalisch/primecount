@@ -2,11 +2,11 @@
 /// @file  AC_libdivide.hpp
 /// @brief Scalar implementation of the A + C formulas in Xavier
 ///        Gourdon's prime counting algorithm that replaces the
-///        integer divisions of 64-bit numerators by multiplications
+///        integer divisions of numerators < 2^63 by multiplications
 ///        with precomputed reciprocals of the primes. This is much
 ///        faster than the CPU's integer division instruction,
-///        especially on older CPUs. Wide numerators use the shared
-///        scalar helpers in AC_default.hpp.
+///        especially on older CPUs. Larger numerators use the
+///        shared scalar helpers in AC_default.hpp.
 ///
 ///        primecount's C formula differs from Gourdon's original
 ///        C formula: for the primes (x/y)^(1/3) < p <= sqrt(y),
@@ -46,18 +46,14 @@ namespace {
 
 using namespace primecount;
 
-/// Divides 64-bit numerators by a prime using a multiplication
-/// by the prime's precomputed reciprocal. Like the sign-selected
-/// multiplier of Ben Joffe's fast floor division algorithm, the
-/// top bit of the numerator selects the multiplier:
+/// Divides 64-bit numerators n < 2^63 by a prime using a
+/// multiplication by the prime's precomputed reciprocal,
+/// based on Ben Joffe's fast floor division algorithm:
 /// https://www.benjoffe.com/fast-floordiv
 ///
 /// For d > 1, s = floor(log2(d - 1)) and m = ceil(2^(64+s) / d)
 /// the error e = m * d - 2^(64+s) < d <= 2^(s+1). Hence for
 /// n < 2^63, n * e < 2^(64+s) and n / d = (n * m) >> (64 + s).
-/// For n >= 2^63 this round-up method is only correct if
-/// e <= 2^s, for the other divisors (about 30%) we use the
-/// round-down multiplier m - 1 with the incremented numerator.
 ///
 /// Packing FastDivider (9 bytes instead of 16) improves the cache
 /// efficiency, this is faster even though some loads are unaligned.
@@ -70,74 +66,22 @@ struct FastDivider
   FastDivider(uint64_t d)
   {
     ASSERT(d > 1);
-    uint64_t shift = ilog2(d - 1);
+    shift = uint8_t(ilog2(d - 1));
     uint128_t pow2 = uint128_t(1) << (64 + shift);
     multiplier = fast_div64(pow2 + d - 1, d);
-    uint128_t error = uint128_t(multiplier) * d - pow2;
-    uint64_t round_down = error > (1ull << shift);
-    more = uint8_t(shift | (round_down << 7));
-  }
-
-  /// LARGE_N = false requires n < 2^63.
-  /// LARGE_N = true requires n < 2^64 - 1.
-  template <bool LARGE_N>
-  ALWAYS_INLINE uint64_t divide(uint64_t n) const
-  {
-    ASSERT(LARGE_N || n < (1ull << 63));
-    ASSERT(n < pstd::numeric_limits<uint64_t>::max());
-
-    uint64_t m = multiplier;
-
-    if (LARGE_N)
-    {
-      uint64_t round_down = (more & 128) != 0;
-      m -= round_down;
-      n += round_down;
-    }
-
-    uint64_t q = uint64_t((uint128_t(n) * m) >> 64);
-    return q >> (more & 63);
   }
 
   uint64_t multiplier;
-  // Bits 0-5: shift, bit 7: round-down
-  uint8_t more;
+  uint8_t shift;
 };
 #pragma pack(pop)
 
-template <typename T,
-          bool LARGE_XP,
-          typename LibdividePrimes>
-ALWAYS_INLINE T sum_pi_fastdiv(uint64_t xp,
-                               uint64_t i,
-                               uint64_t last,
-                               const LibdividePrimes& primes,
-                               const SegmentedPiTable& segmentedPi)
+/// Requires n < 2^63
+ALWAYS_INLINE uint64_t operator/(uint64_t n, const FastDivider& d)
 {
-  T sum = 0;
-
-  // Unroll loop to increase instruction level parallelism
-  for (; i + 3 <= last; i += 4)
-  {
-    uint64_t xpq0 = primes[i].template divide<LARGE_XP>(xp);
-    uint64_t xpq1 = primes[i+1].template divide<LARGE_XP>(xp);
-    uint64_t xpq2 = primes[i+2].template divide<LARGE_XP>(xp);
-    uint64_t xpq3 = primes[i+3].template divide<LARGE_XP>(xp);
-
-    sum += segmentedPi[xpq0] +
-           segmentedPi[xpq1] +
-           segmentedPi[xpq2] +
-           segmentedPi[xpq3];
-  }
-
-  NO_UNROLL_LOOP
-  for (; i <= last; i++)
-  {
-    uint64_t xpq = primes[i].template divide<LARGE_XP>(xp);
-    sum += segmentedPi[xpq];
-  }
-
-  return sum;
+  ASSERT(n < (1ull << 63));
+  uint64_t q = uint64_t((uint128_t(n) * d.multiplier) >> 64);
+  return q >> d.shift;
 }
 
 template <typename T,
@@ -153,21 +97,35 @@ ALWAYS_INLINE T sum_pi_libdivide(uint64_t xp,
   if (i > last)
     return 0;
 
-  T sum;
+  T sum = 0;
   uint64_t size = last - i + 1;
 
-  // The division requires an extra correction
-  // step only for numerators >= 2^63.
-  if (xp < (1ull << 63))
-    sum = sum_pi_fastdiv<T, false>(xp, i, last, primes, segmentedPi);
-  else
-    sum = sum_pi_fastdiv<T, true>(xp, i, last, primes, segmentedPi);
+  // Unroll loop to increase instruction level parallelism
+  for (; i + 3 <= last; i += 4)
+  {
+    uint64_t xpq0 = xp / primes[i];
+    uint64_t xpq1 = xp / primes[i+1];
+    uint64_t xpq2 = xp / primes[i+2];
+    uint64_t xpq3 = xp / primes[i+3];
+
+    sum += segmentedPi[xpq0] +
+           segmentedPi[xpq1] +
+           segmentedPi[xpq2] +
+           segmentedPi[xpq3];
+  }
+
+  NO_UNROLL_LOOP
+  for (; i <= last; i++)
+  {
+    uint64_t xpq = xp / primes[i];
+    sum += segmentedPi[xpq];
+  }
 
   return sum * MULTIPLIER + size * 2 - size * T(b);
 }
 
 /// Compute the A formula using FastDivider.
-/// 64-bit numerator: xp < 2^64 - 1
+/// 64-bit numerator: xp < 2^63
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
@@ -204,7 +162,7 @@ T A_libdivide(T xlow,
 }
 
 /// Compute the 1st part of the C formula using FastDivider.
-/// 64-bit numerator: xp < 2^64 - 1
+/// 64-bit numerator: xp < 2^63
 /// pi[(x/y)^(1/3)] < b <= pi[sqrt(y)]
 /// low <= position < high
 ///
@@ -272,7 +230,7 @@ T C1_hyperbola_libdivide(T xlow,
 /// Compute the 2nd part of the C formula using FastDivider.
 /// Computes the clustered and sparse easy leaves of the C
 /// formula for which the second factor is necessarily prime.
-/// 64-bit numerator: xp < 2^64 - 1
+/// 64-bit numerator: xp < 2^63
 /// pi[sqrt(y)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
@@ -386,8 +344,8 @@ T AC_OpenMP_libdivide(T x,
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   auto mertens_y = generate_mertens_y(y, k, primes, pi);
 
-  // FastDivider requires numerators < 2^64 - 1
-  T max_xp = pstd::numeric_limits<uint64_t>::max() - 1;
+  // FastDivider requires numerators < 2^63
+  T max_xp = pstd::numeric_limits<int64_t>::max();
 
   // Initialize FastDivider vector from primes vector
   Vector<FastDivider> lprimes;
