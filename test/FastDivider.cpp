@@ -9,13 +9,16 @@
 /// file in the top level directory.
 ///
 
-#include <FastDivider.hpp>
 #include <int128_t.hpp>
 
 #include <stdint.h>
 #include <cstdlib>
 #include <iostream>
 #include <random>
+
+#if defined(ENABLE_FASTDIVIDER)
+  #include <FastDivider.hpp>
+#endif
 
 using namespace primecount;
 
@@ -25,6 +28,8 @@ void check(bool OK)
   if (!OK)
     std::exit(1);
 }
+
+#if defined(ENABLE_FASTDIVIDER)
 
 bool check_div(uint64_t n, uint64_t d, const FastDivider& fd)
 {
@@ -84,8 +89,12 @@ bool test_divisor(uint64_t d, std::mt19937_64& gen)
   return true;
 }
 
+#endif
+
 int main()
 {
+#if defined(ENABLE_FASTDIVIDER)
+
   std::random_device rd;
   std::mt19937_64 gen(rd());
 
@@ -149,6 +158,10 @@ int main()
 
   std::cout << "n / FastDivider(d) for random d";
   check(OK);
+
+#else
+  std::cout << "FastDivider is disabled, skipping tests" << std::endl;
+#endif
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;

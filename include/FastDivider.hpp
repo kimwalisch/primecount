@@ -5,7 +5,9 @@
 ///        integer division by a multiplication with the divisor's
 ///        precomputed reciprocal and a right shift. This is much
 ///        faster than the CPU's integer division instruction,
-///        especially on older CPUs.
+///        especially on older CPUs. FastDivider is not supported
+///        on 32-bit CPUs, cmake/FastDivider.cmake checks whether
+///        the compiler supports FastDivider.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -42,19 +44,7 @@ ALWAYS_INLINE uint64_t mulhi64(uint64_t x, uint64_t y)
   return __umulh(x, y);
 
 #else
-  // Portable implementation for 32-bit CPUs, computes
-  // x1 * y1 * 2^64 + (x1 * y0 + x0 * y1) * 2^32 + x0 * y0.
-  uint32_t x0 = uint32_t(x);
-  uint32_t x1 = uint32_t(x >> 32);
-  uint32_t y0 = uint32_t(y);
-  uint32_t y1 = uint32_t(y >> 32);
-  uint64_t x0y0 = x0 * uint64_t(y0);
-  uint64_t x0y1 = x0 * uint64_t(y1);
-  uint64_t x1y0 = x1 * uint64_t(y0);
-  uint64_t x1y1 = x1 * uint64_t(y1);
-  uint64_t mid = x1y0 + (x0y0 >> 32);
-  uint64_t mid_lo = uint32_t(mid) + x0y1;
-  return x1y1 + (mid >> 32) + (mid_lo >> 32);
+  #error "FastDivider.hpp requires int128_t or MSVC's __umulh()"
 #endif
 }
 
