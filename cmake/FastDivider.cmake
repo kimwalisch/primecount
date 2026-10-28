@@ -25,10 +25,8 @@ check_cxx_source_compiles("
     #include <FastDivider.hpp>
     #include <stdint.h>
 
-    using namespace primecount;
-
     int main() {
-        FastDivider divider(7);
+        primecount::FastDivider divider(7);
         uint64_t n = 1000;
         return (n / divider == 142) ? 0 : 1;
     }" PRIMECOUNT_FASTDIVIDER)
