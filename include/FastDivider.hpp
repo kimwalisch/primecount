@@ -33,7 +33,7 @@
 namespace primecount {
 
 /// Returns the upper 64 bits of the 128-bit product x * y
-ALWAYS_INLINE uint64_t mulhi64(uint64_t x, uint64_t y)
+ALWAYS_INLINE uint64_t mulhi_u64(uint64_t x, uint64_t y)
 {
 #if defined(HAVE_INT128_T)
   return uint64_t((uint128_t(x) * y) >> 64);
@@ -51,9 +51,9 @@ ALWAYS_INLINE uint64_t mulhi64(uint64_t x, uint64_t y)
 /// Computes (numhi * 2^64 + numlo) / den.
 /// Requires numhi < den, so that the quotient fits into 64 bits.
 ///
-inline uint64_t div128_64(uint64_t numhi,
-                          uint64_t numlo,
-                          uint64_t den)
+inline uint64_t udiv128_64(uint64_t numhi,
+                           uint64_t numlo,
+                           uint64_t den)
 {
   ASSERT(numhi < den);
 
@@ -152,7 +152,7 @@ struct FastDivider
     ASSERT(d > 1);
     shift = uint8_t(ilog2(d - 1));
     // multiplier = ceil(2^(64+shift) / d)
-    multiplier = div128_64(1ull << shift, d - 1, d);
+    multiplier = udiv128_64(1ull << shift, d - 1, d);
   }
 
   /// Largest supported numerator
@@ -170,7 +170,7 @@ struct FastDivider
 ALWAYS_INLINE uint64_t operator/(uint64_t n, const FastDivider& d)
 {
   ASSERT(n <= FastDivider::max());
-  return mulhi64(n, d.multiplier) >> d.shift;
+  return mulhi_u64(n, d.multiplier) >> d.shift;
 }
 
 } // namespace

@@ -112,18 +112,18 @@ int main()
   {
     uint64_t x = gen() >> (gen() % 64);
     uint64_t y = gen() >> (gen() % 64);
-    OK = mulhi64(x, y) == uint64_t((uint128_t(x) * y) >> 64);
+    OK = mulhi_u64(x, y) == uint64_t((uint128_t(x) * y) >> 64);
 
     if (OK && y > 0)
     {
       uint64_t numhi = x % y;
       uint64_t numlo = gen();
       uint128_t numer = (uint128_t(numhi) << 64) | numlo;
-      OK = div128_64(numhi, numlo, y) == uint64_t(numer / y);
+      OK = udiv128_64(numhi, numlo, y) == uint64_t(numer / y);
     }
   }
 
-  std::cout << "mulhi64(x, y) and div128_64(numhi, numlo, den)";
+  std::cout << "mulhi_u64(x, y) and udiv128_64(numhi, numlo, den)";
   check(OK);
 #endif
 
