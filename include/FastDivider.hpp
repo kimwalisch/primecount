@@ -57,16 +57,20 @@ inline uint64_t udiv128_64(uint64_t numhi,
 {
   ASSERT(numhi < den);
 
-#if defined(HAVE_INT128_T)
+#if defined(__x86_64__) && \
+   (defined(__GNUC__) || \
+    defined(__clang__))
+  // (128-bit / 64-bit) = 64-bit.
+  // When we know the result fits into 64-bit (even
+  // though the numerator is 128-bit) we can use the divq
+  // instruction instead of doing a full 128-bit division.
+  __asm__("div %[divider]"
+          : "+a"(numlo), "+d"(numhi) : [divider] "r"(den));
+  return numlo;
+
+#elif defined(HAVE_INT128_T)
   uint128_t numer = (uint128_t(numhi) << 64) | numlo;
   return uint64_t(numer / den);
-
-#elif defined(_MSC_VER) && \
-      defined(_M_X64) && \
-      _MSC_VER >= 1920 && \
-      __has_include(<intrin.h>)
-  uint64_t remainder;
-  return _udiv128(numhi, numlo, den, &remainder);
 
 #else
   // This code has been copied and adapted from libdivide's
