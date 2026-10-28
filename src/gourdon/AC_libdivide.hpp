@@ -156,16 +156,15 @@ inline uint64_t div128_64(uint64_t numhi,
 /// the error e = m * d - 2^(64+s) < d <= 2^(s+1). Hence for
 /// n < 2^63, n * e < 2^(64+s) and n / d = (n * m) >> (64 + s).
 ///
-/// Packing FastDividerU63 (9 bytes instead of 16) improves the
-/// cache efficiency, this is faster even though some loads are
-/// unaligned.
+/// Packing FastDivider (9 bytes instead of 16) improves the cache
+/// efficiency, this is faster even though some loads are unaligned.
 ///
 #pragma pack(push, 1)
-struct FastDividerU63
+struct FastDivider
 {
-  FastDividerU63() = default;
+  FastDivider() = default;
 
-  FastDividerU63(uint64_t d)
+  FastDivider(uint64_t d)
   {
     ASSERT(d > 1);
     shift = uint8_t(ilog2(d - 1));
@@ -184,10 +183,10 @@ struct FastDividerU63
 };
 #pragma pack(pop)
 
-/// Requires n <= FastDividerU63::max()
-ALWAYS_INLINE uint64_t operator/(uint64_t n, const FastDividerU63& d)
+/// Requires n <= FastDivider::max()
+ALWAYS_INLINE uint64_t operator/(uint64_t n, const FastDivider& d)
 {
-  ASSERT(n <= FastDividerU63::max());
+  ASSERT(n <= FastDivider::max());
   return mulhi64(n, d.multiplier) >> d.shift;
 }
 
@@ -231,7 +230,7 @@ ALWAYS_INLINE T sum_pi_libdivide(uint64_t xp,
   return sum * MULTIPLIER + size * 2 - size * T(b);
 }
 
-/// Compute the A formula using FastDividerU63.
+/// Compute the A formula using FastDivider.
 /// 64-bit numerator: xp < 2^63
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) < x^(1/2)
@@ -268,7 +267,7 @@ T A_libdivide(T xlow,
   return sum;
 }
 
-/// Compute the 1st part of the C formula using FastDividerU63.
+/// Compute the 1st part of the C formula using FastDivider.
 /// 64-bit numerator: xp < 2^63
 /// pi[(x/y)^(1/3)] < b <= pi[sqrt(y)]
 /// low <= position < high
@@ -334,7 +333,7 @@ T C1_hyperbola_libdivide(T xlow,
   return sum;
 }
 
-/// Compute the 2nd part of the C formula using FastDividerU63.
+/// Compute the 2nd part of the C formula using FastDivider.
 /// Computes the clustered and sparse easy leaves of the C
 /// formula for which the second factor is necessarily prime.
 /// 64-bit numerator: xp < 2^63
@@ -451,8 +450,8 @@ T AC_OpenMP_libdivide(T x,
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   auto mertens_y = generate_mertens_y(y, k, primes, pi);
 
-  // Initialize FastDividerU63 vector from primes vector
-  Vector<FastDividerU63> lprimes;
+  // Initialize FastDivider vector from primes vector
+  Vector<FastDivider> lprimes;
   lprimes.resize(primes.size());
 
   int64_t min_thread_size = (int64_t) 1e6;
@@ -465,7 +464,7 @@ T AC_OpenMP_libdivide(T x,
   {
     int64_t high = min(low + thread_dist, primes_size);
     for (int64_t i = low; i < high; i++)
-      lprimes[i] = FastDividerU63(primes[i]);
+      lprimes[i] = FastDivider(primes[i]);
   }
 
   // In order to reduce the thread creation & destruction
@@ -525,7 +524,7 @@ T AC_OpenMP_libdivide(T x,
             int64_t prime = primes[b];
             T xp = x / prime;
 
-            if (xp <= FastDividerU63::max())
+            if (xp <= FastDivider::max())
               sum += C1_hyperbola_libdivide(xlow, xhigh, uint64_t(xp), y, b, mertens_y[b], prime, lprimes, pi, segmentedPi);
             else
               sum += C1_hyperbola(xlow, xhigh, xp, y, b, mertens_y[b], primes, pi, segmentedPi);
@@ -556,7 +555,7 @@ T AC_OpenMP_libdivide(T x,
           int64_t prime = primes[b];
           T xp = x / prime;
 
-          if (xp <= FastDividerU63::max())
+          if (xp <= FastDivider::max())
             sum += C2_libdivide(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
@@ -568,7 +567,7 @@ T AC_OpenMP_libdivide(T x,
           int64_t prime = primes[b];
           T xp = x / prime;
 
-          if (xp <= FastDividerU63::max())
+          if (xp <= FastDivider::max())
             sum += C2_libdivide(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
@@ -580,7 +579,7 @@ T AC_OpenMP_libdivide(T x,
           int64_t prime = primes[b];
           T xp = x / prime;
 
-          if (xp <= FastDividerU63::max())
+          if (xp <= FastDivider::max())
             sum += A_libdivide(xlow, xhigh, uint64_t(xp), y, prime, lprimes, pi, segmentedPi);
           else
             sum += A(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
