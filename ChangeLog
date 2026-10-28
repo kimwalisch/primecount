@@ -1,6 +1,9 @@
 Changes in primecount-9.0, 2026-10-28
 
-* AC_libdivide.hpp: Replace libdivide by a faster multiply-shift division.
+* FastDivider.hpp: New faster multiply-shift division by precomputed
+  reciprocals, replaces libdivide in AC and S2_easy.
+* CMake: Rename WITH_LIBDIVIDE option to WITH_FASTDIVIDER.
+* Remove libdivide.h, rename AC_libdivide.hpp to AC_fastdivider.hpp.
 * Gourdon: Compute part of D and the former C1 easy leaves using a weighted
   Dirichlet hyperbola algorithm, cancelling prime-leaf sieve queries.
 * AC_*.hpp: New C1_hyperbola formula computes the hyperbola terms at

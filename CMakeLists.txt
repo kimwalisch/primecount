@@ -27,28 +27,28 @@ else()
     set(PRIMECOUNT_IS_TOP_PROJECT OFF)
 endif()
 
-# Enable/Disable libdivide ###########################################
+# Enable/Disable FastDivider #########################################
 
 # Historically, integer division has been one of the slowest
 # instructions on most CPU architectures. Hence by default we
-# enable libdivide which replaces expensive integer division
-# instructions by a sequence of shift, add and multiply
-# instructions which is often much faster.
+# enable FastDivider which replaces expensive integer division
+# instructions by a multiplication and a shift which is often
+# much faster.
 
-set(DEFAULT_LIBDIVIDE ON)
+set(DEFAULT_FASTDIVIDER ON)
 
 # Apple Silicon CPUs first released in 2020 have very fast integer
 # division instructions. For Apple Silicon CPUs on Apple OSes
-# we disable libdivide to get the best performance.
+# we disable FastDivider to get the best performance.
 
 if(APPLE)
     include("${PROJECT_SOURCE_DIR}/cmake/Apple_ARM64.cmake")
     if(PRIMECOUNT_APPLE_ARM64)
-        set(DEFAULT_LIBDIVIDE OFF)
+        set(DEFAULT_FASTDIVIDER OFF)
     endif()
 endif()
 
-option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
+option(WITH_FASTDIVIDER "Use FastDivider.hpp" ${DEFAULT_FASTDIVIDER})
 
 # Option sanity checks ###############################################
 
@@ -148,10 +148,10 @@ set(LIB_SRC src/api.cpp
             src/gourdon/SegmentedPiTable.cpp
             src/gourdon/Sigma.cpp)
 
-# Use libdivide.h (fast integer divison) #############################
+# Use FastDivider.hpp (fast integer division) ########################
 
-if(WITH_LIBDIVIDE)
-    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_LIBDIVIDE")
+if(WITH_FASTDIVIDER)
+    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_FASTDIVIDER")
 endif()
 
 # Check if compiler supports CPU multiarch ###########################

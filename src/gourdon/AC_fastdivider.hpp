@@ -1,12 +1,12 @@
 ///
-/// @file  AC_libdivide.hpp
+/// @file  AC_fastdivider.hpp
 /// @brief Scalar implementation of the A + C formulas in Xavier
-///        Gourdon's prime counting algorithm that replaces the
-///        integer divisions of numerators < 2^63 by multiplications
-///        with precomputed reciprocals of the primes. This is much
-///        faster than the CPU's integer division instruction,
-///        especially on older CPUs. Larger numerators use the
-///        shared scalar helpers in AC_default.hpp.
+///        Gourdon's prime counting algorithm using FastDivider,
+///        which replaces the integer divisions of numerators < 2^63
+///        by multiplications with precomputed reciprocals of the
+///        primes. This is much faster than the CPU's integer
+///        division instruction, especially on older CPUs. Larger
+///        numerators use the shared scalar helpers in AC_default.hpp.
 ///
 ///        primecount's C formula differs from Gourdon's original
 ///        C formula: for the primes (x/y)^(1/3) < p <= sqrt(y),
@@ -23,8 +23,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef AC_LIBDIVIDE_HPP
-#define AC_LIBDIVIDE_HPP
+#ifndef AC_FASTDIVIDER_HPP
+#define AC_FASTDIVIDER_HPP
 
 #include "AC_default.hpp"
 #include "LoadBalancerAC.hpp"
@@ -32,6 +32,7 @@
 
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
+#include <FastDivider.hpp>
 #include <generate_primes.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
@@ -42,163 +43,19 @@
 
 #include <stdint.h>
 
-#if defined(_MSC_VER) && \
-    (defined(_M_X64) || defined(_M_ARM64)) && \
-    __has_include(<intrin.h>)
-  #include <intrin.h>
-#endif
-
 namespace {
 
 using namespace primecount;
 
-/// Returns the upper 64 bits of the 128-bit product x * y
-ALWAYS_INLINE uint64_t mulhi64(uint64_t x, uint64_t y)
-{
-#if defined(HAVE_INT128_T)
-  return uint64_t((uint128_t(x) * y) >> 64);
-
-#elif defined(_MSC_VER) && \
-      (defined(_M_X64) || defined(_M_ARM64)) && \
-      __has_include(<intrin.h>)
-  return __umulh(x, y);
-
-#else
-  // Portable implementation for 32-bit CPUs, computes
-  // x1 * y1 * 2^64 + (x1 * y0 + x0 * y1) * 2^32 + x0 * y0.
-  uint32_t x0 = uint32_t(x);
-  uint32_t x1 = uint32_t(x >> 32);
-  uint32_t y0 = uint32_t(y);
-  uint32_t y1 = uint32_t(y >> 32);
-  uint64_t x0y0 = x0 * uint64_t(y0);
-  uint64_t x0y1 = x0 * uint64_t(y1);
-  uint64_t x1y0 = x1 * uint64_t(y0);
-  uint64_t x1y1 = x1 * uint64_t(y1);
-  uint64_t mid = x1y0 + (x0y0 >> 32);
-  uint64_t mid_lo = uint32_t(mid) + x0y1;
-  return x1y1 + (mid >> 32) + (mid_lo >> 32);
-#endif
-}
-
-/// Computes (numhi * 2^64 + numlo) / den.
-/// Requires numhi < den, so that the quotient fits into 64 bits.
-///
-inline uint64_t div128_64(uint64_t numhi,
-                          uint64_t numlo,
-                          uint64_t den)
-{
-  ASSERT(numhi < den);
-
-#if defined(__x86_64__) && \
-   (defined(__GNUC__) || defined(__clang__))
-  uint64_t quotient;
-  uint64_t remainder;
-  __asm__("div %[den]"
-          : "=a"(quotient), "=d"(remainder)
-          : [den] "r"(den), "a"(numlo), "d"(numhi));
-  return quotient;
-
-#elif defined(_MSC_VER) && \
-      defined(_M_X64) && \
-      _MSC_VER >= 1920 && \
-      __has_include(<intrin.h>)
-  uint64_t remainder;
-  return _udiv128(numhi, numlo, den, &remainder);
-
-#else
-  // Knuth's Algorithm D in base 2^32, this is the same
-  // algorithm as libdivide_128_div_64_to_64() in libdivide.h.
-  // Normalize den so that its most significant bit is set.
-  uint64_t shift = 63 - ilog2(den);
-  den <<= shift;
-  numhi <<= shift;
-  if (shift > 0)
-    numhi |= numlo >> (64 - shift);
-  numlo <<= shift;
-
-  uint64_t b = 1ull << 32;
-  uint64_t den1 = den >> 32;
-  uint64_t den0 = den & 0xffffffff;
-  uint64_t num1 = numlo >> 32;
-  uint64_t num0 = numlo & 0xffffffff;
-
-  // Estimate the high quotient digit using den1,
-  // the estimate is at most 2 too large.
-  uint64_t qhat = numhi / den1;
-  uint64_t rhat = numhi - qhat * den1;
-  uint64_t c1 = qhat * den0;
-  uint64_t c2 = rhat * b + num1;
-  if (c1 > c2)
-    qhat -= (c1 - c2 > den) ? 2 : 1;
-  uint64_t q1 = uint32_t(qhat);
-
-  // Estimate the low quotient digit using den1,
-  // the estimate is at most 2 too large.
-  uint64_t rem = numhi * b + num1 - q1 * den;
-  qhat = rem / den1;
-  rhat = rem - qhat * den1;
-  c1 = qhat * den0;
-  c2 = rhat * b + num0;
-  if (c1 > c2)
-    qhat -= (c1 - c2 > den) ? 2 : 1;
-  uint64_t q0 = uint32_t(qhat);
-
-  return (q1 << 32) | q0;
-#endif
-}
-
-/// Divides 64-bit numerators n < 2^63 by a prime using a
-/// multiplication by the prime's precomputed reciprocal,
-/// based on Ben Joffe's fast floor division algorithm:
-/// https://www.benjoffe.com/fast-floordiv
-///
-/// For d > 1, s = floor(log2(d - 1)) and m = ceil(2^(64+s) / d)
-/// the error e = m * d - 2^(64+s) < d <= 2^(s+1). Hence for
-/// n < 2^63, n * e < 2^(64+s) and n / d = (n * m) >> (64 + s).
-///
-/// Packing FastDivider (9 bytes instead of 16) improves the cache
-/// efficiency, this is faster even though some loads are unaligned.
-///
-#pragma pack(push, 1)
-struct FastDivider
-{
-  FastDivider() = default;
-
-  FastDivider(uint64_t d)
-  {
-    ASSERT(d > 1);
-    shift = uint8_t(ilog2(d - 1));
-    // multiplier = ceil(2^(64+shift) / d)
-    multiplier = div128_64(1ull << shift, d - 1, d);
-  }
-
-  /// Largest supported numerator
-  static constexpr uint64_t max()
-  {
-    return pstd::numeric_limits<int64_t>::max();
-  }
-
-  uint64_t multiplier;
-  uint8_t shift;
-};
-#pragma pack(pop)
-
-/// Requires n <= FastDivider::max()
-ALWAYS_INLINE uint64_t operator/(uint64_t n, const FastDivider& d)
-{
-  ASSERT(n <= FastDivider::max());
-  return mulhi64(n, d.multiplier) >> d.shift;
-}
-
 template <typename T,
           int MULTIPLIER,
-          typename LibdividePrimes>
-ALWAYS_INLINE T sum_pi_libdivide(uint64_t xp,
-                                 uint64_t i,
-                                 uint64_t last,
-                                 uint64_t b,
-                                 const LibdividePrimes& primes,
-                                 const SegmentedPiTable& segmentedPi)
+          typename FastDividerPrimes>
+ALWAYS_INLINE T sum_pi_fastdivider(uint64_t xp,
+                                   uint64_t i,
+                                   uint64_t last,
+                                   uint64_t b,
+                                   const FastDividerPrimes& primes,
+                                   const SegmentedPiTable& segmentedPi)
 {
   if (i > last)
     return 0;
@@ -236,15 +93,15 @@ ALWAYS_INLINE T sum_pi_libdivide(uint64_t xp,
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
-          typename LibdividePrimes>
-T A_libdivide(T xlow,
-              T xhigh,
-              uint64_t xp,
-              uint64_t y,
-              uint64_t prime,
-              const LibdividePrimes& primes,
-              const PiTable& pi,
-              const SegmentedPiTable& segmentedPi)
+          typename FastDividerPrimes>
+T A_fastdivider(T xlow,
+                T xhigh,
+                uint64_t xp,
+                uint64_t y,
+                uint64_t prime,
+                const FastDividerPrimes& primes,
+                const PiTable& pi,
+                const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
@@ -257,12 +114,12 @@ T A_libdivide(T xlow,
 
   // for (; i <= max_i1; i++)
   //   sum += segmentedPi[xp / primes[i]];
-  sum += sum_pi_libdivide<T, 1>(xp, i, max_i1, 2, primes, segmentedPi);
+  sum += sum_pi_fastdivider<T, 1>(xp, i, max_i1, 2, primes, segmentedPi);
   i = max(i, max_i1 + 1);
 
   // for (; i <= max_i2; i++)
   //   sum += segmentedPi[xp / primes[i]] * 2;
-  sum += sum_pi_libdivide<T, 2>(xp, i, max_i2, 2, primes, segmentedPi);
+  sum += sum_pi_fastdivider<T, 2>(xp, i, max_i2, 2, primes, segmentedPi);
 
   return sum;
 }
@@ -276,17 +133,17 @@ T A_libdivide(T xlow,
 /// see C1_hyperbola() in AC_default.hpp.
 ///
 template <typename T,
-          typename LibdividePrimes>
-T C1_hyperbola_libdivide(T xlow,
-                         T xhigh,
-                         uint64_t xp,
-                         uint64_t y,
-                         uint64_t b,
-                         int64_t mertens_y,
-                         uint64_t prime,
-                         const LibdividePrimes& primes,
-                         const PiTable& pi,
-                         const SegmentedPiTable& segmentedPi)
+          typename FastDividerPrimes>
+T C1_hyperbola_fastdivider(T xlow,
+                           T xhigh,
+                           uint64_t xp,
+                           uint64_t y,
+                           uint64_t b,
+                           int64_t mertens_y,
+                           uint64_t prime,
+                           const FastDividerPrimes& primes,
+                           const PiTable& pi,
+                           const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
   uint64_t low = segmentedPi.low();
@@ -328,7 +185,7 @@ T C1_hyperbola_libdivide(T xlow,
 
   // for (i = min_i; i <= max_i; i++)
   //   sum += segmentedPi[xp / primes[i]] * 2 - 2 * b + 1;
-  sum += sum_pi_libdivide<T, 2>(xp, min_i, max_i, 2 * b + 1, primes, segmentedPi);
+  sum += sum_pi_fastdivider<T, 2>(xp, min_i, max_i, 2 * b + 1, primes, segmentedPi);
 
   return sum;
 }
@@ -341,18 +198,18 @@ T C1_hyperbola_libdivide(T xlow,
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
-          typename LibdividePrimes>
-T C2_libdivide(T xlow,
-               T xhigh,
-               uint64_t xp,
-               uint64_t y,
-               uint64_t b,
-               uint64_t pi_y,
-               uint64_t max_clustered_global,
-               uint64_t prime,
-               const LibdividePrimes& primes,
-               const PiTable& pi,
-               const SegmentedPiTable& segmentedPi)
+          typename FastDividerPrimes>
+T C2_fastdivider(T xlow,
+                 T xhigh,
+                 uint64_t xp,
+                 uint64_t y,
+                 uint64_t b,
+                 uint64_t pi_y,
+                 uint64_t max_clustered_global,
+                 uint64_t prime,
+                 const FastDividerPrimes& primes,
+                 const PiTable& pi,
+                 const SegmentedPiTable& segmentedPi)
 {
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   uint64_t x_div_prime3 = xp / (prime * prime);
@@ -400,20 +257,20 @@ T C2_libdivide(T xlow,
   // Sparse leaves below the reflected range.
   // for (; i <= pi_conj_lo; i++)
   //   sum += segmentedPi[xp / primes[i]] - b + 2;
-  sum += sum_pi_libdivide<T, 1>(xp, i, pi_conj_lo, b, primes, segmentedPi);
+  sum += sum_pi_fastdivider<T, 1>(xp, i, pi_conj_lo, b, primes, segmentedPi);
   i = pi_conj_lo + 1;
 
   // Reflected leaves are counted once as a
   // sparse leaf and once as a conjugate.
   // for (; i <= pi_conj_hi; i++)
   //   sum += segmentedPi[xp / primes[i]] * 2 - b + 2;
-  sum += sum_pi_libdivide<T, 2>(xp, i, pi_conj_hi, b, primes, segmentedPi);
+  sum += sum_pi_fastdivider<T, 2>(xp, i, pi_conj_hi, b, primes, segmentedPi);
   i = pi_conj_hi + 1;
 
   // Sparse leaves above the reflected range.
   // for (; i <= pi_min_clustered; i++)
   //   sum += segmentedPi[xp / primes[i]] - b + 2;
-  sum += sum_pi_libdivide<T, 1>(xp, i, pi_min_clustered, b, primes, segmentedPi);
+  sum += sum_pi_fastdivider<T, 1>(xp, i, pi_min_clustered, b, primes, segmentedPi);
 
   return sum;
 }
@@ -421,14 +278,14 @@ T C2_libdivide(T xlow,
 /// Compute A + C
 template <typename T,
           typename Primes>
-T AC_OpenMP_libdivide(T x,
-                      int64_t y,
-                      int64_t k,
-                      int64_t x_star,
-                      const PiTable& pi,
-                      const Primes& primes,
-                      int threads,
-                      bool is_print)
+T AC_OpenMP_fastdivider(T x,
+                        int64_t y,
+                        int64_t k,
+                        int64_t x_star,
+                        const PiTable& pi,
+                        const Primes& primes,
+                        int threads,
+                        bool is_print)
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
@@ -451,11 +308,11 @@ T AC_OpenMP_libdivide(T x,
   auto mertens_y = generate_mertens_y(y, k, primes, pi);
 
   // Initialize FastDivider vector from primes vector
-  Vector<FastDivider> lprimes;
-  lprimes.resize(primes.size());
+  Vector<FastDivider> fprimes;
+  fprimes.resize(primes.size());
 
   int64_t min_thread_size = (int64_t) 1e6;
-  int64_t primes_size = lprimes.size();
+  int64_t primes_size = fprimes.size();
   int init_threads = ideal_num_threads(primes_size, threads, min_thread_size);
   int64_t thread_dist = ceil_div(primes_size, init_threads);
 
@@ -464,7 +321,7 @@ T AC_OpenMP_libdivide(T x,
   {
     int64_t high = min(low + thread_dist, primes_size);
     for (int64_t i = low; i < high; i++)
-      lprimes[i] = FastDivider(primes[i]);
+      fprimes[i] = FastDivider(primes[i]);
   }
 
   // In order to reduce the thread creation & destruction
@@ -525,7 +382,7 @@ T AC_OpenMP_libdivide(T x,
             T xp = x / prime;
 
             if (xp <= FastDivider::max())
-              sum += C1_hyperbola_libdivide(xlow, xhigh, uint64_t(xp), y, b, mertens_y[b], prime, lprimes, pi, segmentedPi);
+              sum += C1_hyperbola_fastdivider(xlow, xhigh, uint64_t(xp), y, b, mertens_y[b], prime, fprimes, pi, segmentedPi);
             else
               sum += C1_hyperbola(xlow, xhigh, xp, y, b, mertens_y[b], primes, pi, segmentedPi);
           }
@@ -556,7 +413,7 @@ T AC_OpenMP_libdivide(T x,
           T xp = x / prime;
 
           if (xp <= FastDivider::max())
-            sum += C2_libdivide(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
+            sum += C2_fastdivider(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, fprimes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -568,7 +425,7 @@ T AC_OpenMP_libdivide(T x,
           T xp = x / prime;
 
           if (xp <= FastDivider::max())
-            sum += C2_libdivide(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
+            sum += C2_fastdivider(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, fprimes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -580,7 +437,7 @@ T AC_OpenMP_libdivide(T x,
           T xp = x / prime;
 
           if (xp <= FastDivider::max())
-            sum += A_libdivide(xlow, xhigh, uint64_t(xp), y, prime, lprimes, pi, segmentedPi);
+            sum += A_fastdivider(xlow, xhigh, uint64_t(xp), y, prime, fprimes, pi, segmentedPi);
           else
             sum += A(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
         }

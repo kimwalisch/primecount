@@ -29,15 +29,15 @@
 
 #include <stdint.h>
 
-#if defined(ENABLE_LIBDIVIDE)
-  #include <libdivide.h>
+#if defined(ENABLE_FASTDIVIDER)
+  #include <FastDivider.hpp>
 #endif
 
 using namespace primecount;
 
 namespace {
 
-#if !defined(ENABLE_LIBDIVIDE)
+#if !defined(ENABLE_FASTDIVIDER)
 
 /// Calculate the contribution of the clustered easy leaves
 /// and the sparse easy leaves.
@@ -155,23 +155,23 @@ T S2_easy_OpenMP(T x,
   return sum;
 }
 
-#elif defined(ENABLE_LIBDIVIDE)
+#elif defined(ENABLE_FASTDIVIDER)
 
-/// This is an optimized version of S2_easy(x, y) using libdivide.
-/// libdivide allows to replace expensive integer division
-/// instructions by a sequence of shift, add and multiply
-/// instructions that will calculate the integer division much
-/// faster, especially on older CPUs.
+/// This is an optimized version of S2_easy(x, y) using FastDivider.
+/// FastDivider replaces the integer divisions of numerators < 2^63
+/// by multiplications with precomputed reciprocals of the primes,
+/// this is much faster than the CPU's integer division instruction,
+/// especially on older CPUs.
 
-/// xp < 2^64
+/// xp < 2^63
 template <typename T,
-          typename LibdividePrimes>
+          typename FastDividerPrimes>
 T S2_easy_64(T xp128,
              uint64_t y,
              uint64_t xy,
              uint64_t b,
              uint64_t prime,
-             const LibdividePrimes& primes,
+             const FastDividerPrimes& primes,
              const PiTable& pi)
 {
   uint64_t xp = (uint64_t) xp128;
@@ -247,7 +247,7 @@ T S2_easy_64(T xp128,
   return sum;
 }
 
-/// xp >= 2^64
+/// xp >= 2^63
 template <typename T,
           typename Primes>
 T S2_easy_128(T xp,
@@ -344,11 +344,11 @@ T S2_easy_OpenMP(T x,
                  int threads,
                  bool is_print)
 {
-  // Initialize libdivide vector from primes vector
-  Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
-  lprimes.resize(primes.size());
-  for (std::size_t i = 1; i < lprimes.size(); i++)
-    lprimes[i] = primes[i];
+  // Initialize FastDivider vector from primes vector
+  Vector<FastDivider> fprimes;
+  fprimes.resize(primes.size());
+  for (std::size_t i = 1; i < fprimes.size(); i++)
+    fprimes[i] = FastDivider(primes[i]);
 
   T sum = 0;
   int64_t x13 = iroot<3>(x);
@@ -372,8 +372,8 @@ T S2_easy_OpenMP(T x,
     int64_t prime = primes[b];
     T xp = x / prime;
 
-    if (xp <= pstd::numeric_limits<uint64_t>::max())
-      sum += S2_easy_64(xp, y, xy, b, prime, lprimes, pi);
+    if (xp <= FastDivider::max())
+      sum += S2_easy_64(xp, y, xy, b, prime, fprimes, pi);
     else
       sum += S2_easy_128(xp, y, xy, b, prime, primes, pi);
 
@@ -393,8 +393,8 @@ T S2_easy_OpenMP(T x,
 
 void print_algo_name()
 {
-  #if defined(ENABLE_LIBDIVIDE)
-    print("Algorithm: libdivide");
+  #if defined(ENABLE_FASTDIVIDER)
+    print("Algorithm: FastDivider");
   #else
     print("Algorithm: CPU div");
   #endif

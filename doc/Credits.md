@@ -48,9 +48,9 @@ shifts. After studying his implementation I also implemented this
 trick in primecount.
 
 * [ridiculousfish](https://github.com/ridiculousfish)<br/>
-primecount uses ridiculousfish's
+Up to primecount-8.8, primecount used ridiculousfish's
 [libdivide library](https://github.com/ridiculousfish/libdivide)
 to replace integer division by multiplication & bit shifts. This
-optimization speeds up the computation of the easy special leaves
+optimization sped up the computation of the easy special leaves
 by about 40%. ridiculousfish added a branchfree divider to libdivide
 specifically for primecount.

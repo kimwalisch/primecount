@@ -1,6 +1,6 @@
 # Apple Silicon CPUs first released in 2020 have very fast integer
 # division instructions. For Apple Silicon CPUs on Apple OSes
-# we disable libdivide to get the best performance.
+# we disable FastDivider to get the best performance.
 
 include(CheckCXXSourceCompiles)
 
