@@ -38,10 +38,10 @@
   #define AC_DEFAULT_HEADER "AC_arm_sve.hpp"
   #define AC_DEFAULT_ALGO_NAME "Algorithm: ARM SVE"
   #define AC_OPENMP_DEFAULT AC_OpenMP_arm_sve
-#elif defined(ENABLE_LIBDIVIDE)
-  #define AC_DEFAULT_HEADER "AC_libdivide.hpp"
-  #define AC_DEFAULT_ALGO_NAME "Algorithm: libdivide"
-  #define AC_OPENMP_DEFAULT AC_OpenMP_libdivide
+#elif defined(ENABLE_FASTDIVIDER)
+  #define AC_DEFAULT_HEADER "AC_fastdivider.hpp"
+  #define AC_DEFAULT_ALGO_NAME "Algorithm: FastDivider"
+  #define AC_OPENMP_DEFAULT AC_OpenMP_fastdivider
 #else
   #define AC_DEFAULT_HEADER "AC_default.hpp"
   #define AC_DEFAULT_ALGO_NAME "Algorithm: CPU div"

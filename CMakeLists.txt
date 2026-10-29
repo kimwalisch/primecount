@@ -27,28 +27,28 @@ else()
     set(PRIMECOUNT_IS_TOP_PROJECT OFF)
 endif()
 
-# Enable/Disable libdivide ###########################################
+# Enable/Disable FastDivider #########################################
 
 # Historically, integer division has been one of the slowest
 # instructions on most CPU architectures. Hence by default we
-# enable libdivide which replaces expensive integer division
-# instructions by a sequence of shift, add and multiply
-# instructions which is often much faster.
+# enable FastDivider which replaces expensive integer division
+# instructions by a multiplication and a shift which is often
+# much faster.
 
-set(DEFAULT_LIBDIVIDE ON)
+set(DEFAULT_FASTDIVIDER ON)
 
 # Apple Silicon CPUs first released in 2020 have very fast integer
 # division instructions. For Apple Silicon CPUs on Apple OSes
-# we disable libdivide to get the best performance.
+# we disable FastDivider to get the best performance.
 
 if(APPLE)
     include("${PROJECT_SOURCE_DIR}/cmake/Apple_ARM64.cmake")
     if(PRIMECOUNT_APPLE_ARM64)
-        set(DEFAULT_LIBDIVIDE OFF)
+        set(DEFAULT_FASTDIVIDER OFF)
     endif()
 endif()
 
-option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
+option(WITH_FASTDIVIDER "Use FastDivider.hpp" ${DEFAULT_FASTDIVIDER})
 
 # Option sanity checks ###############################################
 
@@ -148,12 +148,6 @@ set(LIB_SRC src/api.cpp
             src/gourdon/SegmentedPiTable.cpp
             src/gourdon/Sigma.cpp)
 
-# Use libdivide.h (fast integer divison) #############################
-
-if(WITH_LIBDIVIDE)
-    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_LIBDIVIDE")
-endif()
-
 # Check if compiler supports CPU multiarch ###########################
 
 if(WITH_MULTIARCH)
@@ -209,6 +203,15 @@ include("${PROJECT_SOURCE_DIR}/cmake/compiler_supports_cpp11.cmake")
 # Check if int128_t is supported #####################################
 
 include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
+
+# Use FastDivider.hpp (fast integer division) ########################
+
+# FastDivider is not supported on 32-bit CPUs, hence we check
+# whether the compiler supports it. This check must run after
+# the int128_t check.
+if(WITH_FASTDIVIDER)
+    include("${PROJECT_SOURCE_DIR}/cmake/FastDivider.cmake")
+endif()
 
 # Check for OpenMP ###################################################
 
