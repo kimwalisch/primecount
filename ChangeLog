@@ -1,5 +1,14 @@
-Changes in primecount-9.0, 2026-10-28
+Changes in primecount-9.0, 2026-10-30
 
+* StatusS2.cpp: Smoother status for D, S2_hard and LMO using a model of
+  the special leaves' work distribution.
+* StatusS2.cpp: More accurate status for non-default alpha tuning factors
+  and for LMO.
+* LoadBalancerS2.cpp: Increase each thread's previous segment size instead
+  of the shared segment size, improves scaling on many-core servers.
+* LoadBalancerS2: Remove lazy initialization of workload finish times.
+* LoadBalancerS2.cpp: Throttle status printing also in C++14 builds.
+* StatusS2.cpp: Don't print 100% before the computation has finished.
 * FastDivider.hpp: New faster multiply-shift division by precomputed
   reciprocals, replaces libdivide in AC and S2_easy.
 * CMake: Rename WITH_LIBDIVIDE option to WITH_FASTDIVIDER.

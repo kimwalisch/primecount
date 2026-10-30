@@ -171,7 +171,22 @@ T D_OpenMP(T x,
   int max_threads = (int) std::pow(xy, 1 / 3.7);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
-  INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
+
+  // Used for printing the status: position of the first hard
+  // special leaves, x^(2/5) using the hyperbola method,
+  // x / y^(4/3) for large y and x / y^(3/2) if y < x^(2/5).
+  double xd = (double) x;
+  double yd = (double) y;
+  double leaves_low = std::pow(xd, 2 / 5.0);
+  leaves_low = std::min(leaves_low, 0.75 * xd / std::pow(yd, 4 / 3.0));
+  leaves_low = std::max(leaves_low, xd / (yd * std::sqrt(yd)));
+
+  // The sieving work relative to the work of the special
+  // leaves decreases if alpha is increased.
+  double alpha = get_alpha(x, y);
+  double default_alpha = get_alpha_gourdon(x);
+  double sieve_factor = std::pow(default_alpha / alpha, 1.05);
+  INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, leaves_low, sieve_factor, threads, is_print);
   using UT = typename pstd::make_unsigned<T>::type;
   UT sum = 0;
 

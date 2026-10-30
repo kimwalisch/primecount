@@ -192,7 +192,17 @@ int64_t S2(int64_t x,
   int max_threads = (int) std::pow(xy, 1 / 3.7);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
-  INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
+
+  // Used for printing the status: position of the first
+  // special leaves, x / (p * m) > x / y^2 for p < m <= y.
+  double leaves_low = double(x) / (double(y) * y);
+
+  // The sieving work relative to the special leaves
+  // decreases quickly if alpha is increased.
+  double alpha = get_alpha(x, y);
+  double default_alpha = get_alpha_lmo(x);
+  double sieve_factor = std::pow(default_alpha / alpha, 2.7);
+  INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, leaves_low, sieve_factor, threads, is_print);
   int64_t sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
