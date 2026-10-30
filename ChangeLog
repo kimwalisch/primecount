@@ -1,5 +1,6 @@
 Changes in primecount-9.0, 2026-10-30
 
+* LoadBalancerP2, LoadBalancerAC: Throttle status printing in C++14 builds.
 * StatusS2.cpp: Smoother status for D, S2_hard and LMO using a model of
   the special leaves' work distribution.
 * LoadBalancerS2.cpp: Increase each thread's previous segment size instead
