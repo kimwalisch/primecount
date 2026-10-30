@@ -1,5 +1,10 @@
-Changes in primecount-9.0, 2026-10-28
+Changes in primecount-9.0, 2026-10-30
 
+* StatusS2.cpp: Smoother status for D, S2_hard and LMO using a model of
+  the special leaves' work distribution.
+* LoadBalancerS2.cpp: Increase each thread's previous segment size instead
+  of the shared segment size, improves scaling on many-core servers.
+* LoadBalancerS2: Remove lazy initialization of workload finish times.
 * FastDivider.hpp: New faster multiply-shift division by precomputed
   reciprocals, replaces libdivide in AC and S2_easy.
 * CMake: Rename WITH_LIBDIVIDE option to WITH_FASTDIVIDER.

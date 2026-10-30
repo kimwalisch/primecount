@@ -65,6 +65,8 @@ namespace primecount {
 LoadBalancerS2::LoadBalancerS2(maxint_t x,
                                int64_t y,
                                int64_t sieve_limit,
+                               double leaves_low,
+                               double sieve_factor,
                                int threads,
                                bool is_print) :
   y_(y),
@@ -73,25 +75,22 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   start_time_(get_time()),
   threads_(threads),
   is_print_(is_print),
-  status_(x, y, is_print)
+  status_(x, leaves_low, sieve_limit, sieve_factor, is_print)
 {
-  int64_t segment_size;
-  int64_t segments;
-
   if (threads == 1 &&
       !is_print)
   {
-    segment_size = L1_segment_size;
-    segment_size = min(segment_size, sieve_limit);
-    segment_size = min(segment_size, max_segment_size);
-    segment_size = Sieve::align_segment_size(segment_size);
-
     // Currently our Sieve.cpp does not rebalance its
     // counters data structure. However, if we process the
     // computation in chunks then the sieve gets recreated
     // for each new chunk which rebalances the counters.
     // Therefore we limit the number of segments here.
-    segments = 100;
+    int64_t segments = 100;
+    int64_t segment_size = L1_segment_size;
+    segment_size = min(segment_size, sieve_limit);
+    segment_size = min(segment_size, max_segment_size);
+    segment_size = Sieve::align_segment_size(segment_size);
+    store_packed(segment_size, segments);
   }
   else
   {
@@ -101,20 +100,22 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
     // and as we need to ensure that all threads are
     // assigned an equal amount of work.
     double x15 = std::pow(double(x), 1.0 / 5.0);
-    segment_size = max(int64_t(x15), 1 << 10);
+    int64_t segments = 1;
+    int64_t segment_size = max(int64_t(x15), 1 << 10);
     segment_size = Sieve::align_segment_size(segment_size);
-    segments = 1;
+    store_packed(segment_size, segments);
   }
 
-  store_packed(segment_size, segments);
+  if (is_print_)
+    print_S2_status(start_time_);
 }
 
 /// Remaining seconds till finished
-double LoadBalancerS2::remaining_secs(ThreadData& thread, int64_t low) const
+double LoadBalancerS2::remaining_secs(const ThreadData& thread, int64_t low) const
 {
-  double percent = status_.getPercent(low, sieve_limit_);
+  double percent = status_.getPercent(low);
   percent = in_between(10, percent, 100);
-  double total_secs = thread.time() - start_time_;
+  double total_secs = thread.stop_time - start_time_;
   double secs = total_secs * (100 / percent) - total_secs;
   return secs;
 }
@@ -138,11 +139,14 @@ void LoadBalancerS2::store_packed(uint64_t segment_size, uint64_t segments)
 ///
 bool LoadBalancerS2::get_work(ThreadData& thread)
 {
+  if (is_print_ &&
+      thread.segments != 0)
+    print_S2_status(thread.stop_time);
+
   int64_t max_low = max_low_.load(std::memory_order_relaxed);
   uint64_t segment_data = segment_data_.load(std::memory_order_relaxed);
   int64_t segment_size = segment_data & 0xffffffff;
   int64_t segments = segment_data >> 32;
-  int64_t print_high = 0;
 
   if (thread.low > max_low)
   {
@@ -154,12 +158,6 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
 
     if (updated_max_low)
     {
-      if (is_print_)
-      {
-        int64_t dist = thread.segment_size * thread.segments;
-        print_high = thread.low + dist;
-      }
-
       // We only start increasing the segment size and segments
       // per thread once the first special leaf has been found.
       // Most special leaves are located near the start (near y).
@@ -168,7 +166,12 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
       if (thread.sum ||
           thread.low > y_)
       {
-        update(segment_size, segments, thread);
+        update(thread, segments);
+
+        // Don't shrink the shared segment size
+        // (best effort, a racing store by another
+        // thread may still be overwritten).
+        segment_size = max(segment_size, thread.segment_size);
         store_packed(segment_size, segments);
       }
     }
@@ -183,27 +186,27 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   thread.segments = segments;
   thread.init_time = 0;
 
-  // The lockfree critical section above should complete
-  // as fast as possible. Hence, printing should be done
-  // afterwards since it may incur a system call.
-  if (print_high)
-    print_S2_status(print_high, thread.time());
-
   return thread.low < sieve_limit_;
 }
 
-void LoadBalancerS2::update(int64_t& segment_size,
-                            int64_t& segments,
-                            ThreadData& thread) const
+/// Increase this thread's previous segment size and update the
+/// number of segments per thread. Other threads may have
+/// increased the shared segment size in the meantime, but only
+/// this thread's previous segment size has a known runtime.
+/// Increasing the latter limits the growth to about one step
+/// per round of workloads, regardless of the number of threads.
+///
+void LoadBalancerS2::update(ThreadData& thread,
+                            int64_t& segments) const
 {
-  // If segment_size < L1_segment_size then slowly increase
-  // the segment size until it reaches L1_segment_size.
-  if (segment_size < L1_segment_size)
+  // If thread.segment_size < L1_segment_size then double
+  // it until it reaches L1_segment_size.
+  if (thread.segment_size < L1_segment_size)
   {
-    segment_size += segment_size / 16;
-    segment_size = min(segment_size, L1_segment_size);
-    segment_size = min(segment_size, max_segment_size);
-    segment_size = Sieve::align_segment_size(segment_size);
+    thread.segment_size *= 2;
+    thread.segment_size = min(thread.segment_size, L1_segment_size);
+    thread.segment_size = min(thread.segment_size, max_segment_size);
+    thread.segment_size = Sieve::align_segment_size(thread.segment_size);
     return;
   }
 
@@ -216,20 +219,20 @@ void LoadBalancerS2::update(int64_t& segment_size,
   if (low <= y_)
     return;
 
-  // If segment_size >= L1_segment_size then slowly increase
-  // the segment size until it reaches L2_segment_size.
-  if (segment_size < L2_segment_size &&
-      segment_size < sqrt_limit_)
+  // If thread.segment_size >= L1_segment_size then double
+  // it until it reaches L2_segment_size.
+  if (thread.segment_size < L2_segment_size &&
+      thread.segment_size < sqrt_limit_)
   {
-    segment_size += segment_size / 16;
-    segment_size = min(segment_size, L2_segment_size);
-    segment_size = min(segment_size, max_segment_size);
-    segment_size = Sieve::align_segment_size(segment_size);
+    thread.segment_size *= 2;
+    thread.segment_size = min(thread.segment_size, L2_segment_size);
+    thread.segment_size = min(thread.segment_size, max_segment_size);
+    thread.segment_size = Sieve::align_segment_size(thread.segment_size);
     return;
   }
 
-  // Once the segment_size >= L2_segment_size we slowly increase
-  // (or decrease) the number of segments per thread.
+  // Once thread.segment_size >= L2_segment_size we slowly
+  // increase (or decrease) the number of segments per thread.
   segments = get_segments(thread, low);
 
   // The hard special leaves algorithm is basically a modified
@@ -246,19 +249,19 @@ void LoadBalancerS2::update(int64_t& segment_size,
   // PrimePi(x) computations a segment size O(sqrt(sieve_limit))
   // is still too large. Hence, I use an even smaller segment size
   // of O(sqrt(high)) in primecount.
-  if (segment_size >= L2_segment_size &&
-      segment_size < sqrt_limit_)
+  if (thread.segment_size >= L2_segment_size &&
+      thread.segment_size < sqrt_limit_)
   {
-    int64_t dist = (segment_size * segments) * threads_;
+    int64_t dist = (thread.segment_size * segments) * threads_;
     int64_t high = min(low + dist, sieve_limit_);
 
-    if (segment_size < isqrt(high))
+    if (thread.segment_size < isqrt(high))
     {
-      segment_size += segment_size / 16;
-      dist = (segment_size * segments) * threads_;
+      thread.segment_size += thread.segment_size / 16;
+      dist = (thread.segment_size * segments) * threads_;
       high = min(low + dist, sieve_limit_);
-      segment_size = isqrt(high);
-      segment_size = Sieve::align_segment_size(segment_size);
+      thread.segment_size = isqrt(high);
+      thread.segment_size = Sieve::align_segment_size(thread.segment_size);
     }
   }
 }
@@ -266,14 +269,14 @@ void LoadBalancerS2::update(int64_t& segment_size,
 /// Increase or decrease the number of segments per
 /// thread based on the remaining runtime.
 ///
-int64_t LoadBalancerS2::get_segments(ThreadData& thread, int64_t low) const
+int64_t LoadBalancerS2::get_segments(const ThreadData& thread, int64_t low) const
 {
   // Near the end it is important that threads run only for
   // a short amount of time in order to ensure that all
   // threads finish nearly at the same time. Since the
   // remaining time is just a rough estimation we want to be
-  // very conservative so we divide the remaining time by 3.
-  double rem_secs = remaining_secs(thread, low) / 3;
+  // conservative so we divide the remaining time by 2.
+  double rem_secs = remaining_secs(thread, low) / 2;
   double thread_init_secs = thread.init_secs();
   double thread_secs = thread.secs();
 
@@ -309,11 +312,11 @@ int64_t LoadBalancerS2::get_segments(ThreadData& thread, int64_t low) const
   // segments per thread also close to 0 which is very bad
   // for performance. The condition below fixes this issue
   // and ensures that the thread runtime is always at
-  // least 20x the thread initialization time.
+  // least 10x the thread initialization time.
   if (thread_secs > 0 &&
-      thread_secs * factor < thread_init_secs * 20)
+      thread_secs * factor < thread_init_secs * 10)
   {
-    double next_runtime = thread_init_secs * 20;
+    double next_runtime = thread_init_secs * 10;
     double current_runtime = thread_secs;
     factor = next_runtime / current_runtime;
   }
@@ -343,16 +346,12 @@ int64_t LoadBalancerS2::get_segments(ThreadData& thread, int64_t low) const
   return segments;
 }
 
-void LoadBalancerS2::print_S2_status(int64_t high,
-                                     double time)
+void LoadBalancerS2::print_S2_status(double time)
 {
-#if __cplusplus >= 201703L
   // Prevent lock contention on many-core systems,
   // print status only every 0.1 seconds.
-  if (std::atomic<double>::is_always_lock_free &&
-      time <= next_print_time_.load(std::memory_order_relaxed))
+  if (time <= next_print_time_.load(std::memory_order_relaxed))
     return;
-#endif
 
   // For printing the status it is OK to use a non-blocking
   // userspace lock because printing the status is a non
@@ -364,18 +363,29 @@ void LoadBalancerS2::print_S2_status(int64_t high,
 
   if (guard.owns_lock())
   {
-  #if __cplusplus >= 201703L
     // It is theoretically possible that multiple threads
     // enter this critical section within 0.1 seconds.
     // This additional condition prevents it.
-    if (std::atomic<double>::is_always_lock_free &&
-        time <= next_print_time_.load(std::memory_order_relaxed))
+    if (time <= next_print_time_.load(std::memory_order_relaxed))
       return;
-  #endif
 
     // The next thread can print again in 0.1 seconds.
     next_print_time_.store(time + 0.1, std::memory_order_relaxed);
-    status_.print_S2_hard(high, sieve_limit_);
+
+    // The workloads below low_ have been assigned to the
+    // threads, the last workload of each thread is on
+    // average half finished. Near the end we stop printing
+    // as the last threads may still be running, 100% is
+    // printed once the computation has finished.
+    int64_t low = low_.load(std::memory_order_relaxed);
+    uint64_t segment_data = segment_data_.load(std::memory_order_relaxed);
+    int64_t segment_size = segment_data & 0xffffffff;
+    int64_t segments = segment_data >> 32;
+    int64_t unfinished = (segment_size * segments) * threads_ / 2;
+    int64_t pos = max(low - unfinished, 0);
+
+    if (pos < sieve_limit_)
+      status_.print_S2_hard(status_.getPercent(pos));
   }
 }
 

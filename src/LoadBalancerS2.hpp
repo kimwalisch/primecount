@@ -43,27 +43,20 @@ struct ThreadData
     double sec = stop_time - start_time;
     return std::max(sec, 0.0);
   }
-
-  double time()
-  {
-    if (stop_time == 0)
-      stop_time = get_time();
-    return stop_time;
-  }
 };
 
 class LoadBalancerS2
 {
 public:
-  LoadBalancerS2(maxint_t x, int64_t y, int64_t sieve_limit, int threads, bool is_print);
+  LoadBalancerS2(maxint_t x, int64_t y, int64_t sieve_limit, double leaves_low, double sieve_factor, int threads, bool is_print);
   bool get_work(ThreadData& thread);
 
 private:
-  double remaining_secs(ThreadData& thread, int64_t low) const;
+  double remaining_secs(const ThreadData& thread, int64_t low) const;
   void store_packed(uint64_t segment_size, uint64_t segments);
-  void update(int64_t& segment_size, int64_t& segments, ThreadData& thread) const;
-  int64_t get_segments(ThreadData& thread, int64_t low) const;
-  void print_S2_status(int64_t high, double time);
+  void update(ThreadData& thread, int64_t& segments) const;
+  int64_t get_segments(const ThreadData& thread, int64_t low) const;
+  void print_S2_status(double time);
 
   int64_t y_ = 0;
   int64_t sieve_limit_ = 0;

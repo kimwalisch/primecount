@@ -197,7 +197,18 @@ T S2_hard_OpenMP(T x,
   int max_threads = (int) std::pow(xy, 1 / 3.7);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
-  INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, threads, is_print);
+
+  // Approximate onset of hard special leaves for the status and
+  // load balancer, bounded by x / y^(3/2) and 0.4 * y.
+  double leaves_low = double(x) / (y * std::sqrt(y));
+  leaves_low = min(leaves_low, 0.4 * double(y));
+
+  // The sieving work relative to the work of the special
+  // leaves decreases if alpha is increased.
+  double alpha = get_alpha(x, y);
+  double default_alpha = get_alpha_deleglise_rivat(x);
+  double sieve_factor = std::pow(default_alpha / alpha, 0.8);
+  INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, leaves_low, sieve_factor, threads, is_print);
   T sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
