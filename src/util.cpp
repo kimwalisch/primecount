@@ -58,7 +58,7 @@ int get_status_precision(maxint_t x)
   // use default precision when no command-line precision provided
   if (status_precision_ < 0)
   {
-    if ((double) x >= 1e23)
+    if ((double) x >= 1e24)
       return 2;
     if ((double) x >= 1e21)
       return 1;
