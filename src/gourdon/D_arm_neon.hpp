@@ -119,7 +119,7 @@ T D_thread_arm_neon(T x,
                     const Primes& primes,
                     const PiTable& pi,
                     const FactorTable& factor,
-                    const Vector<int64_t>& mertens_y,
+                    const Vector<int64_t>& coefficients,
                     ThreadData& thread)
 {
   T sum = 0;
@@ -184,7 +184,7 @@ T D_thread_arm_neon(T x,
 
       if (low < y)
         sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b],
-                             mertens_y[b], primes, pi, sieve,
+                             coefficients[b], primes, pi, sieve,
                              events, sorter, max_m);
 
       min_m = FactorTable::to_index(min_m);

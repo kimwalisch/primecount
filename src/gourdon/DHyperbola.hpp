@@ -27,6 +27,21 @@ class Sieve;
 class SemiprimeEventSorter;
 struct SemiprimeEvent;
 
+/// Precompute the boundary coefficients Phi(y) - E2(y) for the
+/// eligible primes > min_prime, see DHyperbola.cpp.
+///
+Vector<int64_t> generate_hyperbola_coefficients(int64_t y,
+                                                int64_t k,
+                                                int64_t min_prime,
+                                                const Vector<uint32_t>& primes,
+                                                const PiTable& pi);
+
+Vector<int64_t> generate_hyperbola_coefficients(int64_t y,
+                                                int64_t k,
+                                                int64_t min_prime,
+                                                const Vector<int64_t>& primes,
+                                                const PiTable& pi);
+
 uint64_t hyperbola_sum(uint64_t xp,
                        int64_t p,
                        int64_t b,
@@ -34,7 +49,7 @@ uint64_t hyperbola_sum(uint64_t xp,
                        int64_t low,
                        int64_t high,
                        int64_t phi,
-                       int64_t mertens_y,
+                       int64_t coefficient,
                        const Vector<uint32_t>& primes,
                        const PiTable& pi,
                        Sieve& sieve,
@@ -51,7 +66,7 @@ uint128_t hyperbola_sum(uint128_t xp,
                         int64_t low,
                         int64_t high,
                         int64_t phi,
-                        int64_t mertens_y,
+                        int64_t coefficient,
                         const Vector<uint32_t>& primes,
                         const PiTable& pi,
                         Sieve& sieve,
@@ -66,7 +81,7 @@ uint128_t hyperbola_sum(uint128_t xp,
                         int64_t low,
                         int64_t high,
                         int64_t phi,
-                        int64_t mertens_y,
+                        int64_t coefficient,
                         const Vector<int64_t>& primes,
                         const PiTable& pi,
                         Sieve& sieve,

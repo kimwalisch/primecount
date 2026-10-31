@@ -89,23 +89,47 @@ struct Reference
 {
   Vector<uint32_t> lpf;
   Vector<int8_t> mu;
+  Vector<int8_t> omega;
+  Vector<int64_t> pi;
   Vector<int64_t> phi;
   Vector<int64_t> mertens;
+  Vector<int64_t> coefficients;
 
   Reference(int64_t limit, int64_t prime)
   {
     auto primes = generate_primes<uint32_t>(limit);
     lpf = generate_lpf(limit, primes);
     mu = generate_moebius(limit, primes);
+    omega.resize(limit + 1);
+    pi.resize(limit + 1);
     phi.resize(limit + 1);
     mertens.resize(limit + 1);
+    coefficients.resize(limit + 1);
+    omega[0] = omega[1] = 0;
+    pi[0] = 0;
     phi[0] = 0;
     mertens[0] = 0;
+    coefficients[0] = 0;
     for (int64_t n = 1; n <= limit; n++)
     {
+      if (n > 1)
+        omega[n] = omega[n / lpf[n]] + 1;
+      pi[n] = pi[n - 1] + (n > 1 && lpf[n] == n);
       phi[n] = phi[n - 1] + (n == 1 || lpf[n] >= prime);
       mertens[n] = mertens[n - 1] + (lpf[n] > prime ? mu[n] : 0);
+      coefficients[n] = coefficients[n - 1];
+      if (lpf[n] > prime && omega[n] <= 2)
+        coefficients[n] += mu[n];
+      if (lpf[n] >= prime && omega[n] == 3)
+        coefficients[n]++;
     }
+  }
+
+  int64_t e2(int64_t t, int64_t p) const
+  {
+    if (t < p * p)
+      return 2 * pi[t] - 2 * pi[p] + 1;
+    return 2 * pi[t] + pi[t / p] + pi[isqrt(t)] - 4 * pi[p] + 2;
   }
 };
 
@@ -118,7 +142,7 @@ void check_segments(const Input& input, int64_t size,
   int64_t b = pi[p];
   int64_t xpy = input.xp / input.y;
   int64_t stop = expected.size() - 1;
-  int64_t mertens_y = reference.mertens[input.y];
+  int64_t coefficient = reference.coefficients[input.y];
   Vector<SemiprimeEvent> events;
   SemiprimeEventSorter sorter;
 
@@ -131,13 +155,15 @@ void check_segments(const Input& input, int64_t size,
     sieve.pre_sieve(primes, b - 1, low, high);
     sieve.init_counter(low, high);
 
-    T actual = hyperbola_sum(T(input.xp), p, b, input.y, low, high, phi, mertens_y,
+    T actual = hyperbola_sum(T(input.xp), p, b, input.y, low, high, phi, coefficient,
                              primes, pi, sieve, events, sorter, max_m);
     int64_t wanted = expected[high] - expected[low];
     if (actual != T(wanted) || max_m != xpy)
     {
-      std::cerr << "Hyperbola segment differs: p=" << p << ", low=" << low
-                << ", high=" << high << ", integer bytes=" << sizeof(T)
+      std::cerr << "Hyperbola segment differs: xp=" << input.xp << ", y="
+                << input.y << ", p=" << p << ", low=" << low
+                << ", high=" << high << ", actual=" << actual
+                << ", expected=" << T(wanted) << ", integer bytes=" << sizeof(T)
                 << ", prime bytes=" << sizeof(Prime) << '\n';
       std::exit(1);
     }
@@ -188,8 +214,9 @@ void check(const Input& input)
 
   // hyperbola_sum() tests the prime itself, whereas AC computes
   // the C1 hyperbola terms for p > (x/y)^(1/3).
-  check(sqrt_xp < input.y && input.y < square * p &&
+  check(sqrt_xp < input.y && input.y < square * square &&
         square <= input.y &&
+        input.y * input.y <= input.xp * p &&
         input.easy_leaves == (xpy < square) &&
         input.easy_leaves == (p > iroot<3>(xy)),
         "The test must use the hyperbola method");
@@ -213,15 +240,26 @@ void check(const Input& input)
       expected[position + 1] += value;
   };
 
-  add(sqrt_xp, reference.mertens[sqrt_xp] * reference.phi[sqrt_xp]);
-  add(xpy, -reference.mertens[input.y] * reference.phi[xpy]);
+  add(sqrt_xp, reference.coefficients[sqrt_xp] * reference.phi[sqrt_xp]);
+  add(xpy, -reference.coefficients[input.y] * reference.phi[xpy]);
   for (int64_t n = xpy + 1; n <= sqrt_xp; n++)
     if (reference.lpf[n] >= p)
     {
       int64_t c = reference.lpf[n] > p ? reference.mu[n] : 0;
       int64_t t = input.xp / n;
-      add(t, -(reference.mertens[t] + c * reference.phi[t]));
+      add(t, reference.e2(t, p) - (1 + c) * reference.phi[t]);
     }
+  // Reflect the three-factor prefix correction to positions <= H
+  for (int64_t d = sqrt_xp + 1; d <= input.y; d++)
+    if (reference.lpf[d] >= p && reference.omega[d] == 3)
+    {
+      int64_t c = reference.lpf[d] > p ? reference.mu[d] : 0;
+      add(input.xp / d, (1 - c) * reference.phi[input.xp / d]);
+    }
+
+  for (int64_t t = square; t <= input.y; t++)
+    check(reference.phi[t] - reference.e2(t, p) == reference.coefficients[t],
+          "The dense three-factor boundary coefficient differs");
 
   // The hyperbola terms replace the leaves xpy < m <= y
   int64_t direct = 0;
@@ -239,12 +277,19 @@ void check(const Input& input)
   auto primes32 = pi.get_primes<uint32_t>(input.y, 1);
   int64_t mertens_y = reference.mertens[input.y];
   Vector<int64_t> mertens = generate_mertens_y(input.y, 8, primes32, pi);
-  check(mertens[pi[p]] == mertens_y, "generate_mertens_y() differs");
+  if (input.y < square * p && pi[p] > 8)
+    check(mertens[pi[p]] == mertens_y, "generate_mertens_y() differs");
+  auto coefficients = generate_hyperbola_coefficients(input.y, 0, 0, primes32, pi);
+  check(coefficients[pi[p]] == reference.coefficients[input.y],
+        "generate_hyperbola_coefficients() differs");
 
   #if defined(HAVE_INT128_T)
     Vector<int64_t> primes64(primes32.size());
     for (std::size_t i = 0; i < primes32.size(); i++)
       primes64[i] = primes32[i];
+    auto coefficients64 = generate_hyperbola_coefficients(input.y, 0, 0, primes64, pi);
+    check(coefficients64[pi[p]] == reference.coefficients[input.y],
+          "generate_hyperbola_coefficients() with 64-bit primes differs");
   #endif
 
   for (int64_t size : { 240, 1680 })
@@ -288,10 +333,176 @@ void check_easy_primes()
   }
 }
 
+template <typename Prime>
+void check_coefficients(int64_t y, const Reference& reference,
+                        const Vector<Prime>& primes, const PiTable& pi)
+{
+  int64_t pi_sqrty = pi[isqrt(y)];
+  Vector<int64_t> mertens2(pi_sqrty + 1);
+  Vector<int64_t> triples(pi_sqrty + 1);
+  for (int64_t b = 1; b <= pi_sqrty; b++)
+  {
+    mertens2[b] = 0;
+    triples[b] = 0;
+    for (int64_t n = 1; n <= y; n++)
+    {
+      if (reference.lpf[n] > primes[b] && reference.omega[n] <= 2)
+        mertens2[b] += reference.mu[n];
+      if (reference.lpf[n] >= primes[b] && reference.omega[n] == 3)
+        triples[b]++;
+    }
+  }
+
+  const Array<int64_t, 4> k_values = { 0, 3, 8, pi_sqrty };
+  const Array<int64_t, 6> min_primes = { 0, iroot<4>(y), iroot<3>(y), isqrt(y),
+                                       y + 1, 2 * y };
+  for (int64_t k : k_values)
+    for (int64_t min_prime : min_primes)
+    {
+      auto coefficients = generate_hyperbola_coefficients(y, k, min_prime, primes, pi);
+      check(coefficients.size() == std::size_t(pi_sqrty + 1),
+            "The hyperbola coefficient vector has an incorrect size");
+      for (int64_t b = k + 1; b <= pi_sqrty; b++)
+      {
+        int64_t expected = mertens2[b];
+        if (primes[b] > max(min_prime, iroot<4>(y)))
+          expected += triples[b];
+        if (coefficients[b] != expected)
+        {
+          std::cerr << "Hyperbola coefficient differs: y=" << y << ", k=" << k
+                    << ", min_prime=" << min_prime << ", p=" << primes[b]
+                    << ", prime bytes=" << sizeof(Prime) << '\n';
+          std::exit(1);
+        }
+      }
+    }
+}
+
+void check_coefficients()
+{
+  for (int64_t y : { 80, 81, 82, 124, 125, 126, 624, 625, 626,
+                     1330, 1331, 1332, 14640, 14641, 14642 })
+  {
+    Reference reference(y, 2);
+    PiTable pi(y, 1);
+    auto primes32 = pi.get_primes<uint32_t>(y, 1);
+    check_coefficients(y, reference, primes32, pi);
+    #if defined(HAVE_INT128_T)
+      Vector<int64_t> primes64(primes32.size());
+      for (std::size_t i = 0; i < primes32.size(); i++)
+        primes64[i] = primes32[i];
+      check_coefficients(y, reference, primes64, pi);
+    #endif
+  }
+}
+
+template <typename T, typename Prime>
+void check_fourth_power(int64_t y, int64_t p,
+                        const Vector<Prime>& primes, const PiTable& pi)
+{
+  int64_t b = pi[p];
+  int64_t max_m = y;
+  int64_t size = 1680;
+  Sieve sieve(0, size, b);
+  sieve.pre_sieve(primes, b - 1, 0, size);
+  sieve.init_counter(0, size);
+  Vector<SemiprimeEvent> events;
+  SemiprimeEventSorter sorter;
+  T xp = (T(y) * y + p - 1) / p;
+  T actual = hyperbola_sum(xp, p, b, y, 0, size, 0, 0,
+                           primes, pi, sieve, events, sorter, max_m);
+  check(actual == 0 && max_m == y,
+        "The hyperbola method must reject y >= p^4");
+}
+
+void check_three_factor_inputs()
+{
+  // Triples on each side of H exercise all four event weights:
+  // 13*17*19 and 13^3 below H, 13*17*23 and 11^2*41 above H.
+  check({ 17640000, 13900, 11, false });
+
+  for (int64_t p : { 7, 11, 23 })
+    for (int64_t delta : { -1, 0, 1 })
+    {
+      int64_t y = p * p * p + delta;
+      int64_t xp = max((y * y + p - 1) / p, y * p * p);
+      check({ xp, y, p, false });
+    }
+
+  for (int64_t h : { 1330, 1331, 1332, 1680, 4198, 4199, 4200, 4320 })
+    for (int64_t delta : { -1, 0, 1 })
+    {
+      int64_t y = h < 2000 ? 4200 : 10000;
+      check({ h * h + delta, y, 11, false });
+    }
+
+  // Put repeated and square-free triples exactly at segment edges
+  for (int64_t delta : { -1, 0, 1 })
+  {
+    check({ 997 * (1331 + delta), 2000, 11, false });
+    check({ 1331 * 240 + delta, 1400, 11, false });
+    check({ 2197 * 2400 + delta, 5000, 11, false });
+    check({ 4199 * 4320 + delta, 10000, 11, false });
+    check({ 5083 * 1680 + delta, 9000, 11, false });
+    check({ 4961 * 1680 + delta, 9000, 11, false });
+  }
+
+  for (int64_t p : { 7, 11 })
+  {
+    int64_t fourth_power = p * p * p * p;
+    int64_t y = fourth_power - 1;
+    check({ (y * y + p - 1) / p, y, p, false });
+    for (int64_t delta : { 0, 1 })
+    {
+      y = fourth_power + delta;
+      PiTable pi(y, 1);
+      auto primes32 = pi.get_primes<uint32_t>(y, 1);
+      check_fourth_power<uint64_t>(y, p, primes32, pi);
+      #if defined(HAVE_INT128_T)
+        Vector<int64_t> primes64(primes32.size());
+        for (std::size_t i = 0; i < primes32.size(); i++)
+          primes64[i] = primes32[i];
+        check_fourth_power<uint128_t>(y, p, primes32, pi);
+        check_fourth_power<uint128_t>(y, p, primes64, pi);
+      #endif
+    }
+  }
+}
+
+#if defined(HAVE_INT128_T)
+template <typename Prime>
+void check_large_xp(const Vector<Prime>& primes, const PiTable& pi)
+{
+  int64_t y = 1000;
+  int64_t p = 23;
+  int64_t b = pi[p];
+  int64_t max_m = y;
+  Sieve sieve(0, 240, b);
+  sieve.pre_sieve(primes, b - 1, 0, 240);
+  sieve.init_counter(0, 240);
+  Vector<SemiprimeEvent> events;
+  SemiprimeEventSorter sorter;
+  uint128_t xp = uint128_t(1) << 100;
+  uint128_t actual = hyperbola_sum(xp, p, b, y, 0, 240, 0, 0,
+                                   primes, pi, sieve, events, sorter, max_m);
+  check(actual == 0 && max_m == y,
+        "The hyperbola method must reject a large 128-bit quotient");
+}
+#endif
+
 int main()
 {
   check_easy_primes();
+  check_coefficients();
   for (const Input& input : inputs)
     check(input);
+  check_three_factor_inputs();
+  #if defined(HAVE_INT128_T)
+    PiTable pi(1000, 1);
+    auto primes32 = pi.get_primes<uint32_t>(1000, 1);
+    auto primes64 = pi.get_primes<int64_t>(1000, 1);
+    check_large_xp(primes32, pi);
+    check_large_xp(primes64, pi);
+  #endif
   std::cout << "All hyperbola segment tests passed successfully!" << std::endl;
 }

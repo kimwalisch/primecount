@@ -1,6 +1,6 @@
 ///
 /// @file  SemiprimeEventSorter.hpp
-/// @brief Sort the distinct semiprime events of hyperbola_sum() by
+/// @brief Sort the distinct composite events of hyperbola_sum() by
 ///        decreasing n using two wheel-compressed bitmaps for presence
 ///        and weight, or std::sort if the bitmaps would be too large.
 ///
@@ -35,8 +35,8 @@ struct SemiprimeEvent
 class SemiprimeEventSorter : private BitSieve240
 {
 public:
-  /// Events must have distinct n = q*r in (min_n, max_n],
-  /// where 5 < q <= r are primes, and weight 1 or 2. Retain
+  /// Events must have distinct n in (min_n, max_n],
+  /// coprime to 30, and weight 1 or 2. Retain
   /// one sorter per D work unit so its scratch allocations
   /// are reused between segments and primes.
   void sort(Vector<SemiprimeEvent>& events,

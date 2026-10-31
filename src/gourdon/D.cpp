@@ -158,12 +158,11 @@ T D_OpenMP(T x,
            int threads,
            bool is_print)
 {
-  auto mertens_y = generate_mertens_y(y, k, primes, pi);
-
   // Hard special leaves satisfy m > p and
   // p^3 * m <= x, hence p^4 < x.
   int64_t x14 = iroot<4>(x);
   int64_t xy = x / y;
+  auto coefficients = generate_hyperbola_coefficients(y, k, xy / y, primes, pi);
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -197,7 +196,7 @@ T D_OpenMP(T x,
     while (loadBalancer.get_work(thread))
     {
       thread.start_time = get_time();
-      thread.sum = D_thread<T>(x, y, xy, k, x14, primes, pi, factor, mertens_y, thread);
+      thread.sum = D_thread<T>(x, y, xy, k, x14, primes, pi, factor, coefficients, thread);
       thread.stop_time = get_time();
       sum += thread.sum;
     }

@@ -123,9 +123,9 @@ Vector<uint32_t> generate_lpf(int64_t max,
 
 /// Returns a vector with the values
 /// mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n)
-/// for k < b <= pi[sqrt(y)]. Only entries with
-/// primes[b]^2 <= y < primes[b]^3 are correct, these are
-/// the entries used by the hyperbola method in D and AC.
+/// for k < b <= pi[sqrt(y)], restricted to integers with at most
+/// two prime factors. If y < primes[b]^3 this is the full prefix,
+/// otherwise D adds a three-factor boundary correction.
 ///
 Vector<int64_t> generate_mertens_y(int64_t y,
                                    int64_t k,
@@ -147,9 +147,9 @@ Vector<int64_t> generate_mertens_y(int64_t y,
 
 /// Returns a vector with the values
 /// mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n)
-/// for k < b <= pi[sqrt(y)]. Only entries with
-/// primes[b]^2 <= y < primes[b]^3 are correct, these are
-/// the entries used by the hyperbola method in D and AC.
+/// for k < b <= pi[sqrt(y)], restricted to integers with at most
+/// two prime factors. If y < primes[b]^3 this is the full prefix,
+/// otherwise D adds a three-factor boundary correction.
 ///
 Vector<int64_t> generate_mertens_y(int64_t y,
                                    int64_t k,
