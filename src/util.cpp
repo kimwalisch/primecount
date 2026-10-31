@@ -57,7 +57,7 @@ int get_status_precision(maxint_t x, int threads)
 {
   // Use default precision when no command-line precision provided
   if (status_precision_ < 0 &&
-      double(x) > 3e19)
+      double(x) >= 3e19)
   {
     // D(3e19) takes about 100 seconds using a single thread.
     // Multiplying x by 10 quadruples the runtime, while
