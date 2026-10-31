@@ -52,7 +52,10 @@ Vector<int8_t> generate_moebius(int64_t max, const Vector<uint32_t>& primes);
 Vector<uint32_t> generate_lpf(int64_t max, const Vector<uint32_t>& primes);
 
 /// Returns a vector with the values
-/// mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n).
+/// mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n)
+/// for k < b <= pi[sqrt(y)]. Only entries with
+/// primes[b]^2 <= y < primes[b]^3 are correct, these are
+/// the entries used by the hyperbola method in D and AC.
 ///
 Vector<int64_t> generate_mertens_y(int64_t y, int64_t k, const Vector<uint32_t>& primes, const PiTable& pi);
 Vector<int64_t> generate_mertens_y(int64_t y, int64_t k, const Vector<int64_t>& primes, const PiTable& pi);
