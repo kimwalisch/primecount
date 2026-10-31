@@ -10,7 +10,6 @@
 #ifndef LOADBALANCERS2_HPP
 #define LOADBALANCERS2_HPP
 
-#include <primecount-internal.hpp>
 #include <primecount-config.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
