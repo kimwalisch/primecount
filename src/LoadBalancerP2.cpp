@@ -30,7 +30,6 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
                                int threads,
                                bool is_print) :
   sieve_limit_(sieve_limit),
-  precision_(get_status_precision(x)),
   is_print_(is_print)
 {
   int64_t low = isqrt(x);
@@ -44,6 +43,7 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   double max_threads = std::pow(sieve_limit_, 1 / 3.7);
   threads = min(threads, (int) max_threads);
   threads_ = ideal_num_threads(dist, threads, min_thread_dist_);
+  precision_ = get_status_precision(x, threads_);
 
   // Using more chunks per thread improves load
   // balancing but also adds some overhead.

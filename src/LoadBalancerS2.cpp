@@ -75,7 +75,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   start_time_(get_time()),
   threads_(threads),
   is_print_(is_print),
-  status_(x, leaves_low, sieve_limit, sieve_factor, is_print)
+  status_(x, leaves_low, sieve_limit, sieve_factor, threads, is_print)
 {
   if (threads == 1 &&
       !is_print)

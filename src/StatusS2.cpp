@@ -24,14 +24,14 @@
 
 namespace primecount {
 
-StatusS2::StatusS2(maxint_t x, bool is_print)
+StatusS2::StatusS2(maxint_t x, int threads, bool is_print)
 {
   ASSERT(x >= 1);
 
   if (is_print)
   {
     epsilon_ = 1.0;
-    precision_ = get_status_precision(x);
+    precision_ = get_status_precision(x, threads);
 
     for (int i = 0; i < precision_; i++)
       epsilon_ /= 10.0;
@@ -52,10 +52,12 @@ StatusS2::StatusS2(maxint_t x,
                    double leaves_low,
                    int64_t limit,
                    double sieve_factor,
+                   int threads,
                    bool is_print)
-  : StatusS2(x, is_print)
+  : StatusS2(x, threads, is_print)
 {
   ASSERT(sieve_factor > 0);
+
   limit_ = (double) max(limit, 1);
   leaves_low = in_between(1.0, leaves_low, limit_);
   leaves_low_ = 1.5 * leaves_low;

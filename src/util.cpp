@@ -46,21 +46,29 @@ bool double_check_ = false;
 double truncate3(double n)
 {
   ASSERT(n <= 1e15);
-  return (int64_t)(n * 1000) / 1000.0;
+  return int64_t(n * 1000) / 1000.0;
 }
 
 } // namespace
 
 namespace primecount {
 
-int get_status_precision(maxint_t x)
+int get_status_precision(maxint_t x, int threads)
 {
-  // use default precision when no command-line precision provided
-  if (status_precision_ < 0)
+  // Use default precision when no command-line precision provided
+  if (status_precision_ < 0 &&
+      double(x) > 3e19)
   {
-    if ((double) x >= 1e24)
+    // D(3e19) takes about 100 seconds using a single thread.
+    // Multiplying x by 10 quadruples the runtime, while
+    // the speedup is proportional to the number of threads.
+    double log10_4 = 0.6020599913279624;
+    double seconds = 100 * std::pow(double(x) / 3e19, log10_4);
+    seconds /= max(threads, 1);
+
+    if (seconds >= 10000)
       return 2;
-    if ((double) x >= 1e21)
+    if (seconds >= 100)
       return 1;
   }
 

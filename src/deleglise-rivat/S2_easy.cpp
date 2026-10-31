@@ -63,7 +63,7 @@ T S2_easy_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
 
-  StatusS2 status(x, is_print);
+  StatusS2 status(x, threads, is_print);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_sqrty) + 1);
@@ -360,7 +360,7 @@ T S2_easy_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
 
-  StatusS2 status(x, is_print);
+  StatusS2 status(x, threads, is_print);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_sqrty) + 1);

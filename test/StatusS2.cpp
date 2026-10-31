@@ -75,7 +75,7 @@ int main()
     {
       for (double sieve_factor : sieve_factors)
       {
-        StatusS2 status(limit, leaves_low, limit, sieve_factor, false);
+        StatusS2 status(limit, leaves_low, limit, sieve_factor, 1, false);
         std::cout << "StatusS2(limit = " << limit << ", leaves_low = " << leaves_low
                   << ", sieve_factor = " << sieve_factor << ")";
         check(is_valid(status, limit, leaves_low));
@@ -87,8 +87,8 @@ int main()
   // towards the linear percentage of the sieving.
   int64_t limit = 46415773936ll;
   double leaves_low = 2511886;
-  StatusS2 status1(limit, leaves_low, limit, 1, false);
-  StatusS2 status2(limit, leaves_low, limit, 50, false);
+  StatusS2 status1(limit, leaves_low, limit, 1, 1, false);
+  StatusS2 status2(limit, leaves_low, limit, 50, 1, false);
 
   for (int i = 1; i < 100; i++)
   {

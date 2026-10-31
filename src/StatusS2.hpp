@@ -17,8 +17,8 @@ namespace primecount {
 class StatusS2
 {
 public:
-  StatusS2(maxint_t x, bool is_print);
-  StatusS2(maxint_t x, double leaves_low, int64_t limit, double sieve_factor, bool is_print);
+  StatusS2(maxint_t x, int threads, bool is_print);
+  StatusS2(maxint_t x, double leaves_low, int64_t limit, double sieve_factor, int threads, bool is_print);
   double getPercent(int64_t low) const;
   void print_S2_hard(double percent);
   void print_S2_easy(int64_t b, int64_t max_b);
