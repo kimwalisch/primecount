@@ -79,9 +79,6 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   max_segment_size_ = SegmentedPiTable::align_segment_size(max_segment_size_);
 
   store_packed(segment_size, segments);
-
-  if (is_print_)
-    print_AC_status(0, start_time_);
 }
 
 /// Pack segment_size & segments into a uint64_t,
@@ -105,6 +102,10 @@ void LoadBalancerAC::store_packed(int64_t segment_size,
 bool LoadBalancerAC::get_work(ThreadDataAC& thread)
 {
   double time = get_time();
+
+  if (is_print_)
+    print_AC_status(thread, time);
+
   thread.secs = time - thread.secs;
   int64_t low = low_.load(std::memory_order_relaxed);
 
@@ -157,21 +158,14 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   // fetch_add() reserves unique work for this thread.
   int64_t thread_dist = segment_size * segments;
   low = low_.fetch_add(thread_dist, std::memory_order_relaxed);
-
   thread.low = low;
   thread.segments = segments;
   thread.segment_size = segment_size;
 
-  // The lockfree critical section above should complete
-  // as fast as possible. Hence, printing should be done
-  // afterwards since it may incur a system call.
-  if (is_print_)
-    print_AC_status(low, time);
-
-  return low < sqrtx_;
+  return thread.low < sqrtx_;
 }
 
-void LoadBalancerAC::print_AC_status(int64_t low,
+void LoadBalancerAC::print_AC_status(const ThreadDataAC& thread,
                                      double time)
 {
   // Prevent lock contention on many-core systems,
@@ -197,15 +191,18 @@ void LoadBalancerAC::print_AC_status(int64_t low,
 
     // The next thread can print again in 0.1 seconds
     next_print_time_.store(time + 0.1, std::memory_order_relaxed);
+    int64_t high = thread.low + thread.segment_size * thread.segments;
+    int64_t segment_nr = min(high, sqrtx_) / min_segment_size_;
 
-    low = min(low, sqrtx_);
-    int64_t segment_nr = low / min_segment_size_;
-    int64_t total_segments = ceil_div(sqrtx_, min_segment_size_);
-    std::string status = "Segments: ";
-    status += std::to_string(segment_nr) + '/';
-    status += std::to_string(total_segments);
-
-    print_status(status);
+    if (segment_nr > segment_nr_)
+    {
+      segment_nr_ = segment_nr;
+      int64_t total_segments = ceil_div(sqrtx_, min_segment_size_);
+      std::string status = "Segments: ";
+      status += std::to_string(segment_nr) + '/';
+      status += std::to_string(total_segments);
+      print_status(status);
+    }
   }
 }
 

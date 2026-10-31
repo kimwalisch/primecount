@@ -116,7 +116,7 @@ T P2_OpenMP(T x,
   // for (low = sqrt(x); low < x / y; low += dist)
   #pragma omp parallel num_threads(threads) reduction(+:sum)
   {
-    int64_t low, high;
+    int64_t low = 0, high = 0;
     while (loadBalancer.get_work(low, high))
       sum += P2_thread(x, y, low, high);
   }

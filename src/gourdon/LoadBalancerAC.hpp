@@ -40,12 +40,13 @@ public:
 
 private:
   void store_packed(int64_t segment_size, int64_t segments);
-  void print_AC_status(int64_t low, double time);
+  void print_AC_status(const ThreadDataAC& thread, double time);
 
   int64_t sqrtx_ = 0;
   int64_t y_ = 0;
   int64_t min_segment_size_ = 0;
   int64_t max_segment_size_ = 0;
+  int64_t segment_nr_ = -1;
   double start_time_ = 0;
   int threads_ = 0;
   bool is_print_ = false;
