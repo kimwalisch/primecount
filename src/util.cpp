@@ -62,8 +62,7 @@ int get_status_precision(maxint_t x, int threads)
     // D(3e19) takes about 100 seconds using a single thread.
     // Multiplying x by 10 quadruples the runtime, while
     // the speedup is proportional to the number of threads.
-    double log10_4 = 0.6020599913279624;
-    double seconds = 100 * std::pow(double(x) / 3e19, log10_4);
+    double seconds = 100 * std::pow(double(x) / 3e19, std::log10(4));
     seconds /= max(threads, 1);
 
     if (seconds >= 10000)
