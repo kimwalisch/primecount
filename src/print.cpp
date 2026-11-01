@@ -33,6 +33,7 @@ void print_threads(int threads)
 } // namespace
 
 #if __cplusplus >= 201703L && \
+    (!defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) || __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 130400) && \
     __has_include(<charconv>)
 
 #include <primecount.hpp>
