@@ -206,8 +206,8 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>0.33s</td>
-    <td>0.14s</td>
+    <td>0.31s</td>
+    <td>0.13s</td>
     <td>0.07s</td>
     <td>0.05s</td>
     <td>0.03s</td>
@@ -215,29 +215,29 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>2.24s</td>
-    <td>0.86s</td>
-    <td>0.28s</td>
-    <td>0.19s</td>
+    <td>2.19s</td>
+    <td>0.80s</td>
+    <td>0.27s</td>
+    <td>0.18s</td>
     <td>0.07s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
-    <td>18.79s</td>
-    <td>6.73s</td>
-    <td>1.28s</td>
-    <td>0.78s</td>
-    <td>0.23s</td>
+    <td>17.90s</td>
+    <td>6.31s</td>
+    <td>1.19s</td>
+    <td>0.70s</td>
+    <td>0.21s</td>
   </tr>
   <tr align="right">
     <td>10<sup>18</sup></td>
     <td>24,739,954,287,740,860</td>
-    <td>161.25s</td>
-    <td>60.02s</td>
-    <td>5.70s</td>
-    <td>3.19s</td>
-    <td>0.86s</td>
+    <td>152.92s</td>
+    <td>56.13s</td>
+    <td>5.46s</td>
+    <td>2.85s</td>
+    <td>0.72s</td>
   </tr>
   <tr align="right">
     <td>10<sup>19</sup></td>
@@ -245,8 +245,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>16.61s</td>
-    <td>3.12s</td>
+    <td>14.78s</td>
+    <td>2.73s</td>
   </tr>
   <tr align="right">
     <td>10<sup>20</sup></td>
@@ -254,8 +254,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>82.71s</td>
-    <td>12.08s</td>
+    <td>74.76s</td>
+    <td>10.74s</td>
   </tr>
   <tr align="right">
     <td>10<sup>21</sup></td>
@@ -263,8 +263,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>375.09s</td>
-    <td>48.86s</td>
+    <td>348.50s</td>
+    <td>42.14s</td>
   </tr>
   <tr align="right">
     <td>10<sup>22</sup></td>
@@ -272,8 +272,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>1,629.73s</td>
-    <td>194.82s</td>
+    <td>1,534.40s</td>
+    <td>159.50s</td>
   </tr>
 </table>
 
