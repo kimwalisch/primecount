@@ -294,8 +294,10 @@ T AC_OpenMP_fastdivider(T x,
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
+  // AC's work increases with alpha (y), hence the number
+  // of threads only depends on x and not on x / y.
   int64_t thread_threshold = 1000;
-  int max_threads = (int) std::pow(xy, 1 / 3.7);
+  int max_threads = (int) (std::sqrt(x13) / 4);
   threads = min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
   INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);

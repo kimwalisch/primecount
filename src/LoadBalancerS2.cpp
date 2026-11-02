@@ -199,18 +199,26 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
 void LoadBalancerS2::update(ThreadData& thread,
                             int64_t& segments) const
 {
+  int64_t low = low_.load(std::memory_order_relaxed);
+
   // If thread.segment_size < L1_segment_size then double
   // it until it reaches L1_segment_size.
   if (thread.segment_size < L1_segment_size)
   {
+    // Workloads without special leaves finish almost
+    // instantly, hence doubling the segment size after
+    // each workload would make it much too large before
+    // the dense region of special leaves is reached.
+    // This condition limits the segment_size growth.
+    if (thread.segment_size * threads_ > low * 2)
+      return;
+
     thread.segment_size *= 2;
     thread.segment_size = min(thread.segment_size, L1_segment_size);
     thread.segment_size = min(thread.segment_size, max_segment_size);
     thread.segment_size = Sieve::align_segment_size(thread.segment_size);
     return;
   }
-
-  int64_t low = low_.load(std::memory_order_relaxed);
 
   // Increasing the thread work chunks too quickly near
   // the start (<= y) may cause severe load imbalance

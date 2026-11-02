@@ -1,12 +1,17 @@
-Changes in primecount-9.0, 2026-10-31
+Changes in primecount-9.0, 2026-11-02
 
+* LoadBalancerS2.cpp: Limit segment size growth to avoid huge workloads.
+* LoadBalancerS2.cpp: Increase per-thread segment size, improves scaling.
+* LoadBalancerS2.cpp: Remove lazy initialization of workload finish times.
+* D.cpp: Limit threads to sqrt(x / y) / 150, up to 1.3x faster for x < 1e16.
+* pi_lmo_parallel.cpp: Limit threads to sqrt(x / y) / 300, up to 2x faster.
+* S2_hard.cpp: Limit threads to sqrt(x / y) / 250, up to 1.7x faster.
+* AC_*.hpp: Limit threads to x^(1/6) / 4, up to 1.5x faster for x < 1e17.
+* LoadBalancerP2.cpp: Tune threads and chunk sizes, up to 2x faster B and P2.
 * Choose default status precision using estimated runtime and thread count.
 * LoadBalancerP2, LoadBalancerAC: Throttle status printing in C++14 builds.
 * StatusS2.cpp: Smoother status for D, S2_hard and LMO using a model of
   the special leaves' work distribution.
-* LoadBalancerS2.cpp: Increase each thread's previous segment size instead
-  of the shared segment size, improves scaling on many-core servers.
-* LoadBalancerS2: Remove lazy initialization of workload finish times.
 * FastDivider.hpp: New faster multiply-shift division by precomputed
   reciprocals, replaces libdivide in AC and S2_easy.
 * CMake: Rename WITH_LIBDIVIDE option to WITH_FASTDIVIDER.

@@ -39,15 +39,15 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
-  min_thread_dist_ = 1 << 23;
-  double max_threads = std::pow(sieve_limit_, 1 / 3.7);
+  min_thread_dist_ = 1 << 21;
+  double max_threads = std::sqrt(sieve_limit_) / 350;
   threads = min(threads, (int) max_threads);
   threads_ = ideal_num_threads(dist, threads, min_thread_dist_);
   precision_ = get_status_precision(x, threads_);
 
   // Using more chunks per thread improves load
   // balancing but also adds some overhead.
-  int64_t chunks_per_thread = 8;
+  int64_t chunks_per_thread = 4;
   thread_dist_ = dist / (threads_ * chunks_per_thread);
   thread_dist_ = max(min_thread_dist_, thread_dist_);
 }
