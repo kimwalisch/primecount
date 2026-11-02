@@ -189,7 +189,7 @@ int64_t S2(int64_t x,
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t thread_threshold = 1 << 20;
-  int max_threads = (int) std::pow(xy, 1 / 3.7);
+  int max_threads = (int) (std::sqrt(xy) / 300);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
 
