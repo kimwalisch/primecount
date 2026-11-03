@@ -52,7 +52,7 @@ T Sigma3(T b, T d)
   return (b * (b - 1) * (2 * b - 1)) / 6 - b - (d * (d - 1) * (2 * d - 1)) / 6 + d;
 }
 
-/// Memory usage: O(x^(3/8))
+/// Memory usage: O(y)
 template <typename T>
 T Sigma456(T x,
            int64_t y,
