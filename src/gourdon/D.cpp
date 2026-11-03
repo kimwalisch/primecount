@@ -191,8 +191,7 @@ T D_OpenMP(T x,
   double default_alpha = get_alpha_gourdon(x);
   double sieve_factor = std::pow(default_alpha / alpha, 1.05);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, leaves_start, sieve_factor, threads, is_print);
-  using UT = typename pstd::make_unsigned<T>::type;
-  UT sum = 0;
+  T sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
