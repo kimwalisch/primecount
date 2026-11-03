@@ -284,7 +284,7 @@ int128_t S2_hard(int128_t x,
 
   int128_t sum;
 
-  // uses less memory
+  // Uses less memory
   if (y <= FactorTable<uint16_t>::max())
   {
     FactorTable<uint16_t> factor(y, threads);

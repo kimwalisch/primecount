@@ -266,7 +266,7 @@ int128_t D(int128_t x,
 
   int128_t sum;
 
-  // Use 16-bit factor table entries whenever possible.
+  // Uses less memory
   if (y <= FactorTable<uint16_t>::max())
   {
     FactorTable<uint16_t> factor(y, threads);
