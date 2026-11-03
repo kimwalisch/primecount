@@ -1,10 +1,12 @@
 ///
 /// @file  Sigma.cpp
 ///        The 7 sigma formulas are the least computationally
-///        expensive formulas in Gourdon's algorithm. Sigma0 has a
-///        runtime complexity of O(x(1/2)), all other formulas
-///        have a runtime complexity of O(y) and hence it does not
-///        make much sense to use multi-threading.
+///        expensive formulas in Gourdon's algorithm. Sigma0 computes
+///        pi(x^(1/2)) using multi-threading. Sigma1, Sigma2 and
+///        Sigma3 are closed-form expressions, and Sigma4, Sigma5
+///        and Sigma6 iterate over the primes x_star < p <= x^(1/3)
+///        using O(pi(x^(1/3))) pi[x] lookups. These are so fast
+///        that they are computed using a single thread.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
