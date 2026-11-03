@@ -117,7 +117,7 @@ Use MSYS2 MinGW-w64 GCC in the UCRT64 environment as the primary Windows compile
 
 Prepend that directory to `PATH` in every new shell used to configure, build, or run tests. This makes both the build tools and their runtime DLLs available. Set the compiler and make program explicitly as shown below to avoid tool discovery delays.
 
-The following PowerShell commands were verified on this PC using the `Unix Makefiles` generator from `doc/Build.md`, CMake 4.4.3, and GCC 16.2.0. Run them from the repository root. `build-agents-msys2-gcc` is an ignored build directory; reuse it when its compiler and generator match, or choose a fresh build directory when they differ.
+The following PowerShell commands were verified on this PC using the `Unix Makefiles` generator from `doc/BUILD.md`, CMake 4.4.3, and GCC 16.2.0. Run them from the repository root. `build-agents-msys2-gcc` is an ignored build directory; reuse it when its compiler and generator match, or choose a fresh build directory when they differ.
 
 ```powershell
 $env:Path = 'C:\msys64\ucrt64\bin;' + $env:Path
@@ -158,7 +158,7 @@ Always build and run all of the following checks after code changes, using a sep
 
 In PowerShell, use `.\primecount.exe` as shown above. Check every command's exit status and report any failures or checks that could not be completed.
 
-See `doc/Build.md` for general build instructions and `test/README.md` for additional testing options.
+See `doc/BUILD.md` for general build instructions and `test/README.md` for additional testing options.
 
 ## Windows Python process cleanup
 
