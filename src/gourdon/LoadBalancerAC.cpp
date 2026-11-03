@@ -165,8 +165,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   return thread.low < sqrtx_;
 }
 
-void LoadBalancerAC::print_AC_status(const ThreadDataAC& thread,
-                                     double time)
+void LoadBalancerAC::print_AC_status(const ThreadDataAC& thread, double time)
 {
   // Prevent lock contention on many-core systems,
   // print status only every 0.1 seconds.

@@ -114,7 +114,7 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
   return low < sieve_limit_;
 }
 
-void LoadBalancerP2::print_P2_status(int64_t low)
+void LoadBalancerP2::print_P2_status(int64_t high)
 {
   double time = get_time();
 
@@ -141,7 +141,7 @@ void LoadBalancerP2::print_P2_status(int64_t low)
 
     // The next thread can print again in 0.1 seconds
     next_print_time_.store(time + 0.1, std::memory_order_relaxed);
-    double percent = get_percent(low, sieve_limit_);
+    double percent = get_percent(high, sieve_limit_);
 
     if (percent > percent_)
     {

@@ -30,7 +30,7 @@ public:
   int get_threads() const;
 
 private:
-  void print_P2_status(int64_t low);
+  void print_P2_status(int64_t high);
 
   int64_t sieve_limit_ = 0;
   int64_t min_thread_dist_ = 0;
