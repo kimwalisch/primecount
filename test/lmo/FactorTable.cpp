@@ -40,7 +40,7 @@ int main()
   check(FactorTable<uint16_t>::max() == 149060082888);
   check(FactorTable<uint32_t>::max() == pstd::numeric_limits<int64_t>::max());
   check(FactorTable<uint16_t>::to_index(
-          FactorTable<uint16_t>::max()) > UINT32_MAX);
+          FactorTable<uint16_t>::max()) > uint32_max);
   check(FactorTable<uint16_t>::encode(32766) == uint16_max - 2);
   check(FactorTable<uint16_t>::encode(32767) == uint16_max);
 
