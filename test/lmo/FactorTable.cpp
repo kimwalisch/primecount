@@ -150,20 +150,20 @@ int main()
   // crosses FactorTable's threading threshold.
   {
     int64_t parallel_y = 5000001;
-    FactorTable<uint16_t> singleThread(parallel_y, 1);
-    FactorTable<uint16_t> multiThread(parallel_y, 2);
+    FactorTable<uint16_t> singleThread16(parallel_y, 1);
+    FactorTable<uint16_t> multiThread16(parallel_y, 2);
     FactorTable<uint32_t> singleThread32(parallel_y, 1);
     FactorTable<uint32_t> multiThread32(parallel_y, 2);
-    int64_t size = singleThread.to_index(parallel_y) + 1;
+    int64_t size = singleThread16.to_index(parallel_y) + 1;
     bool equal = true;
 
     for (int64_t i = 0; equal && i < size; i++)
     {
-      equal = singleThread[i] == multiThread[i];
+      equal = singleThread16[i] == multiThread16[i];
       equal = equal && singleThread32[i] == multiThread32[i];
 
-      if (equal && singleThread[i] != 0)
-        equal = singleThread.mu(i) == multiThread.mu(i);
+      if (equal && singleThread16[i] != 0)
+        equal = singleThread16.mu(i) == multiThread16.mu(i);
     }
 
     check(equal);
