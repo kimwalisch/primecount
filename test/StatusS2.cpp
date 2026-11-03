@@ -32,7 +32,7 @@ void check(bool OK)
 
 /// The percentage must be 0 at the start, 100 at the end
 /// and monotonically increase in between.
-bool is_valid(const StatusS2& status, int64_t limit, double leaves_low)
+bool is_valid(const StatusS2& status, int64_t limit, double leaves_start)
 {
   if (status.getPercent(0) != 0 ||
       std::abs(status.getPercent(limit) - 100) > 1e-9 ||
@@ -46,7 +46,7 @@ bool is_valid(const StatusS2& status, int64_t limit, double leaves_low)
     // Linear, logarithmic and near the start of the leaves
     double positions[3] = { limit * (i / 1000.0),
                             std::pow(double(limit), i / 1000.0),
-                            leaves_low * (1 + i / 200.0) };
+                            leaves_start * (1 + i / 200.0) };
 
     for (int j = 0; j < 3; j++)
     {
@@ -71,14 +71,14 @@ int main()
 
   for (int64_t limit : limits)
   {
-    for (double leaves_low : { 1.0, std::sqrt(double(limit)), limit / 2.0, double(limit) })
+    for (double leaves_start : { 1.0, std::sqrt(double(limit)), limit / 2.0, double(limit) })
     {
       for (double sieve_factor : sieve_factors)
       {
-        StatusS2 status(limit, limit, leaves_low, sieve_factor, 1, false);
-        std::cout << "StatusS2(limit = " << limit << ", leaves_low = " << leaves_low
+        StatusS2 status(limit, limit, leaves_start, sieve_factor, 1, false);
+        std::cout << "StatusS2(limit = " << limit << ", leaves_start = " << leaves_start
                   << ", sieve_factor = " << sieve_factor << ")";
-        check(is_valid(status, limit, leaves_low));
+        check(is_valid(status, limit, leaves_start));
       }
     }
   }
@@ -86,9 +86,9 @@ int main()
   // A larger sieve_factor moves the percentage
   // towards the linear percentage of the sieving.
   int64_t limit = 46415773936ll;
-  double leaves_low = 2511886;
-  StatusS2 status1(limit, limit, leaves_low, 1, 1, false);
-  StatusS2 status2(limit, limit, leaves_low, 50, 1, false);
+  double leaves_start = 3767829;
+  StatusS2 status1(limit, limit, leaves_start, 1, 1, false);
+  StatusS2 status2(limit, limit, leaves_start, 50, 1, false);
 
   for (int i = 1; i < 100; i++)
   {

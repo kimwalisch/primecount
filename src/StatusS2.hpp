@@ -18,14 +18,14 @@ class StatusS2
 {
 public:
   StatusS2(maxint_t x, int threads, bool is_print);
-  StatusS2(maxint_t x, int64_t sieve_limit, double leaves_low, double sieve_factor, int threads, bool is_print);
+  StatusS2(maxint_t x, int64_t sieve_limit, double leaves_start, double sieve_factor, int threads, bool is_print);
   double getPercent(int64_t low) const;
   void print_S2_hard(double percent);
   void print_S2_easy(int64_t b, int64_t max_b);
 
 private:
   double work(double low) const;
-  double leaves_low_ = 0;
+  double leaves_start_ = 0;
   double leaves_scale_ = 1;
   double sieve_work_ = 0;
   double sieve_limit_ = 1;

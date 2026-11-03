@@ -41,7 +41,7 @@ StatusS2::StatusS2(maxint_t x, int threads, bool is_print)
 /// Used by S2_hard(), D() and LMO, which sieve the interval
 /// [0, sieve_limit[. The work is modeled as evenly distributed
 /// sieving work plus the work of the special leaves, which
-/// starts near leaves_low and then decreases like O(n^(-3/2)),
+/// starts at leaves_start and then decreases like O(n^(-3/2)),
 /// i.e. a Lomax distribution with shape 1/2. The constants
 /// have been determined empirically for 10^16 <= x <= 10^23
 /// using the default alpha. sieve_factor adjusts the share of
@@ -50,7 +50,7 @@ StatusS2::StatusS2(maxint_t x, int threads, bool is_print)
 ///
 StatusS2::StatusS2(maxint_t x,
                    int64_t sieve_limit,
-                   double leaves_low,
+                   double leaves_start,
                    double sieve_factor,
                    int threads,
                    bool is_print)
@@ -59,8 +59,12 @@ StatusS2::StatusS2(maxint_t x,
   ASSERT(sieve_factor > 0);
 
   sieve_limit_ = (double) max(sieve_limit, 1);
+
+  // The model's constants have been fitted
+  // relative to leaves_low = leaves_start / 1.5.
+  double leaves_low = leaves_start / 1.5;
   leaves_low = in_between(1.0, leaves_low, sieve_limit_);
-  leaves_low_ = 1.5 * leaves_low;
+  leaves_start_ = 1.5 * leaves_low;
   leaves_scale_ = 3.7 * leaves_low;
   sieve_work_ = sieve_factor * 0.066 * std::pow(sieve_limit_ / leaves_low, 0.16);
   total_work_ = work(sieve_limit_);
@@ -73,10 +77,10 @@ double StatusS2::work(double low) const
 {
   double sieve = sieve_work_ * low / sieve_limit_;
 
-  if (low <= leaves_low_)
+  if (low <= leaves_start_)
     return sieve;
 
-  double leaves = 1 - 1 / std::sqrt(1 + (low - leaves_low_) / leaves_scale_);
+  double leaves = 1 - 1 / std::sqrt(1 + (low - leaves_start_) / leaves_scale_);
   return sieve + leaves;
 }
 
