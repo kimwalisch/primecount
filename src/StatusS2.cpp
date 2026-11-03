@@ -40,13 +40,16 @@ StatusS2::StatusS2(maxint_t x, int threads, bool is_print)
 
 /// Used by S2_hard(), D() and LMO, which sieve the interval
 /// [0, sieve_limit[. The work is modeled as evenly distributed
-/// sieving work plus the work of the special leaves, which
-/// starts at leaves_start and then decreases like O(n^(-3/2)),
-/// i.e. a Lomax distribution with shape 1/2. The constants
-/// have been determined empirically for 10^16 <= x <= 10^23
-/// using the default alpha. sieve_factor adjusts the share of
-/// the sieving work for other alphas, it is 1 if the default
-/// alpha is used.
+/// sieving work plus the work of the special leaves, which starts at
+/// leaves_start and then decreases like O(n^(-3/2)), i.e. a Lomax
+/// distribution with shape 1/2. leaves_start is not the position of
+/// the first special leaf, but where the work of the special leaves
+/// becomes significant: roughly 0.1% to a few % of the special leaves
+/// are below it. When retuning, measure this position, not the first
+/// leaf. The constants have been determined empirically for
+/// 10^16 <= x <= 10^23 using the default alpha. sieve_factor adjusts
+/// the share of the sieving work for other alphas, it is 1 if the
+/// default alpha is used.
 ///
 StatusS2::StatusS2(maxint_t x,
                    int64_t sieve_limit,

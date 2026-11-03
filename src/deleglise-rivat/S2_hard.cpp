@@ -198,8 +198,9 @@ T S2_hard_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
 
-  // Approximate start of the special leaves, used
-  // by the load balancer and the status:
+  // Position where the work of the special leaves becomes
+  // significant (not the first leaf), used by the load
+  // balancer and the status, see StatusS2.cpp:
   // 1.5 * x / y^(3/2) for large y and 0.6 * y if y < x^(2/5).
   double leaves_start = 1.5 * double(x) / (y * std::sqrt(y));
   leaves_start = min(leaves_start, 0.6 * double(y));

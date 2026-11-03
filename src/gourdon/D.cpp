@@ -172,8 +172,9 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
 
-  // Approximate start of the special leaves, used
-  // by the load balancer and the status:
+  // Position where the work of the special leaves becomes
+  // significant (not the first leaf), used by the load
+  // balancer and the status, see StatusS2.cpp:
   // 1.5 * x^(2/5) using the hyperbola method,
   // 1.125 * x / y^(4/3) for large y and
   // 1.5 * x / y^(3/2) if y < x^(2/5).

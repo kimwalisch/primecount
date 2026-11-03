@@ -193,8 +193,9 @@ int64_t S2(int64_t x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
 
-  // Approximate start of the special leaves, used
-  // by the load balancer and the status:
+  // Position where the work of the special leaves becomes
+  // significant (not the first leaf), used by the load
+  // balancer and the status, see StatusS2.cpp:
   // 1.5 * x / y^2, since x / (p * m) > x / y^2 for p < m <= y.
   double leaves_start = 1.5 * double(x) / (double(y) * y);
 
