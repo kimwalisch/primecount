@@ -208,7 +208,7 @@ T D_thread_avx2(T x,
       {
         ASSERT(encoded_prime < UINT32_MAX);
         constexpr std::size_t max_m_count = m_indexes32.size() - 8;
-        __m256i m_vec = _mm256_set1_epi32(uint32_t(m));
+        __m256i m_base = _mm256_set1_epi32(uint32_t(m));
         __m256i lane_step = _mm256_set1_epi32(8);
 
         // Filter out square free m values using AVX2
@@ -217,10 +217,10 @@ T D_thread_avx2(T x,
         {
           uint32_t mask = mask8_avx2(&factor_table[m - 7], uint32_t(encoded_prime));
           __m128i offsets = _mm_loadl_epi64((const __m128i*) avx2_compact_offsets.values[mask]);
-          __m256i indexes = _mm256_sub_epi32(m_vec, _mm256_cvtepu8_epi32(offsets));
+          __m256i indexes = _mm256_sub_epi32(m_base, _mm256_cvtepu8_epi32(offsets));
           _mm256_storeu_si256((__m256i*) &m_indexes32[m_count], indexes);
           m_count += _mm_popcnt_u32(mask);
-          m_vec = _mm256_sub_epi32(m_vec, lane_step);
+          m_base = _mm256_sub_epi32(m_base, lane_step);
 
           if (m_count > max_m_count)
           {
@@ -273,7 +273,7 @@ T D_thread_avx2(T x,
       {
         ASSERT(encoded_prime < UINT32_MAX);
         constexpr std::size_t max_m_count = m_indexes64.size() - 8;
-        __m256i m_vec = _mm256_set1_epi64x(m);
+        __m256i m_base = _mm256_set1_epi64x(m);
         __m256i lane_step = _mm256_set1_epi64x(8);
 
         // Filter out square free m values using AVX2
@@ -282,13 +282,13 @@ T D_thread_avx2(T x,
         {
           uint32_t mask = mask8_avx2(&factor_table[m - 7], uint32_t(encoded_prime));
           __m128i offsets = _mm_loadl_epi64((const __m128i*) avx2_compact_offsets.values[mask]);
-          __m256i indexes = _mm256_sub_epi64(m_vec, _mm256_cvtepu8_epi64(offsets));
+          __m256i indexes = _mm256_sub_epi64(m_base, _mm256_cvtepu8_epi64(offsets));
           _mm256_storeu_si256((__m256i*) &m_indexes64[m_count], indexes);
           offsets = _mm_srli_si128(offsets, 4);
-          indexes = _mm256_sub_epi64(m_vec, _mm256_cvtepu8_epi64(offsets));
+          indexes = _mm256_sub_epi64(m_base, _mm256_cvtepu8_epi64(offsets));
           _mm256_storeu_si256((__m256i*) &m_indexes64[m_count + 4], indexes);
           m_count += _mm_popcnt_u32(mask);
-          m_vec = _mm256_sub_epi64(m_vec, lane_step);
+          m_base = _mm256_sub_epi64(m_base, lane_step);
 
           if (m_count > max_m_count)
           {
