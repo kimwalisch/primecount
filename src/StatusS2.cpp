@@ -45,8 +45,8 @@ StatusS2::StatusS2(maxint_t x, int threads, bool is_print)
 /// i.e. a Lomax distribution with shape 1/2. The constants
 /// have been determined empirically for 10^16 <= x <= 10^23
 /// using the default alpha. sieve_factor adjusts the share of
-/// the sieving work for other alphas; D and S2_hard use 1
-/// for the default alpha.
+/// the sieving work for other alphas, it is 1 if the default
+/// alpha is used.
 ///
 StatusS2::StatusS2(maxint_t x,
                    int64_t sieve_limit,
