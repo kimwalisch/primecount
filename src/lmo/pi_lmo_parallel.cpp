@@ -193,8 +193,8 @@ int64_t S2(int64_t x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
 
-  // Used for printing the status: position of the first
-  // special leaves, x / (p * m) > x / y^2 for p < m <= y.
+  // Position of the first hard special leaves,
+  // x / (p * m) > x / y^2 for p < m <= y.
   double leaves_low = double(x) / (double(y) * y);
 
   // The sieving work relative to the special leaves

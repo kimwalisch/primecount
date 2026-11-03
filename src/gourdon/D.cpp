@@ -172,9 +172,9 @@ T D_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
 
-  // Used for printing the status: position of the first hard
-  // special leaves, x^(2/5) using the hyperbola method,
-  // x / y^(4/3) for large y and x / y^(3/2) if y < x^(2/5).
+  // Position of the first hard special leaves,
+  // x^(2/5) using the hyperbola method, x / y^(4/3)
+  // for large y and x / y^(3/2) if y < x^(2/5).
   double xd = (double) x;
   double yd = (double) y;
   double leaves_low = std::pow(xd, 2 / 5.0);

@@ -8,7 +8,7 @@
 #   alpha tuning factors and prints out the fastest alphas. The fastest
 #   alpha factors will vary slightly for different CPUs. Once a list of
 #   fast alpha factors has been generated you can follow the
-#   instructions in doc/alpha-factor-tuning.pdf and generate a new
+#   instructions in doc/alpha-factor-gourdon.pdf and generate a new
 #   alpha tuning function for use in primecount's source code.
 
 # Execute in base directory

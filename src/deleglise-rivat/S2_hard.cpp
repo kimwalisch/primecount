@@ -198,8 +198,8 @@ T S2_hard_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xy, threads, thread_threshold);
 
-  // Approximate onset of hard special leaves for the status and
-  // load balancer, bounded by x / y^(3/2) and 0.4 * y.
+  // Position of the first hard special leaves,
+  // x / y^(3/2) for large y and 0.4 * y if y < x^(2/5).
   double leaves_low = double(x) / (y * std::sqrt(y));
   leaves_low = min(leaves_low, 0.4 * double(y));
 
