@@ -104,7 +104,7 @@ void init_LLVM_OpenMP(int argc, char* argv[])
     // ./primecount 1e20 --time
 
     set_env("OMP_WAIT_POLICY", "ACTIVE");
-    set_env("KMP_BLOCKTIME", "30ms");
+    set_env("KMP_BLOCKTIME", "30");
     set_env("OMP_PLACES", "cores");
     set_env("OMP_PROC_BIND", "spread");
   }

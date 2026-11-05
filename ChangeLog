@@ -1,5 +1,6 @@
-Changes in primecount-9.0, 2026-11-04
+Changes in primecount-9.0, 2026-11-05
 
+* main.cpp: Avoid KMP_BLOCKTIME warnings with LLVM OpenMP before version 18.
 * StatusS2.cpp: Tune the work model of D, S2_hard and LMO separately.
 * LoadBalancerS2.cpp: Limit segment size growth to avoid huge workloads.
 * LoadBalancerS2.cpp: Increase per-thread segment size, improves scaling.
