@@ -2,8 +2,8 @@
 /// @file   StatusS2.cpp
 /// @brief  Test the work model used for printing the status of
 ///         the D, S2_hard and LMO formulas, and test that the
-///         sieve_factor of each algorithm is 1 when using the
-///         default alpha tuning factor.
+///         alpha factor of each algorithm's sieve_work is 1 when
+///         using the default alpha tuning factor.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -67,40 +67,58 @@ bool is_valid(const StatusS2& status, int64_t limit, double leaves_start)
 int main()
 {
   int64_t limits[3] = { 1000, 46415773936ll, 1ll << 62 };
-  double sieve_factors[4] = { 0.001, 1, 50, 1000 };
+  // The alpha factor (default_alpha / alpha)^exponent of sieve_work
+  // ranges from 1.9e-7 (LMO, alpha = x^(1/6)) to 1720 (D, alpha = 1)
+  double sieve_factors[6] = { 1e-7, 0.001, 1, 50, 1000, 1e4 };
+  WorkModelS2 models[3] = { { 0, 0.0149, 1.9307, 0.41271, 0.34966 },
+                            { 0, 0.076243, 4.3158, 0.61257, 0.1403 },
+                            { 0, 0.47309, 1.1764, 0.36355, 0.030408 } };
 
   for (int64_t limit : limits)
   {
     for (double leaves_start : { 1.0, std::sqrt(double(limit)), limit / 2.0, double(limit) })
     {
-      for (double sieve_factor : sieve_factors)
+      for (const WorkModelS2& algo_model : models)
       {
-        StatusS2 status(limit, limit, leaves_start, sieve_factor, 1, false);
-        std::cout << "StatusS2(limit = " << limit << ", leaves_start = " << leaves_start
-                  << ", sieve_factor = " << sieve_factor << ")";
-        check(is_valid(status, limit, leaves_start));
+        for (double sieve_factor : sieve_factors)
+        {
+          WorkModelS2 model = algo_model;
+          model.leaves_start = leaves_start;
+          model.sieve_work *= sieve_factor;
+          StatusS2 status(limit, limit, model, 1, false);
+          std::cout << "StatusS2(limit = " << limit << ", leaves_start = " << leaves_start
+                    << ", leaves_shape = " << model.leaves_shape
+                    << ", sieve_work = " << model.sieve_work << ")";
+          check(is_valid(status, limit, leaves_start));
+        }
       }
     }
   }
 
-  // A larger sieve_factor moves the percentage
+  // A larger sieve_work moves the percentage
   // towards the linear percentage of the sieving.
   int64_t limit = 46415773936ll;
-  double leaves_start = 3767829;
-  StatusS2 status1(limit, limit, leaves_start, 1, 1, false);
-  StatusS2 status2(limit, limit, leaves_start, 50, 1, false);
 
-  for (int i = 1; i < 100; i++)
+  for (WorkModelS2 model1 : models)
   {
-    int64_t low = int64_t(std::pow(double(limit), i / 100.0));
-    double linear = 100.0 * low / limit;
-    double diff1 = std::abs(status1.getPercent(low) - linear);
-    double diff2 = std::abs(status2.getPercent(low) - linear);
-    std::cout << "getPercent(" << low << ") closer to linear for larger sieve_factor";
-    check(diff2 <= diff1 + 1e-9);
+    model1.leaves_start = 3767829;
+    WorkModelS2 model2 = model1;
+    model2.sieve_work *= 50;
+    StatusS2 status1(limit, limit, model1, 1, false);
+    StatusS2 status2(limit, limit, model2, 1, false);
+
+    for (int i = 1; i < 100; i++)
+    {
+      int64_t low = int64_t(std::pow(double(limit), i / 100.0));
+      double linear = 100.0 * low / limit;
+      double diff1 = std::abs(status1.getPercent(low) - linear);
+      double diff2 = std::abs(status2.getPercent(low) - linear);
+      std::cout << "getPercent(" << low << ") closer to linear for larger sieve_work";
+      check(diff2 <= diff1 + 1e-9);
+    }
   }
 
-  // The sieve_factor is computed using get_alpha_*(x) / get_alpha(x, y)
+  // The sieve_work is adjusted using get_alpha_*(x) / get_alpha(x, y)
   // which must be 1 when using the default alpha tuning factor.
   for (int i = 12; i <= 18; i++)
   {

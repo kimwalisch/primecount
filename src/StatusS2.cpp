@@ -41,35 +41,30 @@ StatusS2::StatusS2(maxint_t x, int threads, bool is_print)
 /// Used by S2_hard(), D() and LMO, which sieve the interval
 /// [0, sieve_limit[. The work is modeled as evenly distributed
 /// sieving work plus the work of the special leaves, which starts at
-/// leaves_start and then decreases like O(n^(-3/2)), i.e. a Lomax
-/// distribution with shape 1/2. leaves_start is not the position of
+/// leaves_start and then decreases like O(n^-(1 + leaves_shape)),
+/// i.e. a Lomax distribution. leaves_start is not the position of
 /// the first special leaf, but where the work of the special leaves
 /// becomes significant: roughly 0.1% to a few % of the special leaves
-/// are below it. When retuning, measure this position, not the first
-/// leaf. The constants have been determined empirically for
-/// 10^16 <= x <= 10^23 using the default alpha. sieve_factor adjusts
-/// the share of the sieving work for other alphas, it is 1 if the
-/// default alpha is used.
+/// are below it. sieve_work includes the factor
+/// (default_alpha / alpha)^exponent, which adjusts the share of the
+/// sieving work for non-default alphas and is 1 for the default alpha.
 ///
 StatusS2::StatusS2(maxint_t x,
                    int64_t sieve_limit,
-                   double leaves_start,
-                   double sieve_factor,
+                   const WorkModelS2& model,
                    int threads,
                    bool is_print)
   : StatusS2(x, threads, is_print)
 {
-  ASSERT(sieve_factor > 0);
+  ASSERT(model.leaves_scale > 0);
+  ASSERT(model.leaves_shape > 0);
+  ASSERT(model.sieve_work > 0);
 
   sieve_limit_ = (double) max(sieve_limit, 1);
-
-  // The model's constants have been fitted
-  // relative to leaves_low = leaves_start / 1.5.
-  double leaves_low = leaves_start / 1.5;
-  leaves_low = in_between(1.0, leaves_low, sieve_limit_);
-  leaves_start_ = 1.5 * leaves_low;
-  leaves_scale_ = 3.7 * leaves_low;
-  sieve_work_ = sieve_factor * 0.066 * std::pow(sieve_limit_ / leaves_low, 0.16);
+  leaves_start_ = in_between(1.0, model.leaves_start, sieve_limit_);
+  leaves_scale_ = model.leaves_scale * leaves_start_;
+  leaves_shape_ = model.leaves_shape;
+  sieve_work_ = model.sieve_work * std::pow(sieve_limit_ / leaves_start_, model.sieve_exponent);
   total_work_ = work(sieve_limit_);
 }
 
@@ -83,7 +78,7 @@ double StatusS2::work(double low) const
   if (low <= leaves_start_)
     return sieve;
 
-  double leaves = 1 - 1 / std::sqrt(1 + (low - leaves_start_) / leaves_scale_);
+  double leaves = 1 - std::pow(1 + (low - leaves_start_) / leaves_scale_, -leaves_shape_);
   return sieve + leaves;
 }
 

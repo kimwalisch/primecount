@@ -65,8 +65,7 @@ namespace primecount {
 LoadBalancerS2::LoadBalancerS2(maxint_t x,
                                int64_t y,
                                int64_t sieve_limit,
-                               double leaves_start,
-                               double sieve_factor,
+                               const WorkModelS2& model,
                                int threads,
                                bool is_print) :
   y_(y),
@@ -75,7 +74,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   start_time_(get_time()),
   threads_(threads),
   is_print_(is_print),
-  status_(x, sieve_limit, leaves_start, sieve_factor, threads, is_print)
+  status_(x, sieve_limit, model, threads, is_print)
 {
   if (threads == 1 &&
       !is_print)

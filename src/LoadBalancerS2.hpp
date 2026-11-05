@@ -47,7 +47,7 @@ struct ThreadData
 class LoadBalancerS2
 {
 public:
-  LoadBalancerS2(maxint_t x, int64_t y, int64_t sieve_limit, double leaves_start, double sieve_factor, int threads, bool is_print);
+  LoadBalancerS2(maxint_t x, int64_t y, int64_t sieve_limit, const WorkModelS2& model, int threads, bool is_print);
   bool get_work(ThreadData& thread);
 
 private:

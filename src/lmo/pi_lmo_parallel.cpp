@@ -197,15 +197,16 @@ int64_t S2(int64_t x,
   // becomes significant, i.e. roughly 0.1% to a few
   // percent of the special leaves are below it.
   // Used by the thread load balancer and the status.
-  // 1.5 * x / y^2, since x / (p * m) > x / y^2 for p < m <= y.
-  double leaves_start = 1.5 * double(x) / (double(y) * y);
+  // 1.3352 * x / y^2, since x / (p * m) > x / y^2 for p < m <= y.
+  double leaves_start = 1.3352 * double(x) / (double(y) * y);
 
   // The sieving work relative to the special leaves
   // decreases quickly if alpha is increased.
   double alpha = get_alpha(x, y);
   double default_alpha = get_alpha_lmo(x);
-  double sieve_factor = std::pow(default_alpha / alpha, 2.7);
-  INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, leaves_start, sieve_factor, threads, is_print);
+  double sieve_work = 0.47309 * std::pow(default_alpha / alpha, 2.5849);
+  WorkModelS2 model(leaves_start, sieve_work, 1.1764, 0.36355, 0.030408);
+  INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, model, threads, is_print);
   int64_t sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)

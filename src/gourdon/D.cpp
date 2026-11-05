@@ -176,21 +176,22 @@ T D_OpenMP(T x,
   // becomes significant, i.e. roughly 0.1% to a few
   // percent of the special leaves are below it.
   // Used by the thread load balancer and the status.
-  // 1.5 * x^(2/5) using the hyperbola method,
-  // 1.125 * x / y^(4/3) for large y and
-  // 1.5 * x / y^(3/2) if y < x^(2/5).
+  // 1.6473 * x^(2/5) using the hyperbola method,
+  // 1.1504 * x / y^(4/3) for large y and
+  // 2.0473 * x / y^(3/2) if y < x^(2/5).
   double xd = (double) x;
   double yd = (double) y;
-  double leaves_start = 1.5 * std::pow(xd, 2 / 5.0);
-  leaves_start = std::min(leaves_start, 1.125 * xd / std::pow(yd, 4 / 3.0));
-  leaves_start = std::max(leaves_start, 1.5 * xd / (yd * std::sqrt(yd)));
+  double leaves_start = 1.6473 * std::pow(xd, 2 / 5.0);
+  leaves_start = std::min(leaves_start, 1.1504 * xd / std::pow(yd, 4 / 3.0));
+  leaves_start = std::max(leaves_start, 2.0473 * xd / (yd * std::sqrt(yd)));
 
   // The sieving work relative to the work of the special
   // leaves decreases if alpha is increased.
   double alpha = get_alpha(x, y);
   double default_alpha = get_alpha_gourdon(x);
-  double sieve_factor = std::pow(default_alpha / alpha, 1.05);
-  INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, leaves_start, sieve_factor, threads, is_print);
+  double sieve_work = 0.0149 * std::pow(default_alpha / alpha, 1.082);
+  WorkModelS2 model(leaves_start, sieve_work, 1.9307, 0.41271, 0.34966);
+  INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, model, threads, is_print);
   T sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
