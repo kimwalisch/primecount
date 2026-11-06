@@ -131,8 +131,8 @@ void check_segments(const Input& input, int64_t size,
     sieve.pre_sieve(primes, b - 1, low, high);
     sieve.init_counter(low, high);
 
-    T actual = hyperbola_sum(T(input.xp), p, b, input.y, low, high, phi, mertens_y,
-                             primes, pi, sieve, events, sorter, max_m);
+    T actual = D_hyperbola(T(input.xp), p, b, input.y, low, high, phi, mertens_y,
+                           primes, pi, sieve, events, sorter, max_m);
     int64_t wanted = expected[high] - expected[low];
     if (actual != T(wanted) || max_m != xpy)
     {
@@ -186,7 +186,7 @@ void check(const Input& input)
   int64_t sqrt_xp = isqrt(input.xp);
   int64_t xy = input.xp * p / input.y;
 
-  // hyperbola_sum() tests the prime itself, whereas AC computes
+  // D_hyperbola() tests the prime itself, whereas AC computes
   // the C1 hyperbola terms for p > (x/y)^(1/3).
   check(sqrt_xp < input.y && input.y < square * p &&
         square <= input.y &&

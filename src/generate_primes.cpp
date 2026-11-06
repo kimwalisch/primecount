@@ -121,11 +121,11 @@ Vector<uint32_t> generate_lpf(int64_t max,
   return lpf;
 }
 
-/// Returns a vector with the values
-/// mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n)
-/// for k < b <= pi[sqrt(y)]. Only entries with
-/// primes[b]^2 <= y < primes[b]^3 are correct, these are
-/// the entries used by the hyperbola method in D and AC.
+/// Returns a vector with the values mertens_y[b] = M_p(y)
+/// = sum_{n <= y, lpf(n) > p} mu(n) with p = primes[b], for
+/// k < b <= pi[sqrt(y)]. Only entries with p^2 <= y < p^3
+/// are correct, these are the entries used by the hyperbola
+/// method in D and AC.
 ///
 Vector<int64_t> generate_mertens_y(int64_t y,
                                    int64_t k,
@@ -145,11 +145,11 @@ Vector<int64_t> generate_mertens_y(int64_t y,
   return mertens_y;
 }
 
-/// Returns a vector with the values
-/// mertens_y[b] = sum_{n <= y, lpf(n) > primes[b]} mu(n)
-/// for k < b <= pi[sqrt(y)]. Only entries with
-/// primes[b]^2 <= y < primes[b]^3 are correct, these are
-/// the entries used by the hyperbola method in D and AC.
+/// Returns a vector with the values mertens_y[b] = M_p(y)
+/// = sum_{n <= y, lpf(n) > p} mu(n) with p = primes[b], for
+/// k < b <= pi[sqrt(y)]. Only entries with p^2 <= y < p^3
+/// are correct, these are the entries used by the hyperbola
+/// method in D and AC.
 ///
 Vector<int64_t> generate_mertens_y(int64_t y,
                                    int64_t k,

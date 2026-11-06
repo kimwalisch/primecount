@@ -1,8 +1,9 @@
 ///
 /// @file  SemiprimeEventSorter.hpp
-/// @brief Sort the distinct semiprime events of hyperbola_sum() by
-///        decreasing n using two wheel-compressed bitmaps for presence
-///        and weight, or std::sort if the bitmaps would be too large.
+/// @brief Sort the distinct semiprime events of D_hyperbola() by
+///        decreasing n using two wheel-compressed bitmaps for
+///        presence and weight, or std::sort if the bitmaps would
+///        be too large.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 /// Copyright (C) 2026 Chopper Lin, <choppers@126.com>
@@ -26,6 +27,8 @@
 
 namespace primecount {
 
+/// weight = a_p(n) + c_p(n), either 1 or 2,
+/// see D_hyperbola() in DHyperbola.cpp.
 struct SemiprimeEvent
 {
   int64_t n;

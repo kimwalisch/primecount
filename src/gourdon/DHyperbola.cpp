@@ -57,8 +57,9 @@ ALWAYS_INLINE T sum_pi(T xp,
   return sum;
 }
 
-/// Returns phi(t, b - 1) - M(t) for p = primes[b] and p^2 <= t < p^3,
-/// where M(t) = sum_{n <= t, lpf(n) > p} mu(n).
+/// Returns E_p(t) = Phi_p(t) - M_p(t) for p = primes[b] and
+/// p^2 <= t < p^3, where Phi_p(t) = phi(t, b - 1) and
+/// M_p(t) = sum_{n <= t, lpf(n) > p} mu(n).
 ///
 ALWAYS_INLINE int64_t phi_minus_mertens(int64_t t,
                                         int64_t p,
@@ -68,10 +69,11 @@ ALWAYS_INLINE int64_t phi_minus_mertens(int64_t t,
   return 2 * pi[t] + pi[t / p] + pi[isqrt(t)] - 4 * b + 2;
 }
 
-/// Sum phi_minus_mertens(X/q) over the primes q in (min_n, max_n],
-/// where X = x/p and all X/q are in [p^2, p^3[. Gourdon's inversion
-/// equality turns the sums of pi(X/(p*q)) and pi(sqrt(X/q)) into sums
-/// over the reflected primes r, avoiding two pi lookups per prime q.
+/// Sum E_p(X/n) over the primes n in (min_n, max_n], where X = x/p
+/// and all X/n are in [p^2, p^3[. Gourdon's inversion equality
+/// turns the sums of pi(X/(p*n)) and pi(sqrt(X/n)) into sums over
+/// the reflected primes r with p*n*r <= X and q with n*q^2 <= X,
+/// avoiding two pi lookups per prime n.
 ///
 template <typename T, typename Primes>
 T sum_phi_minus_mertens(T xp,
@@ -91,66 +93,63 @@ T sum_phi_minus_mertens(T xp,
   T xpp = xp / p;
   int64_t min_r = fast_div64(xpp, max_n);
   int64_t max_r = fast_div64(xpp, min_n + 1);
-  int64_t min_r2 = isqrt(fast_div64(xp, max_n));
-  int64_t max_r2 = isqrt(fast_div64(xp, min_n + 1));
+  int64_t min_q = isqrt(fast_div64(xp, max_n));
+  int64_t max_q = isqrt(fast_div64(xp, min_n + 1));
 
   int64_t pi_min_r = pi[min_r];
   int64_t pi_max_r = pi[max_r];
-  int64_t pi_min_r2 = pi[min_r2];
-  int64_t pi_max_r2 = pi[max_r2];
+  int64_t pi_min_q = pi[min_q];
+  int64_t pi_max_q = pi[max_q];
 
   T sum = sum_pi(xp, pi_min_n + 1, pi_max_n, primes, pi) * 2;
   sum += sum_pi(xpp, pi_min_r + 1, pi_max_r, primes, pi);
   sum += T(pi_max_n) * pi_min_r - T(pi_min_n) * pi_max_r;
-  sum += T(pi_max_n) * pi_min_r2 - T(pi_min_n) * pi_max_r2;
+  sum += T(pi_max_n) * pi_min_q - T(pi_min_n) * pi_max_q;
   sum -= T(pi_max_n - pi_min_n) * (4 * b - 2);
 
-  for (int64_t j = pi_min_r2 + 1; j <= pi_max_r2; j++)
+  for (int64_t j = pi_min_q + 1; j <= pi_max_q; j++)
   {
-    int64_t r = primes[j];
-    sum += pi[fast_div64(xp, r * r)];
+    int64_t q = primes[j];
+    sum += pi[fast_div64(xp, q * q)];
   }
 
   return sum;
 }
 
-/// Compute the special leaves x/(p*y) < m <= y of the prime
-/// p = primes[b] in the current segment [low, high[ using the
-/// hyperbola method, if sqrt(x/p) < y < p^3. Then max_m is lowered
-/// to x/(p*y) and the caller processes the remaining leaves using
-/// the factor table.
+/// Compute the hyperbola terms of the prime p = primes[b] with
+/// positions in [max(low, p^2), high[, if sqrt(x/p) < y < p^3.
+/// Then max_m is lowered to x/(p*y) and the caller processes the
+/// remaining leaves using the factor table. C1_hyperbola() in
+/// AC_default.hpp computes the terms at positions < p^2.
 ///
 /// Let X = floor(x/p), L = xpy = floor(X/y), H = sqrt_xp =
-/// floor(sqrt(X)) and Phi(t) = phi(t, b - 1). The leaves L < m <= y
-/// contribute
-///   M(H) Phi(H) - M(y) Phi(L)
-///   + sum_{L < n <= H} a(n) E(X/n)
-///   - sum_{L < n <= H} (a(n) + c(n)) Phi(X/n),
-/// where a(n) = [lpf(n) >= p], c(n) = mu(n)[lpf(n) > p] and
-/// E = Phi - M. Only terms whose position (Phi argument) is in
-/// [max(low, p^2), high[ are computed here, the terms at positions
-/// < p^2 are computed by the C1 formula, see C1_hyperbola() in
-/// AC_default.hpp.
-/// Prime n have a(n) + c(n) = 0, the other n (events) are q*r with
-/// p <= q <= r and a(n) + c(n) = 1 if q = p or q = r, else 2. Events
-/// are processed in decreasing n, as count() and the incremental
-/// phi_minus_mertens() computation require increasing positions X/n.
+/// floor(sqrt(X)), with Phi_p, M_p and E_p as in phi_minus_mertens().
+/// The leaves L < m <= y contribute the hyperbola terms
+///   M_p(H) Phi_p(H) - M_p(y) Phi_p(L)
+///   + sum_{L < n <= H} a_p(n) E_p(X/n)
+///   - sum_{L < n <= H} (a_p(n) + c_p(n)) Phi_p(X/n),
+/// where a_p(n) = [lpf(n) >= p] and c_p(n) = mu(n)[lpf(n) > p].
+/// Prime n have a_p(n) + c_p(n) = 0, so their sieve queries cancel.
+/// The other n (events) are q*r with p <= q <= r and weight
+/// a_p(n) + c_p(n) = 1 if q = p or q = r, else 2. They are processed
+/// in decreasing n, i.e. increasing positions X/n, as required by
+/// sieve.count() and the incremental E_p computation.
 ///
 template <typename T, typename Primes>
-ALWAYS_INLINE T hyperbola_sum(T xp,
-                              int64_t p,
-                              int64_t b,
-                              int64_t y,
-                              int64_t low,
-                              int64_t high,
-                              int64_t phi,
-                              int64_t mertens_y,
-                              const Primes& primes,
-                              const PiTable& pi,
-                              Sieve& sieve,
-                              Vector<SemiprimeEvent>& events,
-                              SemiprimeEventSorter& sorter,
-                              int64_t& max_m)
+ALWAYS_INLINE T D_hyperbola(T xp,
+                            int64_t p,
+                            int64_t b,
+                            int64_t y,
+                            int64_t low,
+                            int64_t high,
+                            int64_t phi,
+                            int64_t mertens_y,
+                            const Primes& primes,
+                            const PiTable& pi,
+                            Sieve& sieve,
+                            Vector<SemiprimeEvent>& events,
+                            SemiprimeEventSorter& sorter,
+                            int64_t& max_m)
 {
   int64_t square = p * p;
   int64_t sqrt_xp = isqrt(xp);
@@ -216,21 +215,21 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
 
     for (const SemiprimeEvent& event : events)
     {
-      int64_t xpn = fast_div64(xp, event.n);
-      int64_t phi_xpn = phi + sieve.count(xpn - low);
-      sum -= event.weight * phi_xpn;
+      t = fast_div64(xp, event.n);
+      int64_t phi_t = phi + sieve.count(t - low);
+      sum -= event.weight * phi_t;
 
-      // Compute phi_minus_mertens(xpn) by incrementally updating
-      // pi(xpn/p) and pi(sqrt(xpn)) instead of computing them from
+      // Compute phi_minus_mertens(t) by incrementally updating
+      // pi(t/p) and pi(sqrt(t)) instead of computing them from
       // scratch. Summed over all segments, the loops iterate at
-      // most pi(y/p) + pi(sqrt(y)) times for the prime p, and over
-      // all primes this is amortized O(1) per event. Hence the
-      // runtime complexity is unchanged, but most of the time they
-      // don't iterate at all, which saves operations.
+      // most pi(y/p) + pi(sqrt(y)) times for the prime p, and
+      // over all primes this is amortized O(1) per event. Hence
+      // the runtime complexity is unchanged, but most of the
+      // time they don't iterate at all, which saves operations.
 
       NO_UNROLL_LOOP
       NO_VECTORIZE_LOOP
-      while (xpn >= next_tp)
+      while (t >= next_tp)
       {
         pi_tp++;
         next_tp = primes[pi_tp + 1] * p;
@@ -238,15 +237,15 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
 
       NO_UNROLL_LOOP
       NO_VECTORIZE_LOOP
-      while (xpn >= next_sqrt)
+      while (t >= next_sqrt)
       {
         pi_sqrt++;
         r = primes[pi_sqrt + 1];
         next_sqrt = r * r;
       }
 
-      // phi_minus_mertens(xpn), its -4b + 2 term is added below
-      sum += 2 * pi[xpn] + pi_tp + pi_sqrt;
+      // phi_minus_mertens(t), its -4b + 2 term is added below
+      sum += 2 * pi[t] + pi_tp + pi_sqrt;
     }
 
     sum -= events.size() * T(4 * b - 2);
@@ -259,63 +258,63 @@ ALWAYS_INLINE T hyperbola_sum(T xp,
 
 namespace primecount {
 
-uint64_t hyperbola_sum(uint64_t xp,
-                       int64_t p,
-                       int64_t b,
-                       int64_t y,
-                       int64_t low,
-                       int64_t high,
-                       int64_t phi,
-                       int64_t mertens_y,
-                       const Vector<uint32_t>& primes,
-                       const PiTable& pi,
-                       Sieve& sieve,
-                       Vector<SemiprimeEvent>& events,
-                       SemiprimeEventSorter& sorter,
-                       int64_t& max_m)
+uint64_t D_hyperbola(uint64_t xp,
+                     int64_t p,
+                     int64_t b,
+                     int64_t y,
+                     int64_t low,
+                     int64_t high,
+                     int64_t phi,
+                     int64_t mertens_y,
+                     const Vector<uint32_t>& primes,
+                     const PiTable& pi,
+                     Sieve& sieve,
+                     Vector<SemiprimeEvent>& events,
+                     SemiprimeEventSorter& sorter,
+                     int64_t& max_m)
 {
-  return ::hyperbola_sum(xp, p, b, y, low, high, phi, mertens_y,
-                         primes, pi, sieve, events, sorter, max_m);
+  return ::D_hyperbola(xp, p, b, y, low, high, phi, mertens_y,
+                       primes, pi, sieve, events, sorter, max_m);
 }
 
 #if defined(HAVE_INT128_T)
 
-uint128_t hyperbola_sum(uint128_t xp,
-                        int64_t p,
-                        int64_t b,
-                        int64_t y,
-                        int64_t low,
-                        int64_t high,
-                        int64_t phi,
-                        int64_t mertens_y,
-                        const Vector<uint32_t>& primes,
-                        const PiTable& pi,
-                        Sieve& sieve,
-                        Vector<SemiprimeEvent>& events,
-                        SemiprimeEventSorter& sorter,
-                        int64_t& max_m)
+uint128_t D_hyperbola(uint128_t xp,
+                      int64_t p,
+                      int64_t b,
+                      int64_t y,
+                      int64_t low,
+                      int64_t high,
+                      int64_t phi,
+                      int64_t mertens_y,
+                      const Vector<uint32_t>& primes,
+                      const PiTable& pi,
+                      Sieve& sieve,
+                      Vector<SemiprimeEvent>& events,
+                      SemiprimeEventSorter& sorter,
+                      int64_t& max_m)
 {
-  return ::hyperbola_sum(xp, p, b, y, low, high, phi, mertens_y,
-                         primes, pi, sieve, events, sorter, max_m);
+  return ::D_hyperbola(xp, p, b, y, low, high, phi, mertens_y,
+                       primes, pi, sieve, events, sorter, max_m);
 }
 
-uint128_t hyperbola_sum(uint128_t xp,
-                        int64_t p,
-                        int64_t b,
-                        int64_t y,
-                        int64_t low,
-                        int64_t high,
-                        int64_t phi,
-                        int64_t mertens_y,
-                        const Vector<int64_t>& primes,
-                        const PiTable& pi,
-                        Sieve& sieve,
-                        Vector<SemiprimeEvent>& events,
-                        SemiprimeEventSorter& sorter,
-                        int64_t& max_m)
+uint128_t D_hyperbola(uint128_t xp,
+                      int64_t p,
+                      int64_t b,
+                      int64_t y,
+                      int64_t low,
+                      int64_t high,
+                      int64_t phi,
+                      int64_t mertens_y,
+                      const Vector<int64_t>& primes,
+                      const PiTable& pi,
+                      Sieve& sieve,
+                      Vector<SemiprimeEvent>& events,
+                      SemiprimeEventSorter& sorter,
+                      int64_t& max_m)
 {
-  return ::hyperbola_sum(xp, p, b, y, low, high, phi, mertens_y,
-                         primes, pi, sieve, events, sorter, max_m);
+  return ::D_hyperbola(xp, p, b, y, low, high, phi, mertens_y,
+                       primes, pi, sieve, events, sorter, max_m);
 }
 
 #endif

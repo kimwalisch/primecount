@@ -166,7 +166,7 @@ T C1_hyperbola_fastdivider(T xlow,
 
   if (sqrt_xp >= low && sqrt_xp < high)
   {
-    // M(H) * phi(H, b - 1) = (1 - u) * (u + 2)
+    // M_p(H) * Phi_p(H) = (1 - u) * (u + 2)
     // = 2 - u * (u + 1) with u = pi[H] - b
     uint64_t u = segmentedPi[sqrt_xp] - b;
     sum += 2 - T(u) * (u + 1);

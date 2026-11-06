@@ -122,15 +122,15 @@ void check(bool OK)
 
 /// The hyperbola terms at positions < p^2 of the leaves
 /// x/(p*y) < m <= y, these are computed by AC's C1 formula.
-/// Brute force using phi(t, b - 1) and the Moebius prefix
-/// M(t) = sum_{n <= t, lpf(n) > p} mu(n).
+/// Brute force using Phi_p(t) = phi(t, b - 1) and
+/// M_p(t) = sum_{n <= t, lpf(n) > p} mu(n).
 ///
-int64_t C1_reference(int64_t xp,
-                     int64_t y,
-                     int64_t prime,
-                     int64_t b,
-                     const Vector<uint32_t>& lpf,
-                     const Vector<int8_t>& mu)
+int64_t C1_hyperbola_reference(int64_t xp,
+                               int64_t y,
+                               int64_t prime,
+                               int64_t b,
+                               const Vector<uint32_t>& lpf,
+                               const Vector<int8_t>& mu)
 {
   int64_t square = prime * prime;
   int64_t xpy = xp / y;
@@ -192,7 +192,7 @@ int64_t D_reference(int64_t x, int64_t y, int64_t k)
         sum -= mu[m] * phi(x / (prime * m), b - 1);
 
     if (easy_leaves)
-      sum -= C1_reference(xp, y, prime, b, lpf, mu);
+      sum -= C1_hyperbola_reference(xp, y, prime, b, lpf, mu);
   }
 
   return sum;

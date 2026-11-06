@@ -234,9 +234,9 @@ T D_thread_avx512(T x,
         break;
 
       if (low < y)
-        sum += hyperbola_sum(xp, prime, b, y, low, high, phi[b],
-                             mertens_y[b], primes, pi, sieve,
-                             events, sorter, max_m);
+        sum += D_hyperbola(xp, prime, b, y, low, high, phi[b],
+                           mertens_y[b], primes, pi, sieve,
+                           events, sorter, max_m);
 
       min_m = FactorTable::to_index(min_m);
       max_m = FactorTable::to_index(max_m);

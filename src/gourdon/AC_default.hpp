@@ -138,15 +138,14 @@ T A(T xlow,
 /// pi[(x/y)^(1/3)] < b <= pi[sqrt(y)]
 /// low <= position < high
 ///
-/// The leaves x/(p*y) < m <= y of these primes p, which include
-/// the easy leaves x/p^3 < m <= y, are computed using the
-/// hyperbola method, see hyperbola_sum() in DHyperbola.cpp.
-/// Here we compute the hyperbola terms at positions < p^2 for
-/// X = x/p, L = X/y and H = sqrt(X): -M(y) * phi(L, b - 1) and,
-/// if H < p^2, M(H) * phi(H, b - 1) and E(X/q) for the primes
-/// X/p^2 < q <= H.
-/// For p <= t < p^2: phi(t, b - 1) = pi[t] - b + 2,
-/// M(t) = 1 - (pi[t] - b) and E(t) = 2 * pi[t] - 2b + 1.
+/// For these primes p, the leaves x/(p*y) < m <= y are computed
+/// using the hyperbola method, see D_hyperbola() in DHyperbola.cpp
+/// for the notation. Here we compute the terms at positions < p^2:
+///   -M_p(y) Phi_p(L)
+///   + M_p(H) Phi_p(H), if H < p^2
+///   + sum_{X/p^2 < q <= H} E_p(X/q) for the primes q.
+/// For p <= t < p^2: Phi_p(t) = pi[t] - b + 2,
+/// M_p(t) = 1 - (pi[t] - b) and E_p(t) = 2 * pi[t] - 2b + 1.
 ///
 template <typename T,
           typename XP,
@@ -184,7 +183,7 @@ T C1_hyperbola(T xlow,
 
   if (sqrt_xp >= low && sqrt_xp < high)
   {
-    // M(H) * phi(H, b - 1) = (1 - u) * (u + 2)
+    // M_p(H) * Phi_p(H) = (1 - u) * (u + 2)
     // = 2 - u * (u + 1) with u = pi[H] - b
     uint64_t u = segmentedPi[sqrt_xp] - b;
     sum += 2 - T(u) * (u + 1);
