@@ -76,7 +76,7 @@ ALWAYS_INLINE uint64_t sieveWordsToPrimes(const uint64_t* sieve,
   ASSERT(maxPrimes <= maxBlockPrimes);
 
   // +8 for the overlapping 8 x uint16_t stores
-  alignas(16) INDETERMINATE uint16_t buffer[maxBlockPrimes + 8];
+  alignas(16) INDETERMINATE uint16_t primeOffsets[maxBlockPrimes + 8];
   std::size_t count = 0;
   uint64_t word = 0;
 
@@ -105,7 +105,7 @@ ALWAYS_INLINE uint64_t sieveWordsToPrimes(const uint64_t* sieve,
     if (wordPrimes > maxPrimes - count)
       break;
 
-    uint16_t* out = &buffer[count];
+    uint16_t* out = &primeOffsets[count];
     count += wordPrimes;
 
     // Bit values of the 1 bits of each byte
@@ -147,7 +147,7 @@ ALWAYS_INLINE uint64_t sieveWordsToPrimes(const uint64_t* sieve,
   NO_UNROLL_LOOP
   for (; i + 8 <= count; i += 8)
   {
-    uint16x8_t offsets = vld1q_u16(&buffer[i]);
+    uint16x8_t offsets = vld1q_u16(&primeOffsets[i]);
     uint32x4_t offsetsLo = vmovl_u16(vget_low_u16(offsets));
     uint32x4_t offsetsHi = vmovl_high_u16(offsets);
     vst1q_u64(&primes[i + 0], vaddw_u32(base, vget_low_u32(offsetsLo)));
@@ -159,7 +159,7 @@ ALWAYS_INLINE uint64_t sieveWordsToPrimes(const uint64_t* sieve,
   NO_UNROLL_LOOP
   NO_VECTORIZE_LOOP
   for (; i < count; i++)
-    primes[i] = low + buffer[i];
+    primes[i] = low + primeOffsets[i];
 
   *primeCount = count;
   return word;
@@ -197,17 +197,17 @@ void PrimeGenerator::fillNextPrimes_arm_neon(Vector<uint64_t>& primes, std::size
       std::size_t primeCount;
       uint64_t words = std::min(sieveSize - sieveIdx, maxBlockWords);
       std::size_t maxPrimes = std::min(maxSize - i, maxBlockPrimes);
-      words = sieveWordsToPrimes(&sieve[sieveIdx], words, low, primes.data() + i,
-          maxPrimes, &primeCount);
-
-      // The next sieve word contains more primes than
-      // there are free slots left in the primes array.
-      if (words == 0)
-        break;
+      uint64_t processedWords = sieveWordsToPrimes(&sieve[sieveIdx], words, low,
+          primes.data() + i, maxPrimes, &primeCount);
 
       i += primeCount;
-      low += words * 240;
-      sieveIdx += words;
+      low += processedWords * 240;
+      sieveIdx += processedWords;
+
+      // The next sieve word does not fit into the
+      // primes buffer or exceeds maxBlockPrimes.
+      if (processedWords < words)
+        break;
     }
 
     low_ = low;
@@ -242,12 +242,12 @@ void PrimeGenerator::fillPrevPrimes_arm_neon(Vector<uint64_t>& primes, std::size
 
       std::size_t primeCount;
       uint64_t words = std::min(sieveSize - sieveIdx, maxBlockWords);
-      words = sieveWordsToPrimes(&sieve[sieveIdx], words, low,
+      uint64_t processedWords = sieveWordsToPrimes(&sieve[sieveIdx], words, low,
           &primes[i], maxBlockPrimes, &primeCount);
 
       i += primeCount;
-      low += words * 240;
-      sieveIdx += words;
+      low += processedWords * 240;
+      sieveIdx += processedWords;
     }
 
     low_ = low;
