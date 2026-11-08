@@ -149,7 +149,6 @@ template <typename T> struct make_unsigned {
 template <typename T> struct numeric_limits {
   static constexpr T min() { return std::numeric_limits<T>::min(); }
   static constexpr T max() { return std::numeric_limits<T>::max(); }
-  static constexpr T infinity() { return std::numeric_limits<T>::infinity(); }
   static constexpr T epsilon() { return std::numeric_limits<T>::epsilon(); }
   static constexpr int digits = std::numeric_limits<T>::digits;
 };
