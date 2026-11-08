@@ -46,7 +46,7 @@ namespace {
 const primecount::Array<long double, 128> zeta =
 {
  -0.500000000000000000000000000000000000000L,
-  pstd::numeric_limits<long double>::infinity(),
+  pstd::numeric_limits<long double>::max(), // Unused zeta(1) placeholder
   1.644934066848226436472415166646025189219L,
   1.202056903159594285399738161511449990765L,
   1.082323233711138191516003696541167902775L,
@@ -507,7 +507,7 @@ T RiemannR_psi_inverse(T x)
 const primecount::Array<__float128, 128> zeta_f128 =
 {
  -0.500000000000000000000000000000000000000Q,
-  HUGE_VALQ,
+  FLT128_MAX, // Unused zeta(1) placeholder
   1.644934066848226436472415166646025189219Q,
   1.202056903159594285399738161511449990765Q,
   1.082323233711138191516003696541167902775Q,
@@ -848,7 +848,7 @@ __float128 RiemannR_inverse(__float128 x)
     return 0;
 
   __float128 t = initialNthPrimeApprox(x);
-  __float128 old_term = HUGE_VALQ;
+  __float128 old_term = FLT128_MAX;
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
@@ -926,7 +926,7 @@ __float128 RiemannR_psi_inverse(__float128 x)
     return 0;
 
   __float128 t = initialNthPrimeApprox(x);
-  __float128 old_term = HUGE_VALQ;
+  __float128 old_term = FLT128_MAX;
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where

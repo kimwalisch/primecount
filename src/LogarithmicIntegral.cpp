@@ -253,7 +253,7 @@ __float128 Li_inverse(__float128 x)
     return 0;
 
   __float128 t = initialNthPrimeApprox(x);
-  __float128 old_term = HUGE_VALQ;
+  __float128 old_term = FLT128_MAX;
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
