@@ -4,6 +4,7 @@ Changes in primecount-9.1, 2026-11-08
 * LogarithmicIntegral.cpp: Use max() instead of infinity() for -ffast-math compatibility.
 * RiemannR.cpp: Use max() instead of infinity() for -ffast-math compatibility.
 * int128_t.hpp: Remove pstd::numeric_limits<T>::infinity().
+* Windows build scripts: Use primecount-9.0 archives for README.txt.
 
 Changes in primecount-9.0, 2026-11-05
 
