@@ -391,7 +391,7 @@ T RiemannR_inverse(T x)
     return 0;
 
   T t = initialNthPrimeApprox(x);
-  T old_term = pstd::numeric_limits<T>::infinity();
+  T old_term = pstd::numeric_limits<T>::max();
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
@@ -473,7 +473,7 @@ T RiemannR_psi_inverse(T x)
     return 0;
 
   T t = initialNthPrimeApprox(x);
-  T old_term = pstd::numeric_limits<T>::infinity();
+  T old_term = pstd::numeric_limits<T>::max();
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where

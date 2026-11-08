@@ -52,10 +52,11 @@ bool is_valid(const StatusS2& status, int64_t limit, double leaves_start)
     {
       double pos = std::min(positions[j], double(limit));
       double percent = status.getPercent(int64_t(pos));
+      // Allow rounding differences between x87 registers and stored doubles
       if (!std::isfinite(percent) ||
           percent < 0 ||
           percent > 100 ||
-          percent < old[j])
+          percent + 1e-9 < old[j])
         return false;
       old[j] = percent;
     }

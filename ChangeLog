@@ -1,3 +1,9 @@
+Changes in primecount-9.1, 2026-11-08
+
+* test/StatusS2.cpp: Fix broken test on i586 OpenSUSE.
+* LogarithmicIntegral.cpp: Use max() instead of infinity() for -ffast-math compatibility.
+* RiemannR.cpp: Use max() instead of infinity() for -ffast-math compatibility.
+
 Changes in primecount-9.0, 2026-11-05
 
 * main.cpp: Avoid KMP_BLOCKTIME warnings with LLVM OpenMP before version 18.

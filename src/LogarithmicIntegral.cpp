@@ -14,7 +14,7 @@
 ///        during compilation (using -Wpedantic) although the code
 ///        works perfectly fine.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -129,7 +129,7 @@ T Li_inverse(T x)
     return 0;
 
   T t = initialNthPrimeApprox(x);
-  T old_term = pstd::numeric_limits<T>::infinity();
+  T old_term = pstd::numeric_limits<T>::max();
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
