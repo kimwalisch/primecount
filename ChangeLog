@@ -1,5 +1,7 @@
-Changes in primecount-9.1, 2026-11-08
+Changes in primecount-9.1, 2026-11-12
 
+* Update to primesieve-12.18 library which fixes GCC < 14 crashes on ARM64 CPUs without ARM SVE.
+* actions.lock: Lock GitHub Actions to exact commits to prevent supply chain attacks.
 * test/StatusS2.cpp: Fix broken test on i586 OpenSUSE.
 * LogarithmicIntegral.cpp: Use max() instead of infinity() for -ffast-math compatibility.
 * RiemannR.cpp: Use max() instead of infinity() for -ffast-math compatibility.

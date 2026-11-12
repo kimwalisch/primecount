@@ -22,8 +22,8 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v7
-      - uses: msys2/setup-msys2@v2
+      - uses: actions/checkout@v7.0.1
+      - uses: msys2/setup-msys2@v2.33.0
         with:
           msystem: UCRT64
           update: true
@@ -56,7 +56,7 @@ jobs:
   windows_clang:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Build primecount
         run: |
             cmake . -G Ninja -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang++.exe" -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang.exe" -DCMAKE_CXX_FLAGS="-O3 -Wall -Wextra -pedantic -Werror" -DCMAKE_C_FLAGS="-O3 -Wall -Wextra -pedantic -Werror" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
@@ -83,7 +83,7 @@ jobs:
   windows_msvc2022:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Build primecount
         run: |
             cmake . -G "Visual Studio 17 2022" -DBUILD_TESTS=ON -DBUILD_CODEGEN_TESTS=ON -DCMAKE_CXX_FLAGS="/W3 /WX /MP /EHsc"
@@ -110,7 +110,7 @@ jobs:
   windows_msvc2022_POPCNT:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Build primecount
         # Enable POPCNT using /arch:AVX
         run: |
@@ -149,7 +149,7 @@ jobs:
       CC: gcc
       CXX: g++
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Build primecount
         run: |
             cmake . -DBUILD_TESTS=ON -DBUILD_CODEGEN_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-march=x86-64 -Wall -Wextra -pedantic -Werror"
@@ -192,7 +192,7 @@ jobs:
       CC: gcc-14
       CXX: g++-14
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Install GCC 14
         run: |
             sudo apt update
@@ -230,7 +230,7 @@ jobs:
         config: ['Debug', 'Release']
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Install dependencies
         run: |
             sudo apt update
@@ -269,7 +269,7 @@ jobs:
       CC: gcc
       CXX: g++
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Build primecount
         run: |
             cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-march=x86-64 -mpopcnt -Wall -Wextra -pedantic -Werror"
@@ -299,7 +299,7 @@ jobs:
       CC: gcc
       CXX: g++
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Build primecount
         run: |
             cmake . -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
@@ -329,7 +329,7 @@ jobs:
       CC: gcc
       CXX: g++
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Install dependencies
         run: |
             sudo apt update
@@ -363,7 +363,7 @@ jobs:
       CC: clang
       CXX: clang++
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Install dependencies
         run: |
             sudo apt update
@@ -401,7 +401,7 @@ jobs:
       CC: clang
       CXX: clang++
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Install dependencies
         run: |
             sudo apt update
@@ -435,9 +435,9 @@ jobs:
         config: ['Debug', 'Release']
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Build and test primecount
-        uses: vmactions/freebsd-vm@v1
+        uses: vmactions/freebsd-vm@v1.6.0
         with:
           usesh: true
           run: |
@@ -463,7 +463,7 @@ jobs:
         config: ['Release']
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Install Emscripten SDK
         run: |
           git clone https://github.com/emscripten-core/emsdk.git
@@ -497,7 +497,7 @@ jobs:
       CC: clang
       CXX: clang++
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Install dependencies
         run: brew install libomp
       - name: Build primecount
@@ -526,7 +526,7 @@ jobs:
   linux_128bit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Build primecount
         run: |
             cmake . -DBUILD_TESTS=ON
@@ -549,7 +549,7 @@ jobs:
       CC: gcc
       CXX: g++
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Build & install primecount
         run: |
             cmake . -DBUILD_SHARED_LIBS=${{matrix.shared}} -DCMAKE_INSTALL_PREFIX=$PWD/inst
@@ -586,7 +586,7 @@ jobs:
       CC: gcc
       CXX: g++
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Build & install primecount
         run: |
             cmake . -DBUILD_SHARED_LIBS=${{matrix.shared}} -DCMAKE_INSTALL_PREFIX=$PWD/inst
