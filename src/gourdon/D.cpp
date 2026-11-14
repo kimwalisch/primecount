@@ -30,6 +30,7 @@
 #include <int128_t.hpp>
 #include <LoadBalancerS2.hpp>
 #include <macros.hpp>
+#include <parallel.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
 
@@ -192,10 +193,10 @@ T D_OpenMP(T x,
   double sieve_work = 0.0149 * std::pow(default_alpha / alpha, 1.082);
   WorkModelS2 model(leaves_start, sieve_work, 1.9307, 0.41271, 0.34966);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, model, threads, is_print);
-  T sum = 0;
 
-  #pragma omp parallel num_threads(threads) reduction(+: sum)
+  T sum = parallel_sum<T>(threads, [&](int)
   {
+    T sum = 0;
     ThreadData thread;
 
     while (loadBalancer.get_work(thread))
@@ -205,7 +206,9 @@ T D_OpenMP(T x,
       thread.stop_time = get_time();
       sum += thread.sum;
     }
-  }
+
+    return sum;
+  });
 
   return sum;
 }

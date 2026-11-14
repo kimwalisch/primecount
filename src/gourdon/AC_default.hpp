@@ -47,6 +47,7 @@
 #include <int128_t.hpp>
 #include <macros.hpp>
 #include <min.hpp>
+#include <parallel.hpp>
 #include <PiTable.hpp>
 
 #include <stdint.h>
@@ -303,7 +304,6 @@ T AC_OpenMP_default(T x,
                     int threads,
                     bool is_print)
 {
-  T sum = 0;
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
   int64_t xy = x / y;
@@ -333,8 +333,10 @@ T AC_OpenMP_default(T x,
   // 2) Computation of the C2 formula.
   // 3) Computation of the A formula.
   //
-  #pragma omp parallel num_threads(threads) reduction(+: sum)
+  T sum = parallel_sum<T>(threads, [&](int)
   {
+    T sum = 0;
+
     // SegmentedPiTable is accessed very frequently.
     // In order to get good performance it is important that
     // SegmentedPiTable fits into the CPU's cache.
@@ -440,7 +442,9 @@ T AC_OpenMP_default(T x,
         }
       }
     }
-  }
+
+    return sum;
+  });
 
   return sum;
 }

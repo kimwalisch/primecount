@@ -37,6 +37,7 @@
 #include <imath.hpp>
 #include <macros.hpp>
 #include <min.hpp>
+#include <parallel.hpp>
 #include <PiTable.hpp>
 #include <Vector.hpp>
 
@@ -286,7 +287,6 @@ T AC_OpenMP_fastdivider(T x,
                         int threads,
                         bool is_print)
 {
-  T sum = 0;
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
   int64_t xy = x / y;
@@ -317,13 +317,13 @@ T AC_OpenMP_fastdivider(T x,
   int init_threads = ideal_num_threads(primes_size, threads, min_thread_size);
   int64_t thread_dist = ceil_div(primes_size, init_threads);
 
-  #pragma omp parallel for num_threads(init_threads) schedule(static, 1)
-  for (int64_t low = 1; low < primes_size; low += thread_dist)
+  parallel_region(init_threads, [&](int t)
   {
+    int64_t low = 1 + thread_dist * t;
     int64_t high = min(low + thread_dist, primes_size);
     for (int64_t i = low; i < high; i++)
       fprimes[i] = FastDivider(primes[i]);
-  }
+  });
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -333,8 +333,10 @@ T AC_OpenMP_fastdivider(T x,
   // 2) Computation of the C2 formula.
   // 3) Computation of the A formula.
   //
-  #pragma omp parallel num_threads(threads) reduction(+: sum)
+  T sum = parallel_sum<T>(threads, [&](int)
   {
+    T sum = 0;
+
     // SegmentedPiTable is accessed very frequently.
     // In order to get good performance it is important that
     // SegmentedPiTable fits into the CPU's cache.
@@ -444,7 +446,9 @@ T AC_OpenMP_fastdivider(T x,
         }
       }
     }
-  }
+
+    return sum;
+  });
 
   return sum;
 }
