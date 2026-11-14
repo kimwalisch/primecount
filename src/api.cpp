@@ -15,22 +15,16 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
+#include <parallel.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
 
-#include <algorithm>
 #include <string>
 #include <stdint.h>
 
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
-
 namespace {
 
-#if defined(_OPENMP)
-  int threads_ = 0;
-#endif
+int threads_ = 0;
 
 } // namespace
 
@@ -272,21 +266,15 @@ std::string primecount_version()
 
 int get_num_threads()
 {
-#ifdef _OPENMP
   if (threads_)
     return threads_;
   else
-    return std::max(1, omp_get_max_threads());
-#else
-  return 1;
-#endif
+    return max_threads();
 }
 
 void set_num_threads(int threads)
 {
-#ifdef _OPENMP
-  threads_ = in_between(1, threads, omp_get_max_threads());
-#endif
+  threads_ = in_between(1, threads, max_threads());
   primesieve::set_num_threads(threads);
 }
 

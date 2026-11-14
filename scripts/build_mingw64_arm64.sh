@@ -10,7 +10,7 @@
 # 3) Install MSYS2 x64 (or arm64 if available)
 # 4) Open C:/msys64/clangarm64.exe
 # 5) pacman -Syu (exit then run it again)
-# 6) pacman -S mingw-w64-clang-aarch64-clang mingw-w64-clang-aarch64-llvm-openmp make git zip unzip
+# 6) pacman -S mingw-w64-clang-aarch64-clang make git zip unzip
 # 7) git clone https://github.com/kimwalisch/primecount.git
 # 8) scripts/build_mingw64_arm64.sh
 
@@ -52,13 +52,13 @@ cd ..
 mkdir build_primecount
 cd build_primecount
 clang++ -c -I../../include -I../../src -I../../lib/primesieve/include \
-  -O3 -flto -fopenmp -static -Wall -Wextra -pedantic \
-  -DENABLE_FASTDIVIDER -DENABLE_MULTIARCH_ARM_SVE -DINIT_LLVM_OPENMP -DHAVE_GETENV_S -DHAVE_PUTENV_S -DNDEBUG -D_WIN32_WINNT=0x0A00 \
+  -O3 -flto -static -Wall -Wextra -pedantic \
+  -DENABLE_FASTDIVIDER -DENABLE_MULTIARCH_ARM_SVE -DNDEBUG -D_WIN32_WINNT=0x0A00 \
   ../../src/*.cpp ../../src/sieve/*.cpp ../../src/lmo/*.cpp ../../src/deleglise-rivat/*.cpp \
   ../../src/gourdon/*.cpp ../../src/arch/arm/sve.cpp ../../src/app/*.cpp
 
 cd ..
-clang++ -O3 -flto -fopenmp -static -Wall -Wextra -pedantic -DENABLE_MULTIARCH_ARM_SVE -DNDEBUG -D_WIN32_WINNT=0x0A00 \
+clang++ -O3 -flto -static -Wall -Wextra -pedantic -DENABLE_MULTIARCH_ARM_SVE -DNDEBUG -D_WIN32_WINNT=0x0A00 \
   build_primesieve/*.o build_primecount/*.o -o primecount -lPsapi
 
 strip primecount.exe

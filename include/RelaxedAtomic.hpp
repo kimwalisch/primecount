@@ -1,20 +1,15 @@
 ///
 /// @file  RelaxedAtomic.hpp
-///        LLVM/OpenMP dynamic scheduling caused a severe scaling issue
-///        in primecount: https://bugs.llvm.org/show_bug.cgi?id=49588
-///        By default OpenMP dynamic scheduling may process iterations
-///        in random order, it is likely that this causes many cache
-///        misses when computing the easy special leaves in primecount.
-///        It is possible to use schedule(monotonic:dynamic) to ensure
-///        that iterations are processed in sequential order. This
-///        seems to fix primecount's scaling issue.
+///        Padded atomic counter with relaxed memory ordering. Threads
+///        use it to process loop iterations in sequential order, like
+///        OpenMP's schedule(monotonic:dynamic, 1). LLVM/OpenMP's
+///        default dynamic scheduling, which may process iterations
+///        in random order, caused a severe scaling issue in
+///        primecount, likely due to many cache misses when computing
+///        the easy special leaves:
+///        https://bugs.llvm.org/show_bug.cgi?id=49588
 ///
-///        However as a precaution measure we try to avoid OpenMP
-///        dynamic scheduling in primecount and instead implement
-///        schedule(monotonic:dynamic, 1) ourselves using relaxed
-///        atomics.
-///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

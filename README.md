@@ -9,8 +9,8 @@ primes&nbsp;≤&nbsp;x (maximum 10<sup>31</sup>) using **highly optimized** impl
 [combinatorial prime counting algorithms](https://en.wikipedia.org/wiki/Prime-counting_function#Algorithms_for_evaluating_%CF%80(x)).
 
 primecount includes implementations of all important combinatorial prime counting algorithms
-known up to this date all of which have been parallelized using
-[OpenMP](https://en.wikipedia.org/wiki/OpenMP). primecount contains the first ever open
+known up to this date all of which have been parallelized using primecount's own
+[thread pool](https://github.com/kimwalisch/primecount/blob/master/src/ThreadPool.cpp). primecount contains the first ever open
 source implementations of the Deleglise-Rivat algorithm and Xavier Gourdon's algorithm (that works).
 primecount also features a [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/LoadBalancerS2.cpp)
 that is shared amongst all implementations and that scales up to hundreds of CPU cores. primecount
@@ -57,7 +57,7 @@ For doing development with libprimecount you may need to install
 
 You need to have installed a C++ compiler and CMake. Ideally
 primecount should be compiled using GCC or Clang as these compilers
-support both OpenMP (multi-threading library) and 128-bit integers.
+support 128-bit integers.
 
 ```sh
 cmake .

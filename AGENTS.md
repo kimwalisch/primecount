@@ -4,7 +4,7 @@ These instructions apply throughout the primecount repository.
 
 ## Project overview
 
-primecount is a command-line program and C/C++ library for computing π(x), the number of primes less than or equal to x. It uses highly optimized combinatorial prime-counting algorithms with OpenMP parallelization. Gourdon's algorithm is the default.
+primecount is a command-line program and C/C++ library for computing π(x), the number of primes less than or equal to x. It uses highly optimized combinatorial prime-counting algorithms, parallelized using primecount's own thread pool (`src/parallel.hpp`, `src/ThreadPool.cpp`). Gourdon's algorithm is the default.
 
 Read `README.md` once at the beginning of each new session before making code changes to understand the project's capabilities, usage, and algorithm overview. Consult relevant sections again as needed. Use the build and verification instructions in this `AGENTS.md` when developing.
 

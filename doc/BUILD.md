@@ -32,7 +32,7 @@ You need to have installed a C++ compiler which supports C++14 (or later) and CM
     </tr>
     <tr>
         <td><b>macOS:</b></td>
-        <td><code>brew install cmake libomp</code></td>
+        <td><code>brew install cmake</code></td>
     </tr>
     <tr>
         <td><b>openSUSE:</b></td>
@@ -60,10 +60,10 @@ manager](https://brew.sh) then AppleClang is usually already installed on your M
 Open a terminal, cd into the primecount directory and run:
 
 ```bash
-# Install CMake & the OpenMP library
-brew install cmake libomp
+# Install CMake
+brew install cmake
 
-CXXFLAGS="-I$(brew --prefix libomp)/include" LDFLAGS="-L$(brew --prefix libomp)/lib" cmake .
+cmake .
 cmake --build . --parallel
 sudo cmake --install .
 ```
@@ -145,7 +145,6 @@ option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
 option(BUILD_TESTS         "Build the test programs"               OFF)
 
 option(WITH_FASTDIVIDER     "Use FastDivider.hpp"                  ON)
-option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
 option(WITH_MULTIARCH       "Enable runtime dispatching to fastest supported CPU instruction set" ON)
 option(WITH_DIV32           "Use 32-bit division instead of 64-bit division if possible" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)

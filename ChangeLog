@@ -1,5 +1,9 @@
-Changes in primecount-9.1, 2026-11-12
+Changes in primecount-9.1, 2026-11-14
 
+* ThreadPool.cpp: New thread pool designed for primecount, replaces OpenMP.
+* CMake: Remove WITH_OPENMP option, primecount is always multi-threaded.
+* OpenMP environment variables like OMP_NUM_THREADS no longer have any effect.
+* nth_prime_sieve.cpp: Use nested parallel regions instead of OpenMP tasks.
 * Update to primesieve-12.18 library which fixes GCC < 14 crashes on ARM64 CPUs without ARM SVE.
 * actions.lock: Lock GitHub Actions to exact commits to prevent supply chain attacks.
 * test/StatusS2.cpp: Fix broken test on i586 OpenSUSE.
