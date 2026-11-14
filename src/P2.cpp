@@ -25,6 +25,7 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <LoadBalancerP2.hpp>
+#include <parallel.hpp>
 #include <print.hpp>
 
 #include <stdint.h>
@@ -114,12 +115,14 @@ T P2_OpenMP(T x,
   threads = loadBalancer.get_threads();
 
   // for (low = sqrt(x); low < x / y; low += dist)
-  #pragma omp parallel num_threads(threads) reduction(+:sum)
+  sum += parallel_sum<T>(threads, [&](int)
   {
+    T sum = 0;
     int64_t low = 0, high = 0;
     while (loadBalancer.get_work(low, high))
       sum += P2_thread(x, y, low, high);
-  }
+    return sum;
+  });
 
   return sum;
 }

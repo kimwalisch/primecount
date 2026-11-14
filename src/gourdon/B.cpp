@@ -24,6 +24,7 @@
 #include <macros.hpp>
 #include <min.hpp>
 #include <imath.hpp>
+#include <parallel.hpp>
 #include <print.hpp>
 
 #include <stdint.h>
@@ -93,18 +94,19 @@ T B_OpenMP(T x,
   if (x < 4)
     return 0;
 
-  T sum = 0;
   int64_t xy = (int64_t)(x / max(y, 1));
   INDETERMINATE LoadBalancerP2 loadBalancer(x, xy, threads, is_print);
   threads = loadBalancer.get_threads();
 
   // for (low = sqrt(x); low < x / y; low += dist)
-  #pragma omp parallel num_threads(threads) reduction(+:sum)
+  T sum = parallel_sum<T>(threads, [&](int)
   {
+    T sum = 0;
     int64_t low = 0, high = 0;
     while (loadBalancer.get_work(low, high))
       sum += B_thread(x, y, low, high);
-  }
+    return sum;
+  });
 
   return sum;
 }
