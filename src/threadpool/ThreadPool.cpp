@@ -81,9 +81,14 @@ struct Region;
 ///
 struct LeaderSync
 {
+  // Every worker reads waiting_for when it checks out, the
+  // padding separates it from next, which the pool writes
+  // whenever it reuses the LeaderSync.
+  MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
   // Number of workers the sleeping leader waits for to check
   // out, 0 while the leader does not sleep.
   std::atomic<int> waiting_for{0};
+  MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
   std::mutex mutex;
   std::condition_variable cond;
   LeaderSync* next = nullptr;
@@ -164,7 +169,12 @@ public:
   Clock::time_point spin_deadline() const;
 
 private:
+  // Every worker reads spin_time_us_ after each region, the
+  // padding separates it from the pool state that leaders
+  // write when they lease and return workers.
+  MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
   std::atomic<int> spin_time_us_{3000};
+  MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
   std::mutex mutex_;
   Worker* idle_ = nullptr;
   LeaderSync* syncs_ = nullptr;
