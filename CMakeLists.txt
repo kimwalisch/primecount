@@ -222,13 +222,6 @@ if(CMAKE_THREAD_LIBS_INIT)
     string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "${CMAKE_THREAD_LIBS_INIT} ")
 endif()
 
-# ThreadPool.cpp uses dlopen() to prevent unloading libprimecount
-# while its worker threads are running.
-if(CMAKE_DL_LIBS)
-    list(APPEND PRIMECOUNT_LINK_LIBRARIES "${CMAKE_DL_LIBS}")
-    string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-l${CMAKE_DL_LIBS} ")
-endif()
-
 # Check if libatomic is needed (old 32-bit systems) ##################
 
 include("${PROJECT_SOURCE_DIR}/cmake/libatomic.cmake")

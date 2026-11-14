@@ -544,8 +544,6 @@ jobs:
             cmake --build . --parallel --verbose
             cmake --install .
             cat inst/lib/pkgconfig/primecount.pc
-      - name: primecount.pc contains the private libraries
-        run: grep -E "^Libs.private:.*-ldl" inst/lib/pkgconfig/primecount.pc
       - name: Link libprimecount using pkg-config (shared)
         if: matrix.shared == 'ON'
         run: |

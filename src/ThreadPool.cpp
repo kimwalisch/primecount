@@ -39,17 +39,11 @@
 #include <system_error>
 #include <thread>
 
-#if defined(_WIN32)
-  #if !defined(NOMINMAX)
-    #define NOMINMAX
-  #endif
-  #include <windows.h>
-#elif __has_include(<dlfcn.h>) && \
-      __has_include(<pthread.h>) && \
-      !defined(__EMSCRIPTEN__)
-  #include <dlfcn.h>
+#if !defined(_WIN32) && \
+    !defined(__EMSCRIPTEN__) && \
+    __has_include(<pthread.h>)
   #include <pthread.h>
-  #define HAVE_POSIX_HOOKS
+  #define HAVE_PTHREAD_ATFORK
 #endif
 
 #if defined(__linux__)
@@ -183,31 +177,7 @@ ALWAYS_INLINE void cpu_pause()
 #endif
 }
 
-/// Busy-waiting worker threads must never execute code of an
-/// unloaded shared library. Hence once the first worker thread
-/// has been created, libprimecount can no longer be unloaded.
-///
-void pin_module()
-{
-  static const char anchor = 0;
-
-#if defined(_WIN32)
-  HMODULE module;
-  GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                     GET_MODULE_HANDLE_EX_FLAG_PIN,
-                     (LPCWSTR) &anchor, &module);
-#elif defined(HAVE_POSIX_HOOKS) && \
-      defined(RTLD_NODELETE) && \
-      defined(RTLD_NOLOAD)
-  Dl_info info;
-  if (dladdr(&anchor, &info) && info.dli_fname)
-    dlopen(info.dli_fname, RTLD_NOW | RTLD_NOLOAD | RTLD_NODELETE);
-#else
-  (void) anchor;
-#endif
-}
-
-#if defined(HAVE_POSIX_HOOKS)
+#if defined(HAVE_PTHREAD_ATFORK)
 
 /// After fork() the child process only contains the thread
 /// that called fork(). We leak the parent's thread pool, the
@@ -231,7 +201,7 @@ ThreadPool& get_pool()
     if (thread_pool.compare_exchange_strong(pool, new_pool, std::memory_order_acq_rel))
     {
       pool = new_pool;
-#if defined(HAVE_POSIX_HOOKS)
+#if defined(HAVE_PTHREAD_ATFORK)
       static const int registered = pthread_atfork(nullptr, nullptr, fork_child);
       (void) registered;
 #endif
@@ -447,9 +417,6 @@ void ThreadPool::create_workers(Team& team, Region& region)
 
   try
   {
-    static const bool pinned = (pin_module(), true);
-    (void) pinned;
-
     for (; created < team.reserved; created++)
     {
       if (team.slot + created >= team.limit)
