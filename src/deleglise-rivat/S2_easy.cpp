@@ -45,14 +45,14 @@ namespace {
 /// @param T  either int64_t or uint128_t.
 ///
 template <typename T, typename Primes>
-T S2_easy_OpenMP(T x,
-                 int64_t y,
-                 int64_t xy,
-                 int64_t k,
-                 const PiTable& pi,
-                 const Primes& primes,
-                 int threads,
-                 bool is_print)
+T S2_easy_parallel(T x,
+                   int64_t y,
+                   int64_t xy,
+                   int64_t k,
+                   const PiTable& pi,
+                   const Primes& primes,
+                   int threads,
+                   bool is_print)
 {
   int64_t x13 = iroot<3>(x);
 
@@ -336,14 +336,14 @@ T S2_easy_128(T xp,
 ///
 template <typename T,
           typename Primes>
-T S2_easy_OpenMP(T x,
-                 int64_t y,
-                 int64_t xy,
-                 int64_t k,
-                 const PiTable& pi,
-                 const Primes& primes,
-                 int threads,
-                 bool is_print)
+T S2_easy_parallel(T x,
+                   int64_t y,
+                   int64_t xy,
+                   int64_t k,
+                   const PiTable& pi,
+                   const Primes& primes,
+                   int threads,
+                   bool is_print)
 {
   // Initialize FastDivider vector from primes vector
   Vector<FastDivider> fprimes;
@@ -425,7 +425,7 @@ int64_t S2_easy(int64_t x,
 
   PiTable pi(y, threads);
   auto primes = pi.get_primes<uint32_t>(y, threads);
-  int64_t sum = S2_easy_OpenMP((uint64_t) x, y, xy, k, pi, primes, threads, is_print);
+  int64_t sum = S2_easy_parallel((uint64_t) x, y, xy, k, pi, primes, threads, is_print);
 
   if (is_print)
     print("S2_easy", sum, time);
@@ -460,12 +460,12 @@ int128_t S2_easy(int128_t x,
   if (y <= pstd::numeric_limits<uint32_t>::max())
   {
     auto primes = pi.get_primes<uint32_t>(y, threads);
-    sum = S2_easy_OpenMP((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
+    sum = S2_easy_parallel((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
   }
   else
   {
     auto primes = pi.get_primes<int64_t>(y, threads);
-    sum = S2_easy_OpenMP((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
+    sum = S2_easy_parallel((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
   }
 
   if (is_print)

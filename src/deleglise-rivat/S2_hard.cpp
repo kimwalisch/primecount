@@ -182,15 +182,15 @@ T S2_hard_thread(T x,
 /// starts a new computation.
 ///
 template <typename T, typename Primes, typename FactorTable>
-T S2_hard_OpenMP(T x,
-                 int64_t y,
-                 int64_t xy,
-                 int64_t k,
-                 const PiTable& pi,
-                 const Primes& primes,
-                 const FactorTable& factor,
-                 int threads,
-                 bool is_print)
+T S2_hard_parallel(T x,
+                   int64_t y,
+                   int64_t xy,
+                   int64_t k,
+                   const PiTable& pi,
+                   const Primes& primes,
+                   const FactorTable& factor,
+                   int threads,
+                   bool is_print)
 {
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -259,7 +259,7 @@ int64_t S2_hard(int64_t x,
   int64_t max_prime = min(y, xy / isqrt(y));
   PiTable pi(max_prime, threads);
   auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-  int64_t sum = S2_hard_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
+  int64_t sum = S2_hard_parallel(x, y, xy, k, pi, primes, factor, threads, is_print);
 
   if (is_print)
     print("S2_hard", sum, time);
@@ -298,12 +298,12 @@ int128_t S2_hard(int128_t x,
     if (max_prime <= UINT32_MAX)
     {
       auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-      sum = S2_hard_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
+      sum = S2_hard_parallel(x, y, xy, k, pi, primes, factor, threads, is_print);
     }
     else
     {
       auto primes = pi.get_primes<int64_t>(max_prime, threads);
-      sum = S2_hard_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
+      sum = S2_hard_parallel(x, y, xy, k, pi, primes, factor, threads, is_print);
     }
   }
   else
@@ -312,7 +312,7 @@ int128_t S2_hard(int128_t x,
     int64_t max_prime = min(y, xy / isqrt(y));
     PiTable pi(max_prime, threads);
     auto primes = pi.get_primes<int64_t>(max_prime, threads);
-    sum = S2_hard_OpenMP(x, y, xy, k, pi, primes, factor, threads, is_print);
+    sum = S2_hard_parallel(x, y, xy, k, pi, primes, factor, threads, is_print);
   }
 
   if (is_print)

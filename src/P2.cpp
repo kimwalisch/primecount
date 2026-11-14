@@ -88,11 +88,11 @@ T P2_thread(T x,
 /// Memory usage: O(n^(1/2))
 ///
 template <typename T>
-T P2_OpenMP(T x,
-            int64_t y,
-            int64_t a,
-            int threads,
-            bool is_print)
+T P2_parallel(T x,
+              int64_t y,
+              int64_t a,
+              int threads,
+              bool is_print)
 {
   ASSERT(a == pi_noprint(y, threads));
 
@@ -147,7 +147,7 @@ int64_t P2(int64_t x,
     time = get_time();
   }
 
-  int64_t sum = P2_OpenMP(x, y, a, threads, is_print);
+  int64_t sum = P2_parallel(x, y, a, threads, is_print);
 
   if (is_print)
     print("P2", sum, time);
@@ -173,7 +173,7 @@ int128_t P2(int128_t x,
     time = get_time();
   }
 
-  int128_t sum = P2_OpenMP(x, y, a, threads, is_print);
+  int128_t sum = P2_parallel(x, y, a, threads, is_print);
 
   if (is_print)
     print("P2", sum, time);

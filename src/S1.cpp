@@ -62,10 +62,10 @@ T S1_thread(T x,
 /// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
-X S1_OpenMP(X x,
-            Y y,
-            int64_t k,
-            int threads)
+X S1_parallel(X x,
+              Y y,
+              int64_t k,
+              int threads)
 {
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -114,7 +114,7 @@ int64_t S1(int64_t x,
     time = get_time();
   }
 
-  int64_t s1 = S1_OpenMP(x, (uint32_t) y, k, threads);
+  int64_t s1 = S1_parallel(x, (uint32_t) y, k, threads);
 
   if (is_print)
     print("S1", s1, time);
@@ -144,9 +144,9 @@ int128_t S1(int128_t x,
 
   // uses less memory
   if (y <= pstd::numeric_limits<uint32_t>::max())
-    s1 = S1_OpenMP(x, (uint32_t) y, k, threads);
+    s1 = S1_parallel(x, (uint32_t) y, k, threads);
   else
-    s1 = S1_OpenMP(x, y, k, threads);
+    s1 = S1_parallel(x, y, k, threads);
 
   if (is_print)
     print("S1", s1, time);

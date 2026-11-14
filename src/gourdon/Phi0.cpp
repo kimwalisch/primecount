@@ -66,11 +66,11 @@ T Phi0_thread(T x,
 /// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
-X Phi0_OpenMP(X x,
-              Y y,
-              int64_t k,
-              const PiTable& pi,
-              int threads)
+X Phi0_parallel(X x,
+                Y y,
+                int64_t k,
+                const PiTable& pi,
+                int threads)
 {
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -121,7 +121,7 @@ int64_t Phi0(int64_t x,
     time = get_time();
   }
 
-  int64_t phi0 = Phi0_OpenMP(x, (uint32_t) y, k, pi, threads);
+  int64_t phi0 = Phi0_parallel(x, (uint32_t) y, k, pi, threads);
 
   if (is_print)
     print("Phi0", phi0, time);
@@ -153,9 +153,9 @@ int128_t Phi0(int128_t x,
 
   // uses less memory
   if (y <= pstd::numeric_limits<uint32_t>::max())
-    phi0 = Phi0_OpenMP(x, (uint32_t) y, k, pi, threads);
+    phi0 = Phi0_parallel(x, (uint32_t) y, k, pi, threads);
   else
-    phi0 = Phi0_OpenMP(x, y, k, pi, threads);
+    phi0 = Phi0_parallel(x, y, k, pi, threads);
 
   if (is_print)
     print("Phi0", phi0, time);

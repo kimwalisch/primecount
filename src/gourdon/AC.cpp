@@ -37,15 +37,15 @@
 #if defined(ENABLE_ARM_SVE)
   #define AC_DEFAULT_HEADER "AC_arm_sve.hpp"
   #define AC_DEFAULT_ALGO_NAME "Algorithm: ARM SVE"
-  #define AC_OPENMP_DEFAULT AC_OpenMP_arm_sve
+  #define AC_PARALLEL_DEFAULT AC_parallel_arm_sve
 #elif defined(ENABLE_FASTDIVIDER)
   #define AC_DEFAULT_HEADER "AC_fastdivider.hpp"
   #define AC_DEFAULT_ALGO_NAME "Algorithm: FastDivider"
-  #define AC_OPENMP_DEFAULT AC_OpenMP_fastdivider
+  #define AC_PARALLEL_DEFAULT AC_parallel_fastdivider
 #else
   #define AC_DEFAULT_HEADER "AC_default.hpp"
   #define AC_DEFAULT_ALGO_NAME "Algorithm: CPU div"
-  #define AC_OPENMP_DEFAULT AC_OpenMP_default
+  #define AC_PARALLEL_DEFAULT AC_parallel_default
 #endif
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
@@ -62,14 +62,14 @@ namespace {
 /// the CPU supports the required instruction set.
 ///
 template <typename T, typename... Args>
-T AC_OpenMP(T x, Args&&... args)
+T AC_parallel(T x, Args&&... args)
 {
   #if defined(ENABLE_MULTIARCH_ARM_SVE)
     if (cpu_supports_sve)
-      return AC_OpenMP_arm_sve(x, std::forward<Args>(args)...);
+      return AC_parallel_arm_sve(x, std::forward<Args>(args)...);
   #endif
 
-  return AC_OPENMP_DEFAULT(x, std::forward<Args>(args)...);
+  return AC_PARALLEL_DEFAULT(x, std::forward<Args>(args)...);
 }
 
 string_view_t AC_algo_name()
@@ -112,7 +112,7 @@ int64_t AC(int64_t x,
   int64_t max_prime = min(isqrt(x / (x15 + 1)), y);
   int64_t x_star = get_x_star_gourdon(x, y);
   auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-  int64_t sum = AC_OpenMP((uint64_t) x, y, k, x_star, pi, primes, threads, is_print);
+  int64_t sum = AC_parallel((uint64_t) x, y, k, x_star, pi, primes, threads, is_print);
 
   if (is_print)
     print("A + C", sum, time);
@@ -153,12 +153,12 @@ int128_t AC(int128_t x,
   if (max_prime <= pstd::numeric_limits<uint32_t>::max())
   {
     auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-    sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
+    sum = AC_parallel((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
   else
   {
     auto primes = pi.get_primes<int64_t>(max_prime, threads);
-    sum = AC_OpenMP((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
+    sum = AC_parallel((uint128_t) x, y, k, x_star, pi, primes, threads, is_print);
   }
 
   if (is_print)

@@ -86,10 +86,10 @@ T B_thread(T x,
 /// Memory usage: O(n^(1/2))
 ///
 template <typename T>
-T B_OpenMP(T x,
-           int64_t y,
-           int threads,
-           bool is_print)
+T B_parallel(T x,
+             int64_t y,
+             int threads,
+             bool is_print)
 {
   if (x < 4)
     return 0;
@@ -130,7 +130,7 @@ int64_t B(int64_t x,
     time = get_time();
   }
 
-  int64_t sum = B_OpenMP((uint64_t) x, y, threads, is_print);
+  int64_t sum = B_parallel((uint64_t) x, y, threads, is_print);
 
   if (is_print)
     print("B", sum, time);
@@ -155,7 +155,7 @@ int128_t B(int128_t x,
     time = get_time();
   }
 
-  int128_t sum = B_OpenMP((uint128_t) x, y, threads, is_print);
+  int128_t sum = B_parallel((uint128_t) x, y, threads, is_print);
 
   if (is_print)
     print("B", sum, time);

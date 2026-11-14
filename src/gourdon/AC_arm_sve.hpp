@@ -311,14 +311,14 @@ template <typename T,
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   PRIMECOUNT_TARGET_ENTRY("+sve")
 #endif
-T AC_OpenMP_arm_sve(T x,
-                    int64_t y,
-                    int64_t k,
-                    int64_t x_star,
-                    const PiTable& pi,
-                    const Primes& primes,
-                    int threads,
-                    bool is_print)
+T AC_parallel_arm_sve(T x,
+                      int64_t y,
+                      int64_t k,
+                      int64_t x_star,
+                      const PiTable& pi,
+                      const Primes& primes,
+                      int threads,
+                      bool is_print)
 {
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);

@@ -150,14 +150,14 @@ string_view_t D_algo_name()
 /// a new computation.
 ///
 template <typename T, typename Primes, typename FactorTable>
-T D_OpenMP(T x,
-           int64_t y,
-           int64_t k,
-           const PiTable& pi,
-           const Primes& primes,
-           const FactorTable& factor,
-           int threads,
-           bool is_print)
+T D_parallel(T x,
+             int64_t y,
+             int64_t k,
+             const PiTable& pi,
+             const Primes& primes,
+             const FactorTable& factor,
+             int threads,
+             bool is_print)
 {
   auto mertens_y = generate_mertens_y(y, k, primes, pi);
 
@@ -238,7 +238,7 @@ int64_t D(int64_t x,
 
   FactorTable<uint16_t> factor(y, threads);
   auto primes = pi.get_primes<uint32_t>(y, threads);
-  int64_t sum = D_OpenMP(x, y, k, pi, primes, factor, threads, is_print);
+  int64_t sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
 
   if (is_print)
     print("D", sum, time);
@@ -277,19 +277,19 @@ int128_t D(int128_t x,
     if (y <= UINT32_MAX)
     {
       auto primes = pi.get_primes<uint32_t>(y, threads);
-      sum = D_OpenMP(x, y, k, pi, primes, factor, threads, is_print);
+      sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
     }
     else
     {
       auto primes = pi.get_primes<int64_t>(y, threads);
-      sum = D_OpenMP(x, y, k, pi, primes, factor, threads, is_print);
+      sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
     }
   }
   else
   {
     FactorTable<uint32_t> factor(y, threads);
     auto primes = pi.get_primes<int64_t>(y, threads);
-    sum = D_OpenMP(x, y, k, pi, primes, factor, threads, is_print);
+    sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
   }
 
   if (is_print)

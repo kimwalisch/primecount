@@ -340,7 +340,7 @@ int64_t pix_upper(int64_t x)
 /// phi(x, a) counts the numbers <= x that are not divisible
 /// by any of the first a primes.
 ///
-int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
+int64_t phi_parallel(int64_t x, int64_t a, int threads)
 {
   if (x < 1) return 0;
   if (a < 1) return x;
@@ -436,7 +436,7 @@ int64_t phi(int64_t x,
     time = get_time();
   }
 
-  int64_t sum = phi_OpenMP(x, a, threads);
+  int64_t sum = phi_parallel(x, a, threads);
 
   if (is_print)
     print("phi", sum, time);

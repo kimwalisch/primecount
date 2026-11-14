@@ -295,14 +295,14 @@ T C2(T xlow,
 /// Compute A + C
 template <typename T,
           typename Primes>
-T AC_OpenMP_default(T x,
-                    int64_t y,
-                    int64_t k,
-                    int64_t x_star,
-                    const PiTable& pi,
-                    const Primes& primes,
-                    int threads,
-                    bool is_print)
+T AC_parallel_default(T x,
+                      int64_t y,
+                      int64_t k,
+                      int64_t x_star,
+                      const PiTable& pi,
+                      const Primes& primes,
+                      int threads,
+                      bool is_print)
 {
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
