@@ -56,6 +56,7 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
+#include <parallel.hpp>
 #include <Vector.hpp>
 
 #include <algorithm>
@@ -96,8 +97,7 @@ public:
     int64_t thread_dist = ceil_div(y, threads);
     thread_dist += coprime_indexes_.size() - thread_dist % coprime_indexes_.size();
 
-    #pragma omp parallel for num_threads(threads) schedule(static, 1)
-    for (int t = 0; t < threads; t++)
+    parallel_region(threads, [&](int t)
     {
       // Thread processes interval [low, high]
       int64_t low = thread_dist * t;
@@ -160,7 +160,7 @@ public:
           }
         }
       }
-    }
+    });
   }
 
   /// Returns the factor table entry for the number

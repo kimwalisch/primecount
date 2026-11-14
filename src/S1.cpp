@@ -18,6 +18,7 @@
 #include <generate_primes.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <parallel.hpp>
 #include <Vector.hpp>
 #include <print.hpp>
 #include <S.hpp>
@@ -75,12 +76,20 @@ X S1_OpenMP(X x,
   int64_t pi_y = primes.size() - 1;
   X s1 = phi_tiny(x, k);
 
-  #pragma omp parallel for num_threads(threads) schedule(static, 1) reduction (+: s1)
-  for (int64_t b = k + 1; b <= pi_y; b++)
+  // for (b = k + 1; b <= pi_y; b++)
+  // Thread t processes b = k + 1 + t + i * threads
+  s1 += parallel_sum<X>(threads, [&](int t)
   {
-    s1 -= phi_tiny(x / primes[b], k);
-    s1 += S1_thread<1>(x, y, b, k, (X) primes[b], primes);
-  }
+    X s1 = 0;
+
+    for (int64_t b = k + 1 + t; b <= pi_y; b += threads)
+    {
+      s1 -= phi_tiny(x / primes[b], k);
+      s1 += S1_thread<1>(x, y, b, k, (X) primes[b], primes);
+    }
+
+    return s1;
+  });
 
   return s1;
 }

@@ -19,6 +19,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <ctz.hpp>
+#include <parallel.hpp>
 #include <Vector.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
@@ -135,30 +136,27 @@ void PiTable::init(uint64_t limit,
   thread_dist += 240 - thread_dist % 240;
   counts_.resize(threads);
 
-  #pragma omp parallel num_threads(threads)
+  parallel_region(threads, [&](int t)
   {
-    #pragma omp for schedule(static, 1)
-    for (int t = 0; t < threads; t++)
-    {
-      uint64_t low = cache_limit + thread_dist * t;
-      uint64_t high = low + thread_dist;
-      high = min(high, limit);
+    uint64_t low = cache_limit + thread_dist * t;
+    uint64_t high = low + thread_dist;
+    high = min(high, limit);
 
-      if (low < high)
-        init_bits(low, high, t);
-    }
+    if (low < high)
+      init_bits(low, high, t);
+  });
 
-    #pragma omp for nowait schedule(static, 1)
-    for (int t = 0; t < threads; t++)
-    {
-      uint64_t low = cache_limit + thread_dist * t;
-      uint64_t high = low + thread_dist;
-      high = min(high, limit);
+  // init_count() uses the prime counts of the
+  // lower threads computed by init_bits().
+  parallel_region(threads, [&](int t)
+  {
+    uint64_t low = cache_limit + thread_dist * t;
+    uint64_t high = low + thread_dist;
+    high = min(high, limit);
 
-      if (low < high)
-        init_count(low, high, t);
-    }
-  }
+    if (low < high)
+      init_count(low, high, t);
+  });
 }
 
 /// Each thread computes PrimePi [low, high[
@@ -260,8 +258,7 @@ Vector<uint32_t> PiTable::get_primes_u32(uint64_t x, int threads) const
       thread_dist += 240 - thread_dist % 240;
       uint64_t limit = x + 1;
 
-      #pragma omp parallel for num_threads(threads) schedule(static, 1)
-      for (int t = 0; t < threads; t++)
+      parallel_region(threads, [&](int t)
       {
         // Each thread processes [low, high[
         uint64_t low = thread_dist * t;
@@ -282,7 +279,7 @@ Vector<uint32_t> PiTable::get_primes_u32(uint64_t x, int threads) const
           for (uint64_t bits = pi_[max_j].bits & bitmask; bits; bits &= bits - 1)
             primes[i++] = uint32_t(max_j * 240 + bit_values_[ctz64(bits)]);
         }
-      }
+      });
     }
   }
 
@@ -322,8 +319,7 @@ Vector<int64_t> PiTable::get_primes_i64(uint64_t x, int threads) const
       thread_dist += 240 - thread_dist % 240;
       uint64_t limit = x + 1;
 
-      #pragma omp parallel for num_threads(threads) schedule(static, 1)
-      for (int t = 0; t < threads; t++)
+      parallel_region(threads, [&](int t)
       {
         // Each thread processes [low, high[
         uint64_t low = thread_dist * t;
@@ -344,7 +340,7 @@ Vector<int64_t> PiTable::get_primes_i64(uint64_t x, int threads) const
           for (uint64_t bits = pi_[max_j].bits & bitmask; bits; bits &= bits - 1)
             primes[i++] = max_j * 240 + bit_values_[ctz64(bits)];
         }
-      }
+      });
     }
   }
 
