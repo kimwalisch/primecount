@@ -209,7 +209,7 @@ int64_t S2(int64_t x,
   WorkModelS2 model(leaves_start, sieve_work, 1.1764, 0.36355, 0.030408);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, model, threads, is_print);
 
-  int64_t sum = parallel_sum<int64_t>(threads, [&](int)
+  int64_t sum = parallel_sum<int64_t>(threads, [&, x, y, xy, k](int)
   {
     int64_t sum = 0;
     ThreadData thread;

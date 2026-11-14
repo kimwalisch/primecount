@@ -215,7 +215,7 @@ T S2_hard_OpenMP(T x,
   WorkModelS2 model(leaves_start, sieve_work, 4.3158, 0.61257, 0.1403);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, model, threads, is_print);
 
-  T sum = parallel_sum<T>(threads, [&](int)
+  T sum = parallel_sum<T>(threads, [&, x, y, xy, k](int)
   {
     T sum = 0;
     ThreadData thread;

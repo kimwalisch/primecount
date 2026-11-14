@@ -69,7 +69,7 @@ T S2_easy_OpenMP(T x,
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_sqrty) + 1);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
-  T sum = parallel_sum<T>(threads, [&](int id)
+  T sum = parallel_sum<T>(threads, [&, x, y, xy, is_print, pi_x13](int id)
   {
     T sum = 0;
 
@@ -366,7 +366,7 @@ T S2_easy_OpenMP(T x,
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_sqrty) + 1);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
-  T sum = parallel_sum<T>(threads, [&](int id)
+  T sum = parallel_sum<T>(threads, [&, x, y, xy, is_print, pi_x13](int id)
   {
     T sum = 0;
 

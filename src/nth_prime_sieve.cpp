@@ -254,7 +254,7 @@ T nth_prime_sieve1(uint64_t n,
 
   for (uint64_t iter = 0; !finished; iter++)
   {
-    parallel_region(threads, [&](int t)
+    parallel_region(threads, [&, nth_prime_approx, threads, thread_dist, iter](int t)
     {
       // Unsigned integer division is usually
       // faster than signed integer division.
@@ -450,7 +450,7 @@ public:
     int segment_threads = std::min(segment.threads, max_threads);
     INDETERMINATE RelaxedAtomic<uint64_t> next_chunk(0);
 
-    parallel_region(segment_threads, [&](int)
+    parallel_region(segment_threads, [&, low, high, sqrt_high, segment](int)
     {
       for (uint64_t i = next_chunk++; i < segment.chunk_count; i = next_chunk++)
       {
@@ -642,7 +642,8 @@ T nth_prime_sieve2(uint64_t n,
 
   for (uint64_t iter = 0; !finished; iter++)
   {
-    parallel_region(main_threads, [&](int t)
+    parallel_region(main_threads, [&, nth_prime_approx, thread_dist, main_threads,
+                                   max_threads_per_segment, total_threads, iter](int t)
     {
       // Unsigned integer division is usually
       // faster than signed integer division.

@@ -97,7 +97,7 @@ public:
     int64_t thread_dist = ceil_div(y, threads);
     thread_dist += coprime_indexes_.size() - thread_dist % coprime_indexes_.size();
 
-    parallel_region(threads, [&](int t)
+    parallel_region(threads, [&, y, T_MAX, sqrty, thread_dist](int t)
     {
       // Thread processes interval [low, high]
       int64_t low = thread_dist * t;

@@ -392,7 +392,7 @@ int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
   INDETERMINATE RelaxedAtomic<int64_t> next_chunk(0);
 
   // for (i = k + 1; i <= a; i++)
-  sum += parallel_sum<int64_t>(threads, [&](int)
+  sum += parallel_sum<int64_t>(threads, [&, x, a, k, chunks](int)
   {
     // Each thread uses its own PhiCache object in
     // order to avoid thread synchronization.

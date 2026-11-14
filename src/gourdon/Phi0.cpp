@@ -83,7 +83,7 @@ X Phi0_OpenMP(X x,
 
   // for (b = k + 1; b <= pi_y; b++)
   // Thread t processes b = k + 1 + t + i * threads
-  phi0 += parallel_sum<X>(threads, [&](int t)
+  phi0 += parallel_sum<X>(threads, [&, x, y, k, threads, pi_y](int t)
   {
     X phi0 = 0;
 

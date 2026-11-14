@@ -95,7 +95,7 @@ T parallel_sum(int threads, Body&& body)
     sums = vector.data();
   }
 
-  parallel_region(threads, [&](int id) { sums[id] = body(id); });
+  parallel_region(threads, [&body, sums](int id) { sums[id] = body(id); });
 
   T sum = 0;
   for (int i = 0; i < threads; i++)

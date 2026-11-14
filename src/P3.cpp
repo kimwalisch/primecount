@@ -63,7 +63,7 @@ int64_t P3(int64_t x,
     INDETERMINATE RelaxedAtomic<int64_t> next_chunk(0);
 
     // for (i = a + 1; i <= pi_x13; i++)
-    sum = parallel_sum<int64_t>(threads, [&](int)
+    sum = parallel_sum<int64_t>(threads, [&, x, a, pi_x13, chunks](int)
     {
       int64_t sum = 0;
 

@@ -333,7 +333,8 @@ T AC_OpenMP_default(T x,
   // 2) Computation of the C2 formula.
   // 3) Computation of the A formula.
   //
-  T sum = parallel_sum<T>(threads, [&](int)
+  T sum = parallel_sum<T>(threads, [&, x, y, k, x_star, x13, sqrtx, xy, pi_y,
+                                    max_clustered_global, sqrty, pi_sqrty, pi_root3_xy](int)
   {
     T sum = 0;
 

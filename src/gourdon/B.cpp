@@ -99,7 +99,7 @@ T B_OpenMP(T x,
   threads = loadBalancer.get_threads();
 
   // for (low = sqrt(x); low < x / y; low += dist)
-  T sum = parallel_sum<T>(threads, [&](int)
+  T sum = parallel_sum<T>(threads, [&, x, y](int)
   {
     T sum = 0;
     int64_t low = 0, high = 0;

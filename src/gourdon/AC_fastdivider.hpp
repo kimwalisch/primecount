@@ -317,7 +317,7 @@ T AC_OpenMP_fastdivider(T x,
   int init_threads = ideal_num_threads(primes_size, threads, min_thread_size);
   int64_t thread_dist = ceil_div(primes_size, init_threads);
 
-  parallel_region(init_threads, [&](int t)
+  parallel_region(init_threads, [&, primes_size, thread_dist](int t)
   {
     int64_t low = 1 + thread_dist * t;
     int64_t high = min(low + thread_dist, primes_size);
@@ -333,7 +333,8 @@ T AC_OpenMP_fastdivider(T x,
   // 2) Computation of the C2 formula.
   // 3) Computation of the A formula.
   //
-  T sum = parallel_sum<T>(threads, [&](int)
+  T sum = parallel_sum<T>(threads, [&, x, y, k, x_star, x13, sqrtx, xy, pi_y,
+                                    max_clustered_global, sqrty, pi_sqrty, pi_root3_xy](int)
   {
     T sum = 0;
 

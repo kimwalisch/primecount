@@ -136,7 +136,7 @@ void PiTable::init(uint64_t limit,
   thread_dist += 240 - thread_dist % 240;
   counts_.resize(threads);
 
-  parallel_region(threads, [&](int t)
+  parallel_region(threads, [&, limit, cache_limit, thread_dist](int t)
   {
     uint64_t low = cache_limit + thread_dist * t;
     uint64_t high = low + thread_dist;
@@ -148,7 +148,7 @@ void PiTable::init(uint64_t limit,
 
   // init_count() uses the prime counts of the
   // lower threads computed by init_bits().
-  parallel_region(threads, [&](int t)
+  parallel_region(threads, [&, limit, cache_limit, thread_dist](int t)
   {
     uint64_t low = cache_limit + thread_dist * t;
     uint64_t high = low + thread_dist;
@@ -258,7 +258,7 @@ Vector<uint32_t> PiTable::get_primes_u32(uint64_t x, int threads) const
       thread_dist += 240 - thread_dist % 240;
       uint64_t limit = x + 1;
 
-      parallel_region(threads, [&](int t)
+      parallel_region(threads, [&, thread_dist, limit](int t)
       {
         // Each thread processes [low, high[
         uint64_t low = thread_dist * t;
@@ -319,7 +319,7 @@ Vector<int64_t> PiTable::get_primes_i64(uint64_t x, int threads) const
       thread_dist += 240 - thread_dist % 240;
       uint64_t limit = x + 1;
 
-      parallel_region(threads, [&](int t)
+      parallel_region(threads, [&, thread_dist, limit](int t)
       {
         // Each thread processes [low, high[
         uint64_t low = thread_dist * t;
