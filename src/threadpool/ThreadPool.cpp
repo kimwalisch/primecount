@@ -19,6 +19,11 @@
 ///        spin_time before they sleep, this way consecutive
 ///        parallel regions start without OS thread wake-ups.
 ///
+///        Once the pool has grown, regions allocate no memory: the
+///        region lives on the leader's stack and workers are linked
+///        through intrusive lists. Only leaders take the pool lock,
+///        once to lease and once to return their workers.
+///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
@@ -62,6 +67,8 @@ using namespace primecount;
 using Clock = std::chrono::steady_clock;
 
 /// Idle threads check the clock every SPIN_CHECK iterations
+/// because reading the clock is slower than spinning.
+///
 constexpr unsigned SPIN_CHECK = 1024;
 
 struct Region;
@@ -69,7 +76,8 @@ struct Region;
 /// The leader of a parallel region sleeps on its LeaderSync if its
 /// workers take long to check out. LeaderSync objects are never
 /// freed: a worker may still notify a LeaderSync after its leader
-/// has returned, which is a harmless spurious wake-up.
+/// has returned, which is a harmless spurious wake-up. The pool
+/// reuses them, hence regions do not allocate LeaderSync objects.
 ///
 struct LeaderSync
 {
@@ -83,6 +91,9 @@ struct LeaderSync
 
 struct Worker
 {
+  // Each idle worker spins on its own mailbox, hence a leader
+  // only touches the cache lines of the workers it leases. The
+  // padding prevents false sharing between workers.
   MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
   // Region assigned by a leader, nullptr while idle
   std::atomic<Region*> mailbox{nullptr};
@@ -112,6 +123,9 @@ struct Region
   int threads;
   int depth;
   std::exception_ptr exception;
+  // Many threads update next_id and checked_out, the padding
+  // separates them from each other and from the read-only
+  // fields above to avoid false sharing.
   MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
   // The leader executes id 0
   std::atomic<int> next_id{1};
@@ -163,6 +177,10 @@ private:
 thread_local int region_depth = 0;
 std::atomic<ThreadPool*> thread_pool{nullptr};
 
+/// The pause instruction makes busy-waiting cheaper: it saves
+/// power and leaves more resources to the other hyper-thread of
+/// the same CPU core.
+///
 ALWAYS_INLINE void cpu_pause()
 {
 #if defined(_MSC_VER) && \
@@ -243,7 +261,8 @@ void claim_ids(Region& region)
 /// store of the mailbox and load of the sleeping flag pair with
 /// the worker's store of its sleeping flag and load of its
 /// mailbox: either the worker finds its region or we find the
-/// worker sleeping, hence no wake-up is lost.
+/// worker sleeping, hence no wake-up is lost. Spinning workers
+/// are started without a lock or a system call.
 ///
 void post(Worker* worker, Region* region)
 {
@@ -317,7 +336,8 @@ void worker_main(ThreadPool* pool, Worker* worker, Region* region)
 
 /// The leader waits until all its workers have checked out.
 /// The acquire load of checked_out makes all writes of the
-/// workers visible to the leader.
+/// workers visible to the leader. Like idle workers, the
+/// leader only sleeps if spinning takes longer than spin_time.
 ///
 void wait_for_team(ThreadPool* pool, Region& region, int workers)
 {
@@ -414,6 +434,8 @@ Team ThreadPool::lease(int workers)
 
 /// Creates the reserved workers, they start working on the region
 /// immediately. If thread creation fails, the pool stops growing.
+/// Creating threads is slow, hence we create them without holding
+/// the pool lock and the region's work proceeds meanwhile.
 ///
 void ThreadPool::create_workers(Team& team, Region& region)
 {
@@ -454,7 +476,8 @@ void ThreadPool::create_workers(Team& team, Region& region)
 }
 
 /// Returns the leased workers to the pool, the most recently
-/// used workers are leased first next time.
+/// used workers are leased first next time because they are
+/// the most likely to still spin.
 ///
 void ThreadPool::give_back(Team& team)
 {

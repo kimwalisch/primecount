@@ -25,7 +25,9 @@
 namespace primecount {
 
 /// Non-owning reference to a callable with signature void(int).
-/// Unlike std::function it never allocates memory.
+/// Unlike std::function it never allocates memory or copies the
+/// callable, which lives on the caller's stack until the region
+/// has finished.
 ///
 class FunctionRef
 {
@@ -72,8 +74,9 @@ void parallel_region(int threads, Body&& body)
 
 /// Same as parallel_region(), but returns the sum of all
 /// body(id) results. Each id accumulates its partial sum in a
-/// local variable of type T and returns it. After all ids have
-/// finished, the calling thread adds up the partial sums.
+/// local variable of type T and returns it, hence hot loops need
+/// no atomics or locks. After all ids have finished, the calling
+/// thread adds up the partial sums.
 ///
 template <typename T, typename Body>
 T parallel_sum(int threads, Body&& body)
@@ -85,6 +88,7 @@ T parallel_sum(int threads, Body&& body)
     return body(0);
 
   // Partial sums, stored on the stack for up to 256 ids
+  // to avoid a memory allocation per region.
   INDETERMINATE Array<T, 256> array;
   Vector<T> vector;
   T* sums = array.data();
