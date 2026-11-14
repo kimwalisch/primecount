@@ -73,7 +73,9 @@ struct Region;
 ///
 struct LeaderSync
 {
-  std::atomic<bool> sleeping{false};
+  // Number of workers the sleeping leader waits for to check
+  // out, 0 while the leader does not sleep.
+  std::atomic<int> waiting_for{0};
   std::mutex mutex;
   std::condition_variable cond;
   LeaderSync* next = nullptr;
@@ -294,9 +296,10 @@ void run_worker(Region* region)
   region_depth = 0;
 
   LeaderSync* sync = region->sync;
-  region->checked_out.fetch_add(1, std::memory_order_seq_cst);
+  int checked_out = region->checked_out.fetch_add(1, std::memory_order_seq_cst) + 1;
 
-  if (sync->sleeping.load(std::memory_order_seq_cst))
+  // Only the last worker wakes up the sleeping leader
+  if (sync->waiting_for.load(std::memory_order_seq_cst) == checked_out)
   {
     std::lock_guard<std::mutex> lock(sync->mutex);
     sync->cond.notify_one();
@@ -329,12 +332,12 @@ void wait_for_team(ThreadPool* pool, Region& region, int workers)
     {
       LeaderSync* sync = region.sync;
       std::unique_lock<std::mutex> lock(sync->mutex);
-      sync->sleeping.store(true, std::memory_order_seq_cst);
+      sync->waiting_for.store(workers, std::memory_order_seq_cst);
 
       while (region.checked_out.load(std::memory_order_seq_cst) < workers)
         sync->cond.wait(lock);
 
-      sync->sleeping.store(false, std::memory_order_relaxed);
+      sync->waiting_for.store(0, std::memory_order_relaxed);
       break;
     }
   }
