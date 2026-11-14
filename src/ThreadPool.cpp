@@ -147,7 +147,7 @@ public:
   Clock::time_point spin_deadline() const;
 
 private:
-  std::atomic<int> spin_time_us_{10000};
+  std::atomic<int> spin_time_us_{3000};
   std::mutex mutex_;
   Worker* idle_ = nullptr;
   LeaderSync* syncs_ = nullptr;

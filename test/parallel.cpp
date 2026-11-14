@@ -300,7 +300,7 @@ int main()
       OK = OK && check_ids(cpus);
     }
 
-    set_parallel_spin_time(0.01);
+    set_parallel_spin_time(0.003);
     check(OK, "Parallel regions with idle times shorter and longer than spin_time");
   }
 
@@ -324,7 +324,7 @@ int main()
     bool OK = barrier_regions(threads, 20000);
     set_parallel_spin_time(0);
     OK = OK && barrier_regions(threads, 5000);
-    set_parallel_spin_time(0.01);
+    set_parallel_spin_time(0.003);
     check(OK, "20,000 + 5,000 regions in which " + std::to_string(threads) + " threads wait for each other");
   }
 
