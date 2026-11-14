@@ -84,6 +84,16 @@ Prefer primecount's internal utilities over C++ standard library equivalents. Ch
 - `include/min.hpp` also provides `min3(a, b, c)` and `max3(a, b, c)` for three arguments with similar mixed-type support; `min3()` returns the last argument's type and `max3()` returns the first argument's type.
 - Use `in_between(lower, value, upper)` from `include/imath.hpp` instead of `std::clamp()`. Note that the lower bound is the first argument and the value being clamped is the second.
 
+## Multi-threading
+
+primecount uses its own thread pool (`src/ThreadPool.cpp`), not OpenMP. Write multi-threaded code using `parallel_region()` and `parallel_sum()` from `src/parallel.hpp`; do not add OpenMP pragmas or create `std::thread` objects in algorithm code.
+
+- `parallel_region(threads, body)` calls `body(id)` exactly once for every id in `[0, threads)`. The calling thread runs id 0 and `threads <= 1` runs inline. A region may get fewer worker threads than ids, hence an id must never wait for another id. Distribute work using `RelaxedAtomic` counters or the load balancers, and replace barriers with consecutive regions.
+- Use `parallel_sum<T>(threads, body)` instead of shared accumulators: each id adds up its partial sum in a local `T` variable and returns it.
+- Nested regions are supported up to two levels, regions at the third nesting level run on the calling thread.
+- In region lambdas, capture small builtin types such as integers, `bool`, `double`, pointers and small structs by value, listed in declaration order, e.g. `[&, x, y, k](int)`. Capture by reference only large objects and variables shared or modified by multiple threads. Do not use `[=]`.
+- `max_threads()` returns the default number of threads, the number of CPUs in the process's affinity mask.
+
 ## Code comments
 
 - Comment sparsely. Add a comment without being asked only when it helps a human reader understand an important, non-obvious aspect of the code, such as an algorithmic choice or a correctness constraint. Avoid comments that merely restate the code.
