@@ -74,9 +74,8 @@ void start_watchdog()
   }).detach();
 }
 
-/// Checks that every id in [0, threads) runs exactly once,
-/// that the calling thread executes id 0 and that the
-/// body runs inside a parallel region.
+/// Checks that every id in [0, threads) runs exactly once
+/// and that the calling thread executes id 0.
 ///
 bool check_ids(int threads)
 {
@@ -84,7 +83,6 @@ bool check_ids(int threads)
   Vector<int> counts(threads);
   std::fill(counts.begin(), counts.end(), 0);
   std::atomic<int> total{0};
-  std::atomic<bool> in_region{true};
   std::thread::id leader = std::this_thread::get_id();
   bool leader_id0 = false;
 
@@ -94,11 +92,9 @@ bool check_ids(int threads)
     total.fetch_add(1, std::memory_order_relaxed);
     if (id == 0)
       leader_id0 = (std::this_thread::get_id() == leader);
-    if (threads > 1 && !in_parallel_region())
-      in_region = false;
   });
 
-  bool OK = (total == threads) && leader_id0 && in_region && !in_parallel_region();
+  bool OK = (total == threads) && leader_id0;
   for (int i = 0; i < threads; i++)
     OK = OK && (counts[i] == 1);
 
@@ -183,7 +179,6 @@ int main()
     parallel_region(0, [&](int id) { calls += (id == 0); });
     int64_t sum = parallel_sum<int64_t>(1, [](int id) -> int64_t { return id + 7; });
     bool OK = calls == 2 && sum == 7;
-    OK = OK && !in_parallel_region();
     OK = OK && parallel_pool_size() == 0;
     check(OK, "threads <= 1 runs inline without creating threads");
   }
@@ -203,13 +198,10 @@ int main()
     Vector<int> counts3(a * b * c);
     std::fill(counts2.begin(), counts2.end(), 0);
     std::fill(counts3.begin(), counts3.end(), 0);
-    std::atomic<bool> in_region{true};
 
     parallel_region(a, [&](int i) {
       parallel_region(b, [&](int j) {
         counts2[i * b + j]++;
-        if (!in_parallel_region())
-          in_region = false;
       });
     });
 
@@ -221,7 +213,7 @@ int main()
       });
     });
 
-    bool OK = in_region && std::all_of(counts2.begin(), counts2.end(), [](int n) { return n == 1; });
+    bool OK = std::all_of(counts2.begin(), counts2.end(), [](int n) { return n == 1; });
     check(OK, "Nested parallel regions with 2 levels");
     OK = std::all_of(counts3.begin(), counts3.end(), [](int n) { return n == 1; });
     check(OK, "Nested parallel regions with 3 levels");

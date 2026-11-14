@@ -104,11 +104,6 @@ T parallel_sum(int threads, Body&& body)
   return sum;
 }
 
-/// Returns true if the calling thread executes the body
-/// of a parallel region with threads > 1.
-///
-bool in_parallel_region();
-
 /// Maximum number of threads used by default
 int max_threads();
 

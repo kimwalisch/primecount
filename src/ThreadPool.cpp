@@ -539,11 +539,6 @@ void parallel_region_impl(int threads, FunctionRef body)
     std::rethrow_exception(region.exception);
 }
 
-bool in_parallel_region()
-{
-  return region_depth > 0;
-}
-
 int max_threads()
 {
   static const int threads = []() -> int
