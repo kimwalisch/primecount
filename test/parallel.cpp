@@ -151,13 +151,14 @@ bool barrier_regions(int threads, int regions)
 
   for (int i = 0; i < regions; i++)
   {
-    if (i % 1000 == 0)
-      progress++;
+    progress++;
 
     parallel_region(threads, [&](int)
     {
       arrived.fetch_add(1);
-      while (arrived.load() < threads)
+      // Relaxed loads, with ThreadSanitizer many threads that
+      // acquire-load the same atomic can starve its writers.
+      while (arrived.load(std::memory_order_relaxed) < threads)
         std::this_thread::yield();
     });
 
