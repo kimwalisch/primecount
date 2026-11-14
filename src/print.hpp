@@ -52,17 +52,12 @@ void print_nth_prime_sieve(uint64_t n,
                            uint64_t thread_dist,
                            int threads);
 
-#if defined(_OPENMP) && \
-    _OPENMP >= 201307
-
 void print_nth_prime_sieve(uint64_t n,
                            bool sieve_forward,
                            uint64_t dist_approx,
                            uint64_t thread_dist,
                            int main_threads,
                            int threads_per_segment);
-
-#endif
 
 } // namespace
 

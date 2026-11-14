@@ -287,9 +287,6 @@ void print_nth_prime_sieve(uint64_t n,
   std::cout << "threads = " << threads << std::endl;
 }
 
-#if defined(_OPENMP) && \
-    _OPENMP >= 201307
-
 void print_nth_prime_sieve(uint64_t n,
                            bool sieve_forward,
                            uint64_t dist_approx,
@@ -304,7 +301,5 @@ void print_nth_prime_sieve(uint64_t n,
   std::cout << "main_threads = " << main_threads << std::endl;
   std::cout << "threads_per_segment = " << threads_per_segment << std::endl;
 }
-
-#endif
 
 } // namespace
