@@ -1,8 +1,8 @@
 ///
 /// @file  pi_lmo_parallel.cpp
 /// @brief Parallel implementation of the Lagarias-Miller-Odlyzko
-///        prime counting algorithm using OpenMP. This implementation
-///        uses load balancing to ensure all threads are kept busy
+///        prime counting algorithm. This implementation uses
+///        load balancing to ensure all threads are kept busy
 ///        till the very end. This implementation also does not use a
 ///        special tree data structure (a.k.a. Fenwick tree) for
 ///        counting the number of unsieved elements but instead counts
@@ -32,6 +32,7 @@
 #include <LoadBalancerS2.hpp>
 #include <min.hpp>
 #include <imath.hpp>
+#include <parallel.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
@@ -207,10 +208,10 @@ int64_t S2(int64_t x,
   double sieve_work = 0.47309 * std::pow(default_alpha / alpha, 2.5849);
   WorkModelS2 model(leaves_start, sieve_work, 1.1764, 0.36355, 0.030408);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, model, threads, is_print);
-  int64_t sum = 0;
 
-  #pragma omp parallel num_threads(threads) reduction(+: sum)
+  int64_t sum = parallel_sum<int64_t>(threads, [&](int)
   {
+    int64_t sum = 0;
     ThreadData thread;
 
     while (loadBalancer.get_work(thread))
@@ -220,7 +221,9 @@ int64_t S2(int64_t x,
       thread.stop_time = get_time();
       sum += thread.sum;
     }
-  }
+
+    return sum;
+  });
 
   if (is_print)
     print("S2", sum, time);

@@ -35,6 +35,7 @@
 #include <int128_t.hpp>
 #include <LoadBalancerS2.hpp>
 #include <min.hpp>
+#include <parallel.hpp>
 #include <print.hpp>
 #include <S.hpp>
 
@@ -213,10 +214,10 @@ T S2_hard_OpenMP(T x,
   double sieve_work = 0.076243 * std::pow(default_alpha / alpha, 0.9068);
   WorkModelS2 model(leaves_start, sieve_work, 4.3158, 0.61257, 0.1403);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, model, threads, is_print);
-  T sum = 0;
 
-  #pragma omp parallel num_threads(threads) reduction(+: sum)
+  T sum = parallel_sum<T>(threads, [&](int)
   {
+    T sum = 0;
     ThreadData thread;
 
     while (loadBalancer.get_work(thread))
@@ -226,7 +227,9 @@ T S2_hard_OpenMP(T x,
       thread.stop_time = get_time();
       sum += thread.sum;
     }
-  }
+
+    return sum;
+  });
 
   return sum;
 }
