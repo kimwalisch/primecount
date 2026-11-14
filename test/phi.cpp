@@ -4,7 +4,7 @@
 ///         which counts the numbers <= x that are not divisible
 ///         by any of the first a primes.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,6 +14,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <imath.hpp>
+#include <parallel.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -114,12 +115,16 @@ int main()
     std::cout << "Testing phi(x, a) multi-threading" << std::endl;
 
     int64_t iters = 500;
-    int64_t sum1 = 0;
     int64_t sum2 = 0;
+    int threads = max_threads();
 
-    #pragma omp parallel for reduction(+: sum1)
-    for (int64_t i = 0; i < iters; i++)
-      sum1 += pi_legendre(10000000 + i, 1);
+    int64_t sum1 = parallel_sum<int64_t>(threads, [&](int t)
+    {
+      int64_t sum = 0;
+      for (int64_t i = t; i < iters; i += threads)
+        sum += pi_legendre(10000000 + i, 1);
+      return sum;
+    });
 
     for (int64_t i = 0; i < iters; i++)
       sum2 += pi_legendre(10000000 + i, 1);
