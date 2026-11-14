@@ -17,6 +17,7 @@
 #ifndef PARALLEL_HPP
 #define PARALLEL_HPP
 
+#include <macros.hpp>
 #include <Vector.hpp>
 
 #include <type_traits>
@@ -84,7 +85,7 @@ T parallel_sum(int threads, Body&& body)
     return body(0);
 
   // Partial sums, stored on the stack for up to 256 ids
-  Array<T, 256> array;
+  INDETERMINATE Array<T, 256> array;
   Vector<T> vector;
   T* sums = array.data();
 

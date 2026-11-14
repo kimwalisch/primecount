@@ -546,7 +546,7 @@ void parallel_region_impl(int threads, FunctionRef body)
   }
 
   ThreadPool& pool = get_pool();
-  Region region(body, threads, depth + 1);
+  INDETERMINATE Region region(body, threads, depth + 1);
   Team team = pool.lease(threads - 1);
   region.sync = team.sync;
 
