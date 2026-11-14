@@ -39,6 +39,10 @@ endif()
 include(CMakeFindDependencyMacro)
 find_dependency(primesieve QUIET REQUIRED)
 
+if(primecount_STATIC)
+    find_dependency(Threads QUIET)
+endif()
+
 if(primecount_STATIC AND "@PRIMECOUNT_WITH_OPENMP@")
     find_dependency(OpenMP QUIET)
 endif()

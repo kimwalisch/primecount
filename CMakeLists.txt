@@ -111,6 +111,7 @@ set(LIB_SRC src/api.cpp
             src/PhiTiny.cpp
             src/PiTable.cpp
             src/S1.cpp
+            src/ThreadPool.cpp
             src/sieve/Sieve.cpp
             src/sieve/pre_sieve.cpp
             src/LoadBalancerP2.cpp
@@ -211,6 +212,22 @@ include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
 # the int128_t check.
 if(WITH_FASTDIVIDER)
     include("${PROJECT_SOURCE_DIR}/cmake/FastDivider.cmake")
+endif()
+
+# Threads ############################################################
+
+find_package(Threads REQUIRED)
+list(APPEND PRIMECOUNT_LINK_LIBRARIES "Threads::Threads")
+
+if(CMAKE_THREAD_LIBS_INIT)
+    string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "${CMAKE_THREAD_LIBS_INIT} ")
+endif()
+
+# ThreadPool.cpp uses dlopen() to prevent unloading libprimecount
+# while its worker threads are running.
+if(CMAKE_DL_LIBS)
+    list(APPEND PRIMECOUNT_LINK_LIBRARIES "${CMAKE_DL_LIBS}")
+    string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-l${CMAKE_DL_LIBS} ")
 endif()
 
 # Check for OpenMP ###################################################
