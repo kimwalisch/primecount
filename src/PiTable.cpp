@@ -19,7 +19,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <ctz.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <Vector.hpp>
 #include <imath.hpp>
 #include <macros.hpp>

@@ -30,7 +30,7 @@
 #include <int128_t.hpp>
 #include <LoadBalancerS2.hpp>
 #include <macros.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
 

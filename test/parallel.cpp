@@ -9,7 +9,7 @@
 /// file in the top level directory.
 ///
 
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <int128_t.hpp>
 #include <Vector.hpp>
 

@@ -47,7 +47,7 @@
 #include <int128_t.hpp>
 #include <macros.hpp>
 #include <min.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <PiTable.hpp>
 
 #include <stdint.h>

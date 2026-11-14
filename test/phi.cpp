@@ -14,7 +14,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <imath.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 
 #include <stdint.h>
 #include <iostream>

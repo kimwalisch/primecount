@@ -22,7 +22,7 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
 #include <Vector.hpp>

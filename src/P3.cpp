@@ -13,7 +13,7 @@
 #include <generate_primes.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
 #include <RelaxedAtomic.hpp>

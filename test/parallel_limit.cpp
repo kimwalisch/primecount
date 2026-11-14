@@ -11,7 +11,7 @@
 /// file in the top level directory.
 ///
 
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>

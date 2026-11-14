@@ -35,7 +35,7 @@
 #include <int128_t.hpp>
 #include <LoadBalancerS2.hpp>
 #include <min.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <print.hpp>
 #include <S.hpp>
 

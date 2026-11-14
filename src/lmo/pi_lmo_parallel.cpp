@@ -32,7 +32,7 @@
 #include <LoadBalancerS2.hpp>
 #include <min.hpp>
 #include <imath.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>

@@ -25,7 +25,7 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <LoadBalancerP2.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <print.hpp>
 
 #include <stdint.h>

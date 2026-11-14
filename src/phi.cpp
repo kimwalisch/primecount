@@ -28,7 +28,7 @@
 #include <imath.hpp>
 #include <macros.hpp>
 #include <min.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>

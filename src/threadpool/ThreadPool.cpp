@@ -25,7 +25,8 @@
 /// file in the top level directory.
 ///
 
-#include <parallel.hpp>
+#include "parallel.hpp"
+
 #include <primecount-config.hpp>
 #include <macros.hpp>
 

@@ -26,7 +26,7 @@
 
 #include "nth_prime_sieve.hpp"
 #include "BitSieve240.hpp"
-#include "parallel.hpp"
+#include "threadpool/parallel.hpp"
 #include "print.hpp"
 
 #include <primecount.hpp>

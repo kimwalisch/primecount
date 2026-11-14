@@ -18,7 +18,7 @@
 #include <generate_primes.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <Vector.hpp>
 #include <print.hpp>
 #include <S.hpp>

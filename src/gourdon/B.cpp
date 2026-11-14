@@ -24,7 +24,7 @@
 #include <macros.hpp>
 #include <min.hpp>
 #include <imath.hpp>
-#include <parallel.hpp>
+#include <threadpool/parallel.hpp>
 #include <print.hpp>
 
 #include <stdint.h>
