@@ -56,6 +56,7 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
+#include <threadpool/parallel.hpp>
 #include <Vector.hpp>
 
 #include <algorithm>
@@ -90,17 +91,18 @@ public:
     // has an even or odd number of prime factors.
     factor_[0] = T_MAX ^ 1;
 
+    // These load balancing settings work well on my
+    // dual-socket AMD EPYC 7642 server with 192 CPU cores.
     int64_t sqrty = isqrt(y);
-    int64_t thread_threshold = (int64_t) 5e6;
-    threads = ideal_num_threads(y, threads, thread_threshold);
+    int64_t thread_threshold = 100;
+    threads = ideal_num_threads(sqrty, threads, thread_threshold);
     int64_t thread_dist = ceil_div(y, threads);
     thread_dist += coprime_indexes_.size() - thread_dist % coprime_indexes_.size();
 
-    #pragma omp parallel for num_threads(threads) schedule(static, 1)
-    for (int t = 0; t < threads; t++)
+    parallel_for(threads, [&, y, T_MAX, sqrty, thread_dist](int thread_id)
     {
       // Thread processes interval [low, high]
-      int64_t low = thread_dist * t;
+      int64_t low = thread_dist * thread_id;
       int64_t high = low + thread_dist;
       int64_t min_m = first_coprime() * first_coprime();
       low = std::max(first_coprime(), low + 1);
@@ -160,7 +162,7 @@ public:
           }
         }
       }
-    }
+    });
   }
 
   /// Returns the factor table entry for the number

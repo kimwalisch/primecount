@@ -37,6 +37,7 @@
 #include <imath.hpp>
 #include <macros.hpp>
 #include <min.hpp>
+#include <threadpool/parallel.hpp>
 #include <PiTable.hpp>
 #include <Vector.hpp>
 
@@ -277,16 +278,15 @@ T C2_fastdivider(T xlow,
 /// Compute A + C
 template <typename T,
           typename Primes>
-T AC_OpenMP_fastdivider(T x,
-                        int64_t y,
-                        int64_t k,
-                        int64_t x_star,
-                        const PiTable& pi,
-                        const Primes& primes,
-                        int threads,
-                        bool is_print)
+T AC_parallel_fastdivider(T x,
+                          int64_t y,
+                          int64_t k,
+                          int64_t x_star,
+                          const PiTable& pi,
+                          const Primes& primes,
+                          int threads,
+                          bool is_print)
 {
-  T sum = 0;
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
   int64_t xy = x / y;
@@ -312,18 +312,20 @@ T AC_OpenMP_fastdivider(T x,
   Vector<FastDivider> fprimes;
   fprimes.resize(primes.size());
 
-  int64_t min_thread_size = (int64_t) 1e6;
+  // These load balancing settings work well on my
+  // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t primes_size = fprimes.size();
-  int init_threads = ideal_num_threads(primes_size, threads, min_thread_size);
+  int64_t init_threshold = 60;
+  int init_threads = ideal_num_threads(isqrt(primes_size), threads, init_threshold);
   int64_t thread_dist = ceil_div(primes_size, init_threads);
 
-  #pragma omp parallel for num_threads(init_threads) schedule(static, 1)
-  for (int64_t low = 1; low < primes_size; low += thread_dist)
+  parallel_for(init_threads, [&, primes_size, thread_dist](int thread_id)
   {
+    int64_t low = 1 + thread_dist * thread_id;
     int64_t high = min(low + thread_dist, primes_size);
     for (int64_t i = low; i < high; i++)
       fprimes[i] = FastDivider(primes[i]);
-  }
+  });
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -333,8 +335,11 @@ T AC_OpenMP_fastdivider(T x,
   // 2) Computation of the C2 formula.
   // 3) Computation of the A formula.
   //
-  #pragma omp parallel num_threads(threads) reduction(+: sum)
+  T sum = parallel_sum<T>(threads, [&, x, y, k, x_star, x13, sqrtx, xy, pi_y,
+                                    max_clustered_global, sqrty, pi_sqrty, pi_root3_xy]()
   {
+    T sum = 0;
+
     // SegmentedPiTable is accessed very frequently.
     // In order to get good performance it is important that
     // SegmentedPiTable fits into the CPU's cache.
@@ -444,7 +449,9 @@ T AC_OpenMP_fastdivider(T x,
         }
       }
     }
-  }
+
+    return sum;
+  });
 
   return sum;
 }

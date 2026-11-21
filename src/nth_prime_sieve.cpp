@@ -26,6 +26,7 @@
 
 #include "nth_prime_sieve.hpp"
 #include "BitSieve240.hpp"
+#include "threadpool/parallel.hpp"
 #include "print.hpp"
 
 #include <primecount.hpp>
@@ -249,19 +250,16 @@ T nth_prime_sieve1(uint64_t n,
 
   T nth_prime = 0;
   uint64_t count = 0;
-  uint64_t iter = 0;
   bool finished = false;
 
-  #pragma omp parallel num_threads(threads)
-  while (!finished)
+  for (uint64_t iter = 0; !finished; iter++)
   {
-    #pragma omp for schedule(static, 1)
-    for (int t = 0; t < threads; t++)
+    parallel_for(threads, [&, nth_prime_approx, threads, thread_dist, iter](int thread_id)
     {
       // Unsigned integer division is usually
       // faster than signed integer division.
       using UT = typename pstd::make_unsigned<T>::type;
-      uint64_t i = iter * threads + t;
+      uint64_t i = iter * threads + thread_id;
       UT low = 0, high = 0;
 
       if (sieve_forward)
@@ -282,45 +280,40 @@ T nth_prime_sieve1(uint64_t n,
       // instead of slow 128-bit integer division.
       if ( low <= pstd::numeric_limits<uint64_t>::max() &&
           high <= pstd::numeric_limits<uint64_t>::max())
-        sieves[t].sieve(uint64_t(low), uint64_t(high));
+        sieves[thread_id].sieve(uint64_t(low), uint64_t(high));
       else
-        sieves[t].sieve(low, high);
-    }
+        sieves[thread_id].sieve(low, high);
+    });
 
-    #pragma omp single
+    for (int t = 0; t < threads; t++)
     {
-      iter++;
-
-      for (int t = 0; t < threads; t++)
+      if (sieve_forward)
       {
-        if (sieve_forward)
-        {
-          if (count + sieves[t].get_count() < n)
-            count += sieves[t].get_count();
-          else
-          {
-            // Nth prime is in the current segment
-            nth_prime = sieves[t].find_nth_prime(n - count);
-            finished = true;
-            break;
-          }
-        }
-        else // Sieve backwards
-        {
+        if (count + sieves[t].get_count() < n)
           count += sieves[t].get_count();
+        else
+        {
+          // Nth prime is in the current segment
+          nth_prime = sieves[t].find_nth_prime(n - count);
+          finished = true;
+          break;
+        }
+      }
+      else // Sieve backwards
+      {
+        count += sieves[t].get_count();
 
-          if (count >= n)
-          {
-            // Nth prime is in the current segment
-            nth_prime = sieves[t].find_nth_prime((count - n) + 1);
-            finished = true;
-            break;
-          }
-          else if (sieves[t].get_low() == 0)
-          {
-            finished = true;
-            break;
-          }
+        if (count >= n)
+        {
+          // Nth prime is in the current segment
+          nth_prime = sieves[t].find_nth_prime((count - n) + 1);
+          finished = true;
+          break;
+        }
+        else if (sieves[t].get_low() == 0)
+        {
+          finished = true;
+          break;
         }
       }
     }
@@ -334,10 +327,6 @@ T nth_prime_sieve1(uint64_t n,
 
   return nth_prime;
 }
-
-/// nth_prime_sieve2() requires OpenMP 4.0 or later
-#if defined(_OPENMP) && \
-    _OPENMP >= 201307
 
 struct SegmentConfig
 {
@@ -457,10 +446,8 @@ public:
     auto segment = get_segment_config(high, threads);
     INDETERMINATE RelaxedAtomic<uint64_t> next_chunk(0);
 
-    // The main thread starts the worker threads
-    for (int t = 0; t < segment.threads; t++)
+    parallel_for(segment.threads, [&, low, high, sqrt_high, segment]()
     {
-      #pragma omp task shared(next_chunk)
       for (uint64_t i = next_chunk++; i < segment.chunk_count; i = next_chunk++)
       {
         uint64_t iter_start = segment.chunk_dist * i + 1;
@@ -471,9 +458,7 @@ public:
         if (iter_start <= iter_stop)
           cross_off(low, high, iter_start, iter_stop);
       }
-    }
-
-    #pragma omp taskwait
+    });
 
     // Count primes (1 bits)
     for (uint64_t i = 0; i < sieve_size_; i++)
@@ -605,9 +590,12 @@ T nth_prime_sieve2(uint64_t n,
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
   thread_dist = max(ceil_div(dist_approx, main_threads), 240);
+
+  // If main_threads does not divide max_threads, rounding up
+  // slightly oversubscribes the CPUs. This is faster than
+  // sieving some segments using fewer threads.
   int max_threads_per_segment = ceil_div(max_threads, main_threads);
   auto segment = get_segment_config(nth_prime_approx, max_threads_per_segment);
-  int total_threads = min(main_threads * segment.threads, max_threads);
 
   // Our nth_prime_sieve2 uses atomic memory accesses because
   // multiple threads process the same segment simultaneously.
@@ -632,7 +620,6 @@ T nth_prime_sieve2(uint64_t n,
     max_threads_per_segment = max(max_threads_per_segment, 1);
     thread_dist = max(ceil_div(dist_approx, main_threads), 240);
     segment = get_segment_config(nth_prime_approx, max_threads_per_segment);
-    total_threads = min(main_threads * segment.threads, max_threads);
   }
 
   aligned_vector<NthPrimeSieve2<T>> sieves(main_threads);
@@ -651,16 +638,15 @@ T nth_prime_sieve2(uint64_t n,
     time = get_time();
   }
 
-  #pragma omp parallel num_threads(total_threads)
-  #pragma omp single nowait
   for (uint64_t iter = 0; !finished; iter++)
   {
-    for (int t = 0; t < main_threads; t++)
+    parallel_for(main_threads, [&, nth_prime_approx, thread_dist, main_threads,
+                                max_threads_per_segment, iter](int thread_id)
     {
       // Unsigned integer division is usually
       // faster than signed integer division.
       using UT = typename pstd::make_unsigned<T>::type;
-      uint64_t i = iter * main_threads + t;
+      uint64_t i = iter * main_threads + thread_id;
       UT low = 0, high = 0;
 
       if (sieve_forward)
@@ -676,20 +662,15 @@ T nth_prime_sieve2(uint64_t n,
         low = (high - min(high, thread_dist)) + 1;
       }
 
-      #pragma omp task shared(sieves)
-      {
-        // Sieve the current segment [low, high].
-        // If possible use fast 64-bit integer division
-        // instead of slow 128-bit integer division.
-        if ( low <= pstd::numeric_limits<uint64_t>::max() &&
-            high <= pstd::numeric_limits<uint64_t>::max())
-          sieves[t].sieve(uint64_t(low), uint64_t(high), max_threads_per_segment);
-        else
-          sieves[t].sieve(low, high, max_threads_per_segment);
-      }
-    }
-
-    #pragma omp taskwait
+      // Sieve the current segment [low, high].
+      // If possible use fast 64-bit integer division
+      // instead of slow 128-bit integer division.
+      if ( low <= pstd::numeric_limits<uint64_t>::max() &&
+          high <= pstd::numeric_limits<uint64_t>::max())
+        sieves[thread_id].sieve(uint64_t(low), uint64_t(high), max_threads_per_segment);
+      else
+        sieves[thread_id].sieve(low, high, max_threads_per_segment);
+    });
 
     for (int t = 0; t < main_threads; t++)
     {
@@ -734,17 +715,12 @@ T nth_prime_sieve2(uint64_t n,
   return nth_prime;
 }
 
-#endif
-
 template <typename T>
 T nth_prime_sieve(T n,
                   T nth_prime_approx,
                   T count_approx,
                   int threads)
 {
-#if defined(_OPENMP) && \
-    _OPENMP >= 201307
-
   bool is_lock_free = false;
 
   // Use nth_prime_sieve2() if the CPU supports fast,
@@ -772,7 +748,6 @@ T nth_prime_sieve(T n,
                                      nth_prime_approx,
                                      threads);
   }
-#endif
 
   if (count_approx < n)
     return nth_prime_sieve1<true>(uint64_t(n - count_approx),
