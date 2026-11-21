@@ -4,7 +4,7 @@ These instructions apply throughout the primecount repository.
 
 ## Project overview
 
-primecount is a command-line program and C/C++ library for computing π(x), the number of primes less than or equal to x. It uses highly optimized combinatorial prime-counting algorithms with OpenMP parallelization. Gourdon's algorithm is the default.
+primecount is a command-line program and C/C++ library for computing π(x), the number of primes less than or equal to x. It uses highly optimized combinatorial prime-counting algorithms, parallelized using primecount's own thread pool (`src/threadpool/parallel.hpp`, `src/threadpool/ThreadPool.cpp`). Gourdon's algorithm is the default.
 
 Read `README.md` once at the beginning of each new session before making code changes to understand the project's capabilities, usage, and algorithm overview. Consult relevant sections again as needed. Use the build and verification instructions in this `AGENTS.md` when developing.
 
@@ -83,6 +83,17 @@ Prefer primecount's internal utilities over C++ standard library equivalents. Ch
 - For new min/max calls, follow the convention of the surrounding snippet or function when the arguments have the same type and require no casts. Use the internal helpers when mixed types would otherwise require explicit casts. Do not add `min.hpp` solely to replace suitable standard-library calls.
 - `include/min.hpp` also provides `min3(a, b, c)` and `max3(a, b, c)` for three arguments with similar mixed-type support; `min3()` returns the last argument's type and `max3()` returns the first argument's type.
 - Use `in_between(lower, value, upper)` from `include/imath.hpp` instead of `std::clamp()`. Note that the lower bound is the first argument and the value being clamped is the second.
+
+## Multi-threading
+
+primecount uses its own thread pool (`src/threadpool/ThreadPool.cpp`), not OpenMP. Write multi-threaded code using `parallel_for()` and `parallel_sum()` from `src/threadpool/parallel.hpp`; do not add OpenMP pragmas or create `std::thread` objects in algorithm code.
+
+- `parallel_for(threads, func)` calls `func(thread_id)` exactly once for every thread_id in `[0, threads[`, a function that does not use its thread_id may omit the parameter: `func()`. Unlike other `parallel_for()` implementations, every thread_id uses its own thread, hence `threads` is a thread count, not a number of work items. The calling thread runs id 0 and `threads <= 1` runs inline. Like OpenMP, a job runs with all its threads, even if other jobs already use all CPUs. Still, an id must never wait for another id: when the CPUs are oversubscribed, a waiting id takes CPU time from the ids it waits for. Distribute work using `RelaxedAtomic` counters or the load balancers, and replace barriers with consecutive jobs.
+- Use `parallel_sum<T>(threads, func)` instead of shared accumulators: each id adds up its partial sum in a local `T` variable and returns it.
+- Nested jobs are supported, a nested job borrows idle workers and creates new workers if none are idle.
+- In job lambdas, capture small builtin types such as integers, `bool`, `double`, pointers and small structs by value, listed in declaration order, e.g. `[&, x, y, k](int thread_id)` or `[&, x, y, k]()`. This improves register allocation: each thread runs its own copy of `func`, hence the compiler can keep by-value captures in registers, whereas variables captured by reference are shared with other threads and must be reloaded from memory, e.g. after function calls. A small struct has at most 4 members of builtin types, e.g. `SegmentConfig` in `nth_prime_sieve.cpp`, hence the compiler can keep its members in registers too. Capture by reference only large objects, e.g. containers and structs with many members, and variables shared or modified by multiple threads. Do not use `[=]`.
+- `func` must be copyable, lambdas that capture move-only types such as `Vector` by value do not compile.
+- `max_threads()` returns the default number of threads, the number of CPUs in the process's affinity mask. The threads of each job must never exceed `max_threads()`, in primecount's code as well as in the unit tests; `parallel_for()` and hence `parallel_sum()` assert `threads <= max_threads()` in debug builds. Since every thread_id runs on its own thread, a job that is accidentally given a number of work items as its thread count would still compute correct results, but it would create up to one thread per work item and become very slow or fail due to resource exhaustion. Compute thread counts using `ideal_num_threads()` from the caller's thread count, and cap fixed thread counts in tests, e.g. `std::min(4, get_num_threads())`, because CI machines may have only 1 or 2 CPUs. On Linux, run the Debug tests under `taskset -c 0` and `taskset -c 0-1` to check this.
 
 ## Code comments
 

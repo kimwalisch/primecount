@@ -38,82 +38,6 @@
 #include <iostream>
 #include <string>
 
-#if defined(INIT_LLVM_OPENMP)
-
-#include <cstdlib>
-#include <stdlib.h>
-
-namespace {
-
-bool get_env(const char* name)
-{
-#if defined(HAVE_GETENV_S)
-  std::size_t size = 0;
-  auto errcode = getenv_s(&size, nullptr, 0, name);
-  return !errcode && (size > 0);
-#else
-  return std::getenv(name) != nullptr;
-#endif
-}
-
-void set_env(const char* name, const char* value)
-{
-#if defined(HAVE_PUTENV_S)
-  _putenv_s(name, value);
-#else
-  setenv(name, value, 0);
-#endif
-}
-
-/// LLVM OpenMP's default settings are tuned for throughput on shared
-/// systems: worker threads are not bound to CPU cores and may quickly
-/// sleep at fork/join barriers. On many-core systems primecount's
-/// command-line app often enters many short parallel regions with a
-/// large thread team, so the cost of OS scheduling, thread migration
-/// and repeatedly waking idle workers can dominate the actual work.
-/// https://github.com/llvm/llvm-project/issues/195239
-///
-/// Use an active but finite barrier wait and bind the team to core
-/// places before LLVM OpenMP initializes. OMP_WAIT_POLICY=ACTIVE
-/// keeps workers responsive for short barriers, KMP_BLOCKTIME=30ms
-/// prevents long-running phases from spinning indefinitely, and
-/// OMP_PLACES=cores OMP_PROC_BIND=spread binds OpenMP workers to
-/// physical cores and distributes them across the available core
-/// places. This can improve memory bandwidth on multi-socket systems
-/// and avoids placing multiple workers on SMT siblings while unused
-/// physical cores are still available.
-///
-void init_LLVM_OpenMP(int argc, char* argv[])
-{
-  // When launching 1000s of tiny computations then
-  // the default OMP_WAIT_POLICY=PASSIVE performs better.
-  for (int i = 1; i < argc; i++)
-    if (std::string(argv[i]) == "--test")
-      return;
-
-  if (!get_env("OMP_WAIT_POLICY") &&
-      !get_env("KMP_BLOCKTIME") &&
-      !get_env("OMP_PLACES") &&
-      !get_env("OMP_PROC_BIND"))
-  {
-    // These settings provide good performance on my dual-socket
-    // AMD EPYC 7642 with 96 CPU cores (192 threads) for:
-    // ./primecount 1e17 --time
-    // ./primecount 1e18 --time
-    // ./primecount 1e19 --time
-    // ./primecount 1e20 --time
-
-    set_env("OMP_WAIT_POLICY", "ACTIVE");
-    set_env("KMP_BLOCKTIME", "30");
-    set_env("OMP_PLACES", "cores");
-    set_env("OMP_PROC_BIND", "spread");
-  }
-}
-
-} // namespace
-
-#endif
-
 using namespace primecount;
 
 namespace primecount {
@@ -457,10 +381,6 @@ maxint_t S2_hard(maxint_t x,
 
 int main (int argc, char* argv[])
 {
-#if defined(INIT_LLVM_OPENMP)
-  init_LLVM_OpenMP(argc, argv);
-#endif
-
   try
   {
     CmdOptions opts = parseOptions(argc, argv);

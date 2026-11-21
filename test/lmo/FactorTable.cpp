@@ -18,6 +18,7 @@
 #include <int128_t.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 #include <iostream>
 #include <cstdlib>
 #include <random>
@@ -60,7 +61,7 @@ int main()
   std::uniform_int_distribution<int> dist(500000, 1000000);
 
   auto max = dist(gen);
-  auto threads = max % 4;
+  auto threads = std::min(max % 4, get_num_threads());
   auto primes = generate_primes<uint32_t>(max);
   auto lpf = generate_lpf(max, primes);
   auto mu = generate_moebius(max, primes);
@@ -146,14 +147,14 @@ int main()
     not_coprime:;
   }
 
-  // Compare single-threaded and parallel construction. The larger y
-  // crosses FactorTable's threading threshold.
+  // Compare single-threaded and parallel construction
   {
     int64_t parallel_y = 5000001;
+    int parallel_threads = std::min(2, get_num_threads());
     FactorTable<uint16_t> singleThread16(parallel_y, 1);
-    FactorTable<uint16_t> multiThread16(parallel_y, 2);
+    FactorTable<uint16_t> multiThread16(parallel_y, parallel_threads);
     FactorTable<uint32_t> singleThread32(parallel_y, 1);
-    FactorTable<uint32_t> multiThread32(parallel_y, 2);
+    FactorTable<uint32_t> multiThread32(parallel_y, parallel_threads);
     int64_t size = singleThread16.to_index(parallel_y) + 1;
     bool equal = true;
 

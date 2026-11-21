@@ -14,7 +14,6 @@ option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
 option(BUILD_TESTS         "Build the test programs"               OFF)
 option(BUILD_CODEGEN_TESTS "Build the assembly codegen tests"      OFF)
 
-option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
 option(WITH_MULTIARCH       "Enable runtime dispatching to fastest supported CPU instruction set" ON)
 option(WITH_DIV32           "Use 32-bit division instead of 64-bit division if possible" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
@@ -113,6 +112,7 @@ set(LIB_SRC src/api.cpp
             src/S1.cpp
             src/sieve/Sieve.cpp
             src/sieve/pre_sieve.cpp
+            src/threadpool/ThreadPool.cpp
             src/LoadBalancerP2.cpp
             src/LoadBalancerS2.cpp
             src/LogarithmicIntegral.cpp
@@ -213,9 +213,25 @@ if(WITH_FASTDIVIDER)
     include("${PROJECT_SOURCE_DIR}/cmake/FastDivider.cmake")
 endif()
 
-# Check for OpenMP ###################################################
+# Threads ############################################################
 
-include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
+find_package(Threads REQUIRED)
+list(APPEND PRIMECOUNT_LINK_LIBRARIES "Threads::Threads")
+
+if(CMAKE_THREAD_LIBS_INIT)
+    string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "${CMAKE_THREAD_LIBS_INIT} ")
+endif()
+
+# WaitOnAddress() is in the synchronization library.
+# Requires Windows 8 or later.
+if(WIN32)
+    list(APPEND PRIMECOUNT_LINK_LIBRARIES "synchronization")
+    string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-lsynchronization ")
+endif()
+
+# Check if libatomic is needed (old 32-bit systems) ##################
+
+include("${PROJECT_SOURCE_DIR}/cmake/libatomic.cmake")
 
 # Required includes ##################################################
 
@@ -345,16 +361,6 @@ if(BUILD_PRIMECOUNT)
     target_compile_definitions(primecount PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_compile_features(primecount PRIVATE cxx_std_14)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-    # Workaround for LLVM OpenMP performance issue
-    if(PRIMECOUNT_LLVM_OPENMP AND
-       (PRIMECOUNT_POSIX_SETENV OR (PRIMECOUNT_WIN_GETENV_S AND PRIMECOUNT_WIN_PUTENV_S)))
-        target_compile_definitions(primecount PRIVATE INIT_LLVM_OPENMP)
-        if(PRIMECOUNT_WIN_GETENV_S AND PRIMECOUNT_WIN_PUTENV_S)
-            target_compile_definitions(primecount PRIVATE HAVE_GETENV_S)
-            target_compile_definitions(primecount PRIVATE HAVE_PUTENV_S)
-        endif()
-    endif()
 
     # Copy primesieve.dll into the same directory as primecount.exe.
     # On Windows the DLLs must be in the same directory as the

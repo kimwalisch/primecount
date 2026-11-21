@@ -19,6 +19,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <ctz.hpp>
+#include <threadpool/parallel.hpp>
 #include <Vector.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
@@ -128,37 +129,35 @@ void PiTable::init(uint64_t limit,
 {
   ASSERT(cache_limit < limit);
   uint64_t dist = limit - cache_limit;
-  uint64_t thread_threshold = (uint64_t) 1e7;
-  threads = ideal_num_threads(dist, threads, thread_threshold);
+
+  // These load balancing settings work well on my
+  // dual-socket AMD EPYC 7642 server with 192 CPU cores.
+  uint64_t sqrt_dist = isqrt(dist);
+  uint64_t thread_threshold = 400;
+  threads = ideal_num_threads(sqrt_dist, threads, thread_threshold);
   uint64_t thread_dist = dist / threads;
-  thread_dist = max(thread_threshold, thread_dist);
   thread_dist += 240 - thread_dist % 240;
   counts_.resize(threads);
 
-  #pragma omp parallel num_threads(threads)
+  parallel_for(threads, [&, limit, cache_limit, thread_dist](int thread_id)
   {
-    #pragma omp for schedule(static, 1)
-    for (int t = 0; t < threads; t++)
-    {
-      uint64_t low = cache_limit + thread_dist * t;
-      uint64_t high = low + thread_dist;
-      high = min(high, limit);
+    uint64_t low = cache_limit + thread_dist * thread_id;
+    uint64_t high = low + thread_dist;
+    high = min(high, limit);
 
-      if (low < high)
-        init_bits(low, high, t);
-    }
+    if (low < high)
+      init_bits(low, high, thread_id);
+  });
 
-    #pragma omp for nowait schedule(static, 1)
-    for (int t = 0; t < threads; t++)
-    {
-      uint64_t low = cache_limit + thread_dist * t;
-      uint64_t high = low + thread_dist;
-      high = min(high, limit);
+  parallel_for(threads, [&, limit, cache_limit, thread_dist](int thread_id)
+  {
+    uint64_t low = cache_limit + thread_dist * thread_id;
+    uint64_t high = low + thread_dist;
+    high = min(high, limit);
 
-      if (low < high)
-        init_count(low, high, t);
-    }
-  }
+    if (low < high)
+      init_count(low, high, thread_id);
+  });
 }
 
 /// Each thread computes PrimePi [low, high[
@@ -254,17 +253,19 @@ Vector<uint32_t> PiTable::get_primes_u32(uint64_t x, int threads) const
       primes.resize(size);
     else
     {
-      uint64_t thread_threshold = (uint64_t) 1e7;
-      threads = ideal_num_threads(x, threads, thread_threshold);
+      // These load balancing settings work well on my
+      // dual-socket AMD EPYC 7642 server with 192 CPU cores.
+      uint64_t sqrtx = isqrt(x);
+      uint64_t thread_threshold = 300;
+      threads = ideal_num_threads(sqrtx, threads, thread_threshold);
       uint64_t thread_dist = ceil_div(x, threads);
       thread_dist += 240 - thread_dist % 240;
       uint64_t limit = x + 1;
 
-      #pragma omp parallel for num_threads(threads) schedule(static, 1)
-      for (int t = 0; t < threads; t++)
+      parallel_for(threads, [&, thread_dist, limit](int thread_id)
       {
         // Each thread processes [low, high[
-        uint64_t low = thread_dist * t;
+        uint64_t low = thread_dist * thread_id;
         uint64_t high = min(low + thread_dist, limit);
 
         if (low < high)
@@ -282,7 +283,7 @@ Vector<uint32_t> PiTable::get_primes_u32(uint64_t x, int threads) const
           for (uint64_t bits = pi_[max_j].bits & bitmask; bits; bits &= bits - 1)
             primes[i++] = uint32_t(max_j * 240 + bit_values_[ctz64(bits)]);
         }
-      }
+      });
     }
   }
 
@@ -316,17 +317,19 @@ Vector<int64_t> PiTable::get_primes_i64(uint64_t x, int threads) const
       primes.resize(size);
     else
     {
-      uint64_t thread_threshold = (uint64_t) 1e7;
-      threads = ideal_num_threads(x, threads, thread_threshold);
+      // These load balancing settings work well on my
+      // dual-socket AMD EPYC 7642 server with 192 CPU cores.
+      uint64_t sqrtx = isqrt(x);
+      uint64_t thread_threshold = 300;
+      threads = ideal_num_threads(sqrtx, threads, thread_threshold);
       uint64_t thread_dist = ceil_div(x, threads);
       thread_dist += 240 - thread_dist % 240;
       uint64_t limit = x + 1;
 
-      #pragma omp parallel for num_threads(threads) schedule(static, 1)
-      for (int t = 0; t < threads; t++)
+      parallel_for(threads, [&, thread_dist, limit](int thread_id)
       {
         // Each thread processes [low, high[
-        uint64_t low = thread_dist * t;
+        uint64_t low = thread_dist * thread_id;
         uint64_t high = min(low + thread_dist, limit);
 
         if (low < high)
@@ -344,7 +347,7 @@ Vector<int64_t> PiTable::get_primes_i64(uint64_t x, int threads) const
           for (uint64_t bits = pi_[max_j].bits & bitmask; bits; bits &= bits - 1)
             primes[i++] = max_j * 240 + bit_values_[ctz64(bits)];
         }
-      }
+      });
     }
   }
 

@@ -180,7 +180,7 @@ ps -eo pcpu,pid,user,etime,comm --sort=-pcpu | head
 ### 3.3 Tools
 
 Python 3 with NumPy and SciPy (used: Python 3.14.4, NumPy 2.3.5,
-SciPy 1.16.3), git, CMake, GCC with OpenMP, screen, taskset and lscpu.
+SciPy 1.16.3), git, CMake, GCC, screen, taskset and lscpu.
 
 ```bash
 python3 -c "import numpy, scipy; print(numpy.__version__, scipy.__version__)"
@@ -244,14 +244,15 @@ head -c 230 $TUNE/quick.log
 **What the patch does**, in case it must be re-created for newer code:
 
 - `LoadBalancerS2.hpp`: adds a destructor and the members `log_chunks_`,
-  `log_path_`, `log_x_`, `log_model_` (a copy of the `WorkModelS2`),
-  `chunk_frac_` and `x15_`.
+  `log_mutex_`, `log_path_`, `log_x_`, `log_model_` (a copy of the
+  `WorkModelS2`), `chunk_frac_` and `x15_`.
 - Constructor: reads `PRIMECOUNT_S2_LOG=<file>`; logging is off unless
   it is set. `PRIMECOUNT_S2_CHUNK_FRAC=<f>` is honoured only with 1
   thread and switches to fixed chunks of `f * low`.
 - `get_work()`: records each finished chunk (`low`, `high`, init
-  seconds, seconds, start and stop time, `getPercent(low)`, thread
-  number). In fixed-chunk mode it also assigns the chunks.
+  seconds, seconds, start and stop time, `getPercent(low)`, a unique
+  thread number) under `log_mutex_`. In fixed-chunk mode it also
+  assigns the chunks.
 - Destructor: appends one block per `LoadBalancerS2` to the log file. A
   header line `# x .. y .. sieve_limit .. leaves_start .. sieve_work ..
   leaves_scale .. leaves_shape .. sieve_exponent .. threads .. wall ..
@@ -1650,23 +1651,19 @@ model per algorithm" and later), from the repository root with
 <!-- file: primecount-s2-tuning-log.patch -->
 ```diff
 diff --git a/src/LoadBalancerS2.cpp b/src/LoadBalancerS2.cpp
-index 01a72326..055ec0ef 100644
+index 01a72326..63e7767f 100644
 --- a/src/LoadBalancerS2.cpp
 +++ b/src/LoadBalancerS2.cpp
-@@ -44,6 +44,12 @@
+@@ -44,6 +44,8 @@
  #include <stdint.h>
  #include <atomic>
  #include <cmath>
 +#include <cstdio>
 +#include <cstdlib>
-+
-+#if defined(_OPENMP)
-+  #include <omp.h>
-+#endif
 
  namespace {
 
-@@ -107,6 +113,44 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
+@@ -107,6 +109,44 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
 
    if (is_print_)
      print_S2_status(start_time_);
@@ -1711,22 +1708,21 @@ index 01a72326..055ec0ef 100644
  }
 
  /// Remaining seconds till finished
-@@ -138,6 +182,35 @@ void LoadBalancerS2::store_packed(uint64_t segment_size, uint64_t segments)
+@@ -138,6 +178,34 @@ void LoadBalancerS2::store_packed(uint64_t segment_size, uint64_t segments)
  ///
  bool LoadBalancerS2::get_work(ThreadData& thread)
  {
 +  if (log_path_ &&
 +      thread.segments != 0)
 +  {
-+    int tid = 0;
-+    #if defined(_OPENMP)
-+      tid = omp_get_thread_num();
-+    #endif
++    // Unique number of the calling thread
++    static std::atomic<int> threads{0};
++    thread_local int tid = threads++;
 +    int64_t high = min(thread.low + thread.segment_size * thread.segments, sieve_limit_);
 +    LogChunk c = { thread.low, high, thread.init_secs(), thread.secs(),
 +                   thread.start_time - start_time_, thread.stop_time - start_time_,
 +                   status_.getPercent(thread.low), tid };
-+    #pragma omp critical (s2_tuning_log)
++    std::lock_guard<std::mutex> lock(log_mutex_);
 +    log_chunks_.push_back(c);
 +  }
 +
@@ -1748,18 +1744,19 @@ index 01a72326..055ec0ef 100644
        thread.segments != 0)
      print_S2_status(thread.stop_time);
 diff --git a/src/LoadBalancerS2.hpp b/src/LoadBalancerS2.hpp
-index ab9372e4..a4ddb164 100644
+index ab9372e4..8c2fc7a3 100644
 --- a/src/LoadBalancerS2.hpp
 +++ b/src/LoadBalancerS2.hpp
-@@ -18,6 +18,7 @@
+@@ -18,6 +18,8 @@
  #include <stdint.h>
  #include <algorithm>
  #include <atomic>
++#include <mutex>
 +#include <vector>
 
  namespace primecount {
 
-@@ -49,6 +50,7 @@ class LoadBalancerS2
+@@ -49,6 +51,7 @@ class LoadBalancerS2
  public:
    LoadBalancerS2(maxint_t x, int64_t y, int64_t sieve_limit, const WorkModelS2& model, int threads, bool is_print);
    bool get_work(ThreadData& thread);
@@ -1767,13 +1764,14 @@ index ab9372e4..a4ddb164 100644
 
  private:
    double remaining_secs(const ThreadData& thread, int64_t low) const;
-@@ -65,6 +67,15 @@ private:
+@@ -65,6 +68,16 @@ private:
    bool is_print_ = false;
    StatusS2 status_;
 
 +  // Tuning instrumentation, enabled by PRIMECOUNT_S2_LOG=<file>
 +  struct LogChunk { int64_t low, high; double init, secs, start, stop, pct; int tid; };
 +  std::vector<LogChunk> log_chunks_;
++  std::mutex log_mutex_;
 +  const char* log_path_ = nullptr;
 +  double log_x_ = 0;
 +  WorkModelS2 log_model_{0, 0, 0, 0, 0};
