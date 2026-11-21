@@ -1,8 +1,8 @@
 ///
 /// @file  S2_easy.cpp
 /// @brief Calculate the contribution of the clustered easy leaves
-///        and the sparse easy leaves in parallel using OpenMP
-///        (Deleglise-Rivat algorithm).
+///        and the sparse easy leaves in parallel (Deleglise-Rivat
+///        algorithm).
 ///
 ///        This implementation is based on the paper:
 ///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
@@ -21,6 +21,7 @@
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <imath.hpp>
+#include <threadpool/parallel.hpp>
 #include <print.hpp>
 #include <RelaxedAtomic.hpp>
 #include <StatusS2.hpp>
@@ -44,24 +45,24 @@ namespace {
 /// @param T  either int64_t or uint128_t.
 ///
 template <typename T, typename Primes>
-T S2_easy_OpenMP(T x,
-                 int64_t y,
-                 int64_t xy,
-                 int64_t k,
-                 const PiTable& pi,
-                 const Primes& primes,
-                 int threads,
-                 bool is_print)
+T S2_easy_parallel(T x,
+                   int64_t y,
+                   int64_t xy,
+                   int64_t k,
+                   const PiTable& pi,
+                   const Primes& primes,
+                   int threads,
+                   bool is_print)
 {
-  T sum = 0;
   int64_t x13 = iroot<3>(x);
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
-  int64_t thread_threshold = 1000;
-  int max_threads = (int) std::pow(xy, 1 / 4.0);
+  int64_t sqrtx = isqrt(x);
+  int64_t thread_threshold = 32000;
+  int max_threads = (int) (x13 / 500);
   threads = std::min(threads, max_threads);
-  threads = ideal_num_threads(x13, threads, thread_threshold);
+  threads = ideal_num_threads(sqrtx, threads, thread_threshold);
 
   StatusS2 status(x, threads, is_print);
   int64_t pi_sqrty = pi[isqrt(y)];
@@ -69,88 +70,89 @@ T S2_easy_OpenMP(T x,
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_sqrty) + 1);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
-  #pragma omp parallel num_threads(threads) reduction(+: sum)
-  for (int64_t b = min_b++; b <= pi_x13; b = min_b++)
+  T sum = parallel_sum<T>(threads, [&, x, y, xy, is_print, pi_x13](int thread_id)
   {
-    int64_t prime = primes[b];
-    T xp = x / prime;
-    int64_t min_trivial = min(xp / prime, y);
-    int64_t min_clustered = (int64_t) isqrt(xp);
-    int64_t min_sparse = xy / prime;
+    T sum = 0;
 
-    min_clustered = in_between(prime, min_clustered, y);
-    min_sparse = in_between(prime, min_sparse, y);
-
-    int64_t i = pi[min_trivial];
-    int64_t pi_min_clustered = pi[min_clustered];
-    int64_t pi_min_sparse = pi[min_sparse];
-
-    if (i > pi_min_clustered)
+    for (int64_t b = min_b++; b <= pi_x13; b = min_b++)
     {
-      int64_t ihi = i;
-      int64_t ilo = pi_min_clustered + 1;
+      int64_t prime = primes[b];
+      T xp = x / prime;
+      int64_t min_trivial = min(xp / prime, y);
+      int64_t min_clustered = (int64_t) isqrt(xp);
+      int64_t min_sparse = xy / prime;
 
-      // Find all clustered easy leaves where
-      // successive leaves are identical.
+      min_clustered = in_between(prime, min_clustered, y);
+      min_sparse = in_between(prime, min_sparse, y);
+
+      int64_t i = pi[min_trivial];
+      int64_t pi_min_clustered = pi[min_clustered];
+      int64_t pi_min_sparse = pi[min_sparse];
+
+      if (i > pi_min_clustered)
+      {
+        int64_t ihi = i;
+        int64_t ilo = pi_min_clustered + 1;
+
+        // Find all clustered easy leaves where
+        // successive leaves are identical.
+        // pq = primes[b] * primes[i]
+        // Which satisfy: pq > x / y && x / pq <= y
+        // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
+        //
+        // The clustered easy leaves algorithm has poor instruction
+        // level parallelism because of long instruction dependency
+        // chains. To mitigate this issue we process clustered
+        // easy leaves bidirectionally (high-end and low-end streams)
+        // which increases the number of independent instructions
+        // and improves performance on modern out-of-order CPUs.
+        //
+        while (ilo <= ihi)
+        {
+          // High-end stream (decreasing i)
+          int64_t xpq_hi = fast_div64(xp, primes[ihi]);
+          int64_t pi_xpq_hi = pi[xpq_hi];
+          int64_t phi_xpq_hi = pi_xpq_hi - b + 2;
+          int64_t xpq2_hi = fast_div64(xp, primes[pi_xpq_hi + 1]);
+          int64_t ihi_min = pi[xpq2_hi];
+          ASSERT(ihi_min + 1 >= ilo);
+          sum += phi_xpq_hi * (ihi - ihi_min);
+          ihi = ihi_min;
+
+          if (ilo > ihi)
+            break;
+
+          // Low-end stream (increasing i)
+          int64_t xpq_lo = fast_div64(xp, primes[ilo]);
+          int64_t pi_xpq_lo = pi[xpq_lo];
+          int64_t phi_xpq_lo = pi_xpq_lo - b + 2;
+          int64_t xpq2_lo = fast_div64(xp, primes[pi_xpq_lo]);
+          int64_t ilo_max = pi[xpq2_lo] + 1;
+          ASSERT(ilo_max - 1 <= ihi);
+          sum += phi_xpq_lo * (ilo_max - ilo);
+          ilo = ilo_max;
+        }
+
+        i = pi_min_clustered;
+      }
+
+      // Find all sparse easy leaves where
+      // successive leaves are different.
       // pq = primes[b] * primes[i]
       // Which satisfy: pq > x / y && x / pq <= y
       // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-      //
-      // The clustered easy leaves algorithm has poor instruction
-      // level parallelism because of long instruction dependency
-      // chains. To mitigate this issue we process clustered
-      // easy leaves bidirectionally (high-end and low-end streams)
-      // which increases the number of independent instructions
-      // and improves performance on modern out-of-order CPUs.
-      //
-      while (ilo <= ihi)
+      for (; i > pi_min_sparse; i--)
       {
-        // High-end stream (decreasing i)
-        int64_t xpq_hi = fast_div64(xp, primes[ihi]);
-        int64_t pi_xpq_hi = pi[xpq_hi];
-        int64_t phi_xpq_hi = pi_xpq_hi - b + 2;
-        int64_t xpq2_hi = fast_div64(xp, primes[pi_xpq_hi + 1]);
-        int64_t ihi_min = pi[xpq2_hi];
-        ASSERT(ihi_min + 1 >= ilo);
-        sum += phi_xpq_hi * (ihi - ihi_min);
-        ihi = ihi_min;
-
-        if (ilo > ihi)
-          break;
-
-        // Low-end stream (increasing i)
-        int64_t xpq_lo = fast_div64(xp, primes[ilo]);
-        int64_t pi_xpq_lo = pi[xpq_lo];
-        int64_t phi_xpq_lo = pi_xpq_lo - b + 2;
-        int64_t xpq2_lo = fast_div64(xp, primes[pi_xpq_lo]);
-        int64_t ilo_max = pi[xpq2_lo] + 1;
-        ASSERT(ilo_max - 1 <= ihi);
-        sum += phi_xpq_lo * (ilo_max - ilo);
-        ilo = ilo_max;
+        int64_t xpq = fast_div64(xp, primes[i]);
+        sum += pi[xpq] - b + 2;
       }
 
-      i = pi_min_clustered;
+      if (is_print && thread_id == 0)
+        status.print_S2_easy(b, pi_x13);
     }
 
-    // Find all sparse easy leaves where
-    // successive leaves are different.
-    // pq = primes[b] * primes[i]
-    // Which satisfy: pq > x / y && x / pq <= y
-    // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-    for (; i > pi_min_sparse; i--)
-    {
-      int64_t xpq = fast_div64(xp, primes[i]);
-      sum += pi[xpq] - b + 2;
-    }
-
-    #if defined(_OPENMP) && _OPENMP >= 202011
-      #pragma omp masked
-    #else
-      #pragma omp master
-    #endif
-    if (is_print)
-      status.print_S2_easy(b, pi_x13);
-  }
+    return sum;
+  });
 
   return sum;
 }
@@ -335,14 +337,14 @@ T S2_easy_128(T xp,
 ///
 template <typename T,
           typename Primes>
-T S2_easy_OpenMP(T x,
-                 int64_t y,
-                 int64_t xy,
-                 int64_t k,
-                 const PiTable& pi,
-                 const Primes& primes,
-                 int threads,
-                 bool is_print)
+T S2_easy_parallel(T x,
+                   int64_t y,
+                   int64_t xy,
+                   int64_t k,
+                   const PiTable& pi,
+                   const Primes& primes,
+                   int threads,
+                   bool is_print)
 {
   // Initialize FastDivider vector from primes vector
   Vector<FastDivider> fprimes;
@@ -350,15 +352,15 @@ T S2_easy_OpenMP(T x,
   for (std::size_t i = 1; i < fprimes.size(); i++)
     fprimes[i] = FastDivider(primes[i]);
 
-  T sum = 0;
   int64_t x13 = iroot<3>(x);
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
-  int64_t thread_threshold = 1000;
-  int max_threads = (int) std::pow(xy, 1 / 4.0);
+  int64_t sqrtx = isqrt(x);
+  int64_t thread_threshold = 32000;
+  int max_threads = (int) (x13 / 500);
   threads = std::min(threads, max_threads);
-  threads = ideal_num_threads(x13, threads, thread_threshold);
+  threads = ideal_num_threads(sqrtx, threads, thread_threshold);
 
   StatusS2 status(x, threads, is_print);
   int64_t pi_sqrty = pi[isqrt(y)];
@@ -366,25 +368,26 @@ T S2_easy_OpenMP(T x,
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(k, pi_sqrty) + 1);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
-  #pragma omp parallel num_threads(threads) reduction(+: sum)
-  for (int64_t b = min_b++; b <= pi_x13; b = min_b++)
+  T sum = parallel_sum<T>(threads, [&, x, y, xy, is_print, pi_x13](int thread_id)
   {
-    int64_t prime = primes[b];
-    T xp = x / prime;
+    T sum = 0;
 
-    if (xp <= FastDivider::max())
-      sum += S2_easy_64(xp, y, xy, b, prime, fprimes, pi);
-    else
-      sum += S2_easy_128(xp, y, xy, b, prime, primes, pi);
+    for (int64_t b = min_b++; b <= pi_x13; b = min_b++)
+    {
+      int64_t prime = primes[b];
+      T xp = x / prime;
 
-    #if defined(_OPENMP) && _OPENMP >= 202011
-      #pragma omp masked
-    #else
-      #pragma omp master
-    #endif
-    if (is_print)
-      status.print_S2_easy(b, pi_x13);
-  }
+      if (xp <= FastDivider::max())
+        sum += S2_easy_64(xp, y, xy, b, prime, fprimes, pi);
+      else
+        sum += S2_easy_128(xp, y, xy, b, prime, primes, pi);
+
+      if (is_print && thread_id == 0)
+        status.print_S2_easy(b, pi_x13);
+    }
+
+    return sum;
+  });
 
   return sum;
 }
@@ -424,7 +427,7 @@ int64_t S2_easy(int64_t x,
 
   PiTable pi(y, threads);
   auto primes = pi.get_primes<uint32_t>(y, threads);
-  int64_t sum = S2_easy_OpenMP((uint64_t) x, y, xy, k, pi, primes, threads, is_print);
+  int64_t sum = S2_easy_parallel((uint64_t) x, y, xy, k, pi, primes, threads, is_print);
 
   if (is_print)
     print("S2_easy", sum, time);
@@ -459,12 +462,12 @@ int128_t S2_easy(int128_t x,
   if (y <= pstd::numeric_limits<uint32_t>::max())
   {
     auto primes = pi.get_primes<uint32_t>(y, threads);
-    sum = S2_easy_OpenMP((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
+    sum = S2_easy_parallel((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
   }
   else
   {
     auto primes = pi.get_primes<int64_t>(y, threads);
-    sum = S2_easy_OpenMP((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
+    sum = S2_easy_parallel((uint128_t) x, y, xy, k, pi, primes, threads, is_print);
   }
 
   if (is_print)

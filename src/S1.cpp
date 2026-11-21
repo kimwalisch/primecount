@@ -18,6 +18,7 @@
 #include <generate_primes.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <threadpool/parallel.hpp>
 #include <Vector.hpp>
 #include <print.hpp>
 #include <S.hpp>
@@ -61,10 +62,10 @@ T S1_thread(T x,
 /// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
-X S1_OpenMP(X x,
-            Y y,
-            int64_t k,
-            int threads)
+X S1_parallel(X x,
+              Y y,
+              int64_t k,
+              int threads)
 {
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
@@ -75,12 +76,20 @@ X S1_OpenMP(X x,
   int64_t pi_y = primes.size() - 1;
   X s1 = phi_tiny(x, k);
 
-  #pragma omp parallel for num_threads(threads) schedule(static, 1) reduction (+: s1)
-  for (int64_t b = k + 1; b <= pi_y; b++)
+  // for (b = k + 1; b <= pi_y; b++)
+  // Thread t processes b = k + 1 + t + i * threads
+  s1 += parallel_sum<X>(threads, [&, x, y, k, threads, pi_y](int thread_id)
   {
-    s1 -= phi_tiny(x / primes[b], k);
-    s1 += S1_thread<1>(x, y, b, k, (X) primes[b], primes);
-  }
+    X s1 = 0;
+
+    for (int64_t b = k + 1 + thread_id; b <= pi_y; b += threads)
+    {
+      s1 -= phi_tiny(x / primes[b], k);
+      s1 += S1_thread<1>(x, y, b, k, (X) primes[b], primes);
+    }
+
+    return s1;
+  });
 
   return s1;
 }
@@ -105,7 +114,7 @@ int64_t S1(int64_t x,
     time = get_time();
   }
 
-  int64_t s1 = S1_OpenMP(x, (uint32_t) y, k, threads);
+  int64_t s1 = S1_parallel(x, (uint32_t) y, k, threads);
 
   if (is_print)
     print("S1", s1, time);
@@ -135,9 +144,9 @@ int128_t S1(int128_t x,
 
   // uses less memory
   if (y <= pstd::numeric_limits<uint32_t>::max())
-    s1 = S1_OpenMP(x, (uint32_t) y, k, threads);
+    s1 = S1_parallel(x, (uint32_t) y, k, threads);
   else
-    s1 = S1_OpenMP(x, y, k, threads);
+    s1 = S1_parallel(x, y, k, threads);
 
   if (is_print)
     print("S1", s1, time);

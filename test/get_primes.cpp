@@ -13,6 +13,7 @@
 #include <generate_primes.hpp>
 #include <primecount.hpp>
 
+#include <algorithm>
 #include <array>
 #include <cstdlib>
 #include <iostream>
@@ -83,7 +84,7 @@ bool equals(const Vector<T>& primes,
 int main()
 {
   uint64_t max = 4000000;
-  PiTable pi(max, 4);
+  PiTable pi(max, std::min(4, get_num_threads()));
 
   // First test against an independent table. This ensures these tests
   // still fail if PiTable and generate_primes() contain the same bug.
@@ -129,6 +130,9 @@ int main()
 
     for (int threads : thread_counts)
     {
+      if (threads > get_num_threads())
+        continue;
+
       auto primes_u32 = pi.get_primes<uint32_t>(limit, threads);
       std::cout << "get_primes<uint32_t>(" << limit << ", threads = " << threads
                 << ").size() = " << primes_u32.size();

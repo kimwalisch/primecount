@@ -28,9 +28,11 @@
 #include <imath.hpp>
 #include <macros.hpp>
 #include <min.hpp>
+#include <threadpool/parallel.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
+#include <RelaxedAtomic.hpp>
 #include <Vector.hpp>
 #include <popcnt.hpp>
 
@@ -338,7 +340,7 @@ int64_t pix_upper(int64_t x)
 /// phi(x, a) counts the numbers <= x that are not divisible
 /// by any of the first a primes.
 ///
-int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
+int64_t phi_parallel(int64_t x, int64_t a, int threads)
 {
   if (x < 1) return 0;
   if (a < 1) return x;
@@ -380,21 +382,38 @@ int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
-  int64_t thread_threshold = (int64_t) 1e10;
-  int max_threads = (int) std::sqrt(a);
+  // The work of phi(x, a) grows with x and a, hence
+  // the thread threshold decreases with larger a.
+  double sqrta = std::sqrt(a);
+  int64_t x14 = iroot<4>(x);
+  int64_t thread_threshold = int64_t(2e10 / sqrta);
+  int max_threads = min(x14 / 40, int(sqrta));
   threads = min(threads, max_threads);
   threads = ideal_num_threads(x, threads, thread_threshold);
 
-  #pragma omp parallel num_threads(threads) reduction(+: sum)
+  // The threads process chunks of 16 iterations
+  int64_t chunks = ceil_div(a - k, 16);
+  INDETERMINATE RelaxedAtomic<int64_t> next_chunk(0);
+
+  // for (i = k + 1; i <= a; i++)
+  sum += parallel_sum<int64_t>(threads, [&, x, a, k, chunks]()
   {
     // Each thread uses its own PhiCache object in
     // order to avoid thread synchronization.
     PhiCache cache(x, a, primes, pi);
+    int64_t sum = 0;
 
-    #pragma omp for nowait schedule(dynamic, 16)
-    for (int64_t i = k + 1; i <= a; i++)
-      sum += cache.phi<-1>(x / primes[i], i - 1);
-  }
+    for (int64_t chunk = next_chunk++; chunk < chunks; chunk = next_chunk++)
+    {
+      int64_t start = k + 1 + chunk * 16;
+      int64_t stop = min(start + 16, a + 1);
+
+      for (int64_t i = start; i < stop; i++)
+        sum += cache.phi<-1>(x / primes[i], i - 1);
+    }
+
+    return sum;
+  });
 
   return sum;
 }
@@ -421,7 +440,7 @@ int64_t phi(int64_t x,
     time = get_time();
   }
 
-  int64_t sum = phi_OpenMP(x, a, threads);
+  int64_t sum = phi_parallel(x, a, threads);
 
   if (is_print)
     print("phi", sum, time);

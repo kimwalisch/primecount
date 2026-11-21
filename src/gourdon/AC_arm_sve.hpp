@@ -31,6 +31,7 @@
 #include <int128_t.hpp>
 #include <macros.hpp>
 #include <min.hpp>
+#include <threadpool/parallel.hpp>
 #include <PiTable.hpp>
 
 #include <stdint.h>
@@ -310,16 +311,15 @@ template <typename T,
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   PRIMECOUNT_TARGET_ENTRY("+sve")
 #endif
-T AC_OpenMP_arm_sve(T x,
-                    int64_t y,
-                    int64_t k,
-                    int64_t x_star,
-                    const PiTable& pi,
-                    const Primes& primes,
-                    int threads,
-                    bool is_print)
+T AC_parallel_arm_sve(T x,
+                      int64_t y,
+                      int64_t k,
+                      int64_t x_star,
+                      const PiTable& pi,
+                      const Primes& primes,
+                      int threads,
+                      bool is_print)
 {
-  T sum = 0;
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
   int64_t xy = x / y;
@@ -349,8 +349,11 @@ T AC_OpenMP_arm_sve(T x,
   // 2) Computation of the C2 formula.
   // 3) Computation of the A formula.
   //
-  #pragma omp parallel num_threads(threads) reduction(+: sum)
+  T sum = parallel_sum<T>(threads, [&, x, y, k, x_star, x13, sqrtx, xy, pi_y,
+                                    max_clustered_global, sqrty, pi_sqrty, pi_root3_xy]()
   {
+    T sum = 0;
+
     // SegmentedPiTable is accessed very frequently.
     // In order to get good performance it is important that
     // SegmentedPiTable fits into the CPU's cache.
@@ -456,7 +459,9 @@ T AC_OpenMP_arm_sve(T x,
         }
       }
     }
-  }
+
+    return sum;
+  });
 
   return sum;
 }

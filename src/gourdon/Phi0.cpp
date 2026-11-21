@@ -22,6 +22,7 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
+#include <threadpool/parallel.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
 #include <Vector.hpp>
@@ -65,27 +66,36 @@ T Phi0_thread(T x,
 /// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
-X Phi0_OpenMP(X x,
-              Y y,
-              int64_t k,
-              const PiTable& pi,
-              int threads)
+X Phi0_parallel(X x,
+                Y y,
+                int64_t k,
+                const PiTable& pi,
+                int threads)
 {
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
-  int64_t thread_threshold = (int64_t) 1e6;
-  threads = ideal_num_threads(y, threads, thread_threshold);
+  int64_t sqrty = isqrt(y);
+  int64_t thread_threshold = 160;
+  threads = ideal_num_threads(sqrty, threads, thread_threshold);
 
   auto primes = pi.get_primes<Y>(y, threads);
   int64_t pi_y = primes.size() - 1;
   X phi0 = phi_tiny(x, k);
 
-  #pragma omp parallel for num_threads(threads) schedule(static, 1) reduction (+: phi0)
-  for (int64_t b = k + 1; b <= pi_y; b++)
+  // for (b = k + 1; b <= pi_y; b++)
+  // Thread t processes b = k + 1 + t + i * threads
+  phi0 += parallel_sum<X>(threads, [&, x, y, k, threads, pi_y](int thread_id)
   {
-    phi0 -= phi_tiny(x / primes[b], k);
-    phi0 += Phi0_thread<1>(x, y, b, k, (X) primes[b], primes);
-  }
+    X phi0 = 0;
+
+    for (int64_t b = k + 1 + thread_id; b <= pi_y; b += threads)
+    {
+      phi0 -= phi_tiny(x / primes[b], k);
+      phi0 += Phi0_thread<1>(x, y, b, k, (X) primes[b], primes);
+    }
+
+    return phi0;
+  });
 
   return phi0;
 }
@@ -112,7 +122,7 @@ int64_t Phi0(int64_t x,
     time = get_time();
   }
 
-  int64_t phi0 = Phi0_OpenMP(x, (uint32_t) y, k, pi, threads);
+  int64_t phi0 = Phi0_parallel(x, (uint32_t) y, k, pi, threads);
 
   if (is_print)
     print("Phi0", phi0, time);
@@ -144,9 +154,9 @@ int128_t Phi0(int128_t x,
 
   // uses less memory
   if (y <= pstd::numeric_limits<uint32_t>::max())
-    phi0 = Phi0_OpenMP(x, (uint32_t) y, k, pi, threads);
+    phi0 = Phi0_parallel(x, (uint32_t) y, k, pi, threads);
   else
-    phi0 = Phi0_OpenMP(x, y, k, pi, threads);
+    phi0 = Phi0_parallel(x, y, k, pi, threads);
 
   if (is_print)
     print("Phi0", phi0, time);

@@ -30,6 +30,7 @@
 #include <int128_t.hpp>
 #include <LoadBalancerS2.hpp>
 #include <macros.hpp>
+#include <threadpool/parallel.hpp>
 #include <print.hpp>
 #include <PiTable.hpp>
 
@@ -149,14 +150,14 @@ string_view_t D_algo_name()
 /// a new computation.
 ///
 template <typename T, typename Primes, typename FactorTable>
-T D_OpenMP(T x,
-           int64_t y,
-           int64_t k,
-           const PiTable& pi,
-           const Primes& primes,
-           const FactorTable& factor,
-           int threads,
-           bool is_print)
+T D_parallel(T x,
+             int64_t y,
+             int64_t k,
+             const PiTable& pi,
+             const Primes& primes,
+             const FactorTable& factor,
+             int threads,
+             bool is_print)
 {
   auto mertens_y = generate_mertens_y(y, k, primes, pi);
 
@@ -167,10 +168,16 @@ T D_OpenMP(T x,
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
-  int64_t thread_threshold = 1 << 20;
-  int max_threads = (int) (std::sqrt(xy) / 150);
-  threads = std::min(threads, max_threads);
-  threads = ideal_num_threads(xy, threads, thread_threshold);
+  // The work of D depends mostly on x. For small alpha
+  // the sieving work (x / y) and for large alpha the
+  // work of the special leaves (y) requires more threads.
+  int64_t sqrtx = isqrt(x);
+  int64_t thread_threshold = 40000;
+  double max_threads = x14 / 40.0;
+  max_threads = std::max(max_threads, std::sqrt(xy) / 300);
+  max_threads = std::max(max_threads, std::sqrt(y) / 30);
+  threads = std::min(threads, (int) max_threads);
+  threads = ideal_num_threads(sqrtx, threads, thread_threshold);
 
   // Position where the work of the special leaves
   // becomes significant, i.e. roughly 0.1% to a few
@@ -192,10 +199,10 @@ T D_OpenMP(T x,
   double sieve_work = 0.0149 * std::pow(default_alpha / alpha, 1.082);
   WorkModelS2 model(leaves_start, sieve_work, 1.9307, 0.41271, 0.34966);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, xy, model, threads, is_print);
-  T sum = 0;
 
-  #pragma omp parallel num_threads(threads) reduction(+: sum)
+  T sum = parallel_sum<T>(threads, [&, x, y, k, x14, xy]()
   {
+    T sum = 0;
     ThreadData thread;
 
     while (loadBalancer.get_work(thread))
@@ -205,7 +212,9 @@ T D_OpenMP(T x,
       thread.stop_time = get_time();
       sum += thread.sum;
     }
-  }
+
+    return sum;
+  });
 
   return sum;
 }
@@ -235,7 +244,7 @@ int64_t D(int64_t x,
 
   FactorTable<uint16_t> factor(y, threads);
   auto primes = pi.get_primes<uint32_t>(y, threads);
-  int64_t sum = D_OpenMP(x, y, k, pi, primes, factor, threads, is_print);
+  int64_t sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
 
   if (is_print)
     print("D", sum, time);
@@ -274,19 +283,19 @@ int128_t D(int128_t x,
     if (y <= UINT32_MAX)
     {
       auto primes = pi.get_primes<uint32_t>(y, threads);
-      sum = D_OpenMP(x, y, k, pi, primes, factor, threads, is_print);
+      sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
     }
     else
     {
       auto primes = pi.get_primes<int64_t>(y, threads);
-      sum = D_OpenMP(x, y, k, pi, primes, factor, threads, is_print);
+      sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
     }
   }
   else
   {
     FactorTable<uint32_t> factor(y, threads);
     auto primes = pi.get_primes<int64_t>(y, threads);
-    sum = D_OpenMP(x, y, k, pi, primes, factor, threads, is_print);
+    sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
   }
 
   if (is_print)
