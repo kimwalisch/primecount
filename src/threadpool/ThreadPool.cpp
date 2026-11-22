@@ -1,11 +1,11 @@
 ///
 /// @file  ThreadPool.cpp
 /// @brief The thread pool creates worker threads on demand, up to
-///        2 * max_threads() - 1, and never frees them. The main
-///        thread of a parallel job (the calling thread) borrows idle
-///        workers from the pool, the threads that no borrowed worker
-///        runs are claimed from an atomic counter. Jobs may be
-///        nested.
+///        2 * max_threads() - 1, and keeps them until the library is
+///        unloaded or the process exits. The main thread of a
+///        parallel job (the calling thread) borrows idle workers
+///        from the pool, the threads that no borrowed worker runs
+///        are claimed from an atomic counter. Jobs may be nested.
 ///
 ///        The borrowed workers start each other in a binomial tree
 ///        and report their completion back up the same tree, hence
@@ -26,6 +26,11 @@
 ///        Like OpenMP, a job runs with all its threads, even if other
 ///        jobs already use all CPUs. If the pool is full, the job
 ///        creates temporary workers that exit after the job.
+///
+///        Like LLVM OpenMP, the pool shuts down when the library is
+///        unloaded (e.g. dlclose()) and at process exit: it stops
+///        the workers, waits until they have exited and frees all
+///        memory.
 ///
 ///        fork() is not supported: if the parent process has used the
 ///        thread pool, parallel jobs in a child process created by
@@ -55,6 +60,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <new>
 #include <thread>
 
 #if defined(__linux__) && \
@@ -81,6 +87,18 @@
       _WIN32_WINNT >= 0x0602
     #define HAVE_WAIT_ON_ADDRESS
   #endif
+  // See ThreadPool::can_shut_down()
+  #define HAVE_SHUTDOWN_WIN32
+#endif
+
+// See ThreadPool::can_shut_down(). Cygwin is skipped as it runs
+// the destructors of DLLs inside the Windows loader, where
+// waiting for threads may deadlock.
+#if !defined(_WIN32) && \
+    !defined(__CYGWIN__) && \
+    __has_include(<unistd.h>)
+  #include <unistd.h>
+  #define HAVE_SHUTDOWN_POSIX
 #endif
 
 #if defined(_MSC_VER) && \
@@ -222,8 +240,9 @@ private:
 /// if its workers take long to finish. The last worker of a job
 /// may still wake up the MainThreadSync after the main thread has
 /// returned from parallel_for(), hence MainThreadSync objects are
-/// never freed. If a later job already uses the MainThreadSync,
-/// this is a harmless spurious wake-up.
+/// only freed by ThreadPool::shutdown() once all workers have
+/// exited. If a later job already uses the MainThreadSync, this
+/// is a harmless spurious wake-up.
 ///
 struct MainThreadSync
 {
@@ -268,6 +287,10 @@ struct Worker
   // Unfinished parts of the worker's subtree: 1 for its own
   // threads plus 1 per child subtree, see Job::report_finished().
   std::atomic<int> pending{0};
+  // Only written when the worker is created and when it
+  // exits, see ThreadPool::shutdown().
+  std::thread thread;
+  std::atomic<bool> exited{false};
   MAYBE_UNUSED char pad3[MAX_CACHE_LINE_SIZE];
 };
 
@@ -325,9 +348,10 @@ private:
   MAYBE_UNUSED char pad3[MAX_CACHE_LINE_SIZE];
 };
 
-/// The thread pool is never destroyed: its detached persistent
-/// workers run until the process exits. Hence it never frees
-/// its Worker and MainThreadSync objects either.
+/// The thread pool lives in static storage and is never destroyed,
+/// hence it stays valid during exit(). When the library is unloaded
+/// and at process exit, shutdown() stops its persistent workers and
+/// frees its Worker and MainThreadSync objects.
 ///
 class ThreadPool
 {
@@ -336,16 +360,18 @@ public:
   void run(int threads, FunctionRef func);
   int size();
   void set_max_spin_time(double ms);
+  void shutdown();
 
 private:
   WorkerGroup borrow(int workers);
   void create_workers(WorkerGroup& group, Job& job) noexcept;
   void wait_for_workers(const WorkerGroup& group, const Job& job);
   void give_back(WorkerGroup& group);
-  void worker_loop(Worker* worker, Job* job) const;
+  void worker_loop(Worker* worker, Job* job);
   Job* wait_for_job(Worker& worker, int spin_factor) const;
   template <typename Ready>
   void wait_until(Sleeper& sleeper, int spin_factor, Ready ready) const;
+  bool can_shut_down() const;
   static int get_spin_factor(int threads);
   Clock::time_point spin_deadline(const Sleeper& sleeper, int spin_factor) const;
 
@@ -378,9 +404,20 @@ private:
   int cpus_ = 0;
   // Borrowed, new and temporary workers of all jobs
   int busy_workers_ = 0;
+#if defined(HAVE_SHUTDOWN_POSIX)
+  // The workers do not exist in a child process created by fork()
+  pid_t pid_ = getpid();
+#endif
   // Main threads write the fields above in every job, the
-  // padding separates them from neighboring heap memory.
+  // padding separates them from temp_workers_alive_.
   MAYBE_UNUSED char pad4[MAX_CACHE_LINE_SIZE];
+  // Temporary workers that have not exited yet, see shutdown().
+  // It changes while other jobs run, hence it has its own cache
+  // line.
+  std::atomic<int> temp_workers_alive_{0};
+  // The padding separates it from neighboring memory, e.g. the
+  // pool pointer of get_pool() that main threads read in every job.
+  MAYBE_UNUSED char pad5[MAX_CACHE_LINE_SIZE];
 };
 
 /// The pause instruction makes busy-waiting cheaper: it saves
@@ -544,17 +581,46 @@ void Job::start_worker(int position)
   worker->sleeper.wake_up();
 }
 
+/// shutdown() starts the idle workers with this job,
+/// they exit instead of running it.
+///
+Job* stop_job()
+{
+  static char tag;
+  return (Job*) &tag;
+}
+
+/// The pool is constructed on first use and never destroyed.
+/// Its memory is part of the library, which frees it when the
+/// library is unloaded.
+///
 ThreadPool& get_pool()
 {
-  static ThreadPool* pool = new ThreadPool;
+  alignas(ThreadPool) static unsigned char storage[sizeof(ThreadPool)];
+  static ThreadPool* pool = new (storage) ThreadPool;
   return *pool;
 }
+
+/// Its destructor runs when the library is unloaded
+/// (e.g. dlclose()) and at process exit.
+///
+struct PoolShutdown
+{
+  ThreadPool* pool;
+  ~PoolShutdown()
+  {
+    pool->shutdown();
+  }
+};
 
 ThreadPool::ThreadPool()
   : max_size_(2 * max_threads() - 1),
     cpus_(max_threads())
 {
   idle_workers_.reserve(max_size_);
+
+  // A local static, hence it only exists if the pool is used
+  static PoolShutdown pool_shutdown{this};
 }
 
 /// Busy-waits until ready() returns true, the thread sleeps after
@@ -610,10 +676,10 @@ void ThreadPool::wait_until(Sleeper& sleeper, int spin_factor, Ready ready) cons
   }
 }
 
-/// Each worker thread runs this loop until the process exits,
+/// Each worker thread runs this loop until shutdown() stops it,
 /// temporary workers (worker = nullptr) exit after their job.
 ///
-void ThreadPool::worker_loop(Worker* worker, Job* job) const
+void ThreadPool::worker_loop(Worker* worker, Job* job)
 {
   // Used when waiting for the next job, which
   // likely has the same number of threads.
@@ -624,11 +690,22 @@ void ThreadPool::worker_loop(Worker* worker, Job* job) const
   job->report_finished(0);
 
   if (!worker)
+  {
+    // Must be our last access to the pool
+    temp_workers_alive_.fetch_sub(1, std::memory_order_release);
     return;
+  }
 
   while (true)
   {
     job = wait_for_job(*worker, spin_factor);
+
+    if_unlikely(job == stop_job())
+    {
+      worker->exited.store(true, std::memory_order_release);
+      return;
+    }
+
     int position = worker->position;
     spin_factor = get_spin_factor(job->threads());
     job->start_children(*worker);
@@ -753,9 +830,12 @@ void ThreadPool::create_workers(WorkerGroup& group, Job& job) noexcept
     for (int i = 0; i < group.new_workers; i++)
     {
       std::unique_ptr<Worker> worker(new Worker);
-      std::thread(&ThreadPool::worker_loop, this, worker.get(), &job).detach();
+      worker->thread = std::thread(&ThreadPool::worker_loop, this, worker.get(), &job);
       group.sync->workers[group.size++] = worker.release();
     }
+
+    if (group.temp_workers > 0)
+      temp_workers_alive_.fetch_add(group.temp_workers, std::memory_order_relaxed);
 
     for (int i = 0; i < group.temp_workers; i++)
       std::thread(&ThreadPool::worker_loop, this, nullptr, &job).detach();
@@ -841,6 +921,106 @@ Clock::time_point ThreadPool::spin_deadline(const Sleeper& sleeper, int spin_fac
   int64_t max_ns = max_spin_time_us_.load(std::memory_order_relaxed) * 1000ll;
   int64_t ns = std::min(spin_factor * sleeper.wake_ns(), max_ns);
   return Clock::now() + std::chrono::nanoseconds(ns);
+}
+
+#if defined(HAVE_SHUTDOWN_WIN32)
+
+/// During ExitProcess() Windows terminates all other threads
+/// before it runs the static destructors of DLLs. This check
+/// works for primecount.dll and for primecount linked into
+/// another DLL or into the executable.
+///
+bool process_exiting_win32()
+{
+  HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+  if (!ntdll)
+    return true;
+
+  // Casting via void (*)() avoids -Wcast-function-type
+  using Func = BOOLEAN (WINAPI*)();
+  Func func = (Func) (void (*)()) GetProcAddress(ntdll, "RtlDllShutdownInProgress");
+  return !func || func();
+}
+
+#endif
+
+/// The workers must be alive and able to exit, otherwise
+/// shutdown() would wait forever or a mutex may be held by
+/// a thread that does not exist anymore.
+///
+bool ThreadPool::can_shut_down() const
+{
+#if defined(HAVE_SHUTDOWN_WIN32)
+  return !process_exiting_win32();
+#elif defined(HAVE_SHUTDOWN_POSIX)
+  return getpid() == pid_;
+#else
+  return false;
+#endif
+}
+
+/// Called when the library is unloaded and at process exit, see
+/// PoolShutdown. Like LLVM OpenMP, it stops the idle workers,
+/// waits until they have exited and frees all memory.
+///
+void ThreadPool::shutdown()
+{
+  if (!can_shut_down())
+    return;
+
+  Vector<Worker*> workers;
+  MainThreadSync* sync;
+
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    // A job is running, e.g. exit() was called while another
+    // thread uses primecount (LLVM OpenMP skips this case too).
+    if (busy_workers_ > 0)
+      return;
+
+    // Without jobs all workers are idle
+    workers.swap(idle_workers_);
+    sync = unused_syncs_.load(std::memory_order_relaxed);
+    unused_syncs_.store(nullptr, std::memory_order_relaxed);
+    size_ = 0;
+    // Later jobs, e.g. from other static destructors,
+    // only use temporary workers.
+    max_size_ = 0;
+  }
+
+  for (Worker* worker : workers)
+  {
+    worker->job.store(stop_job(), std::memory_order_seq_cst);
+    worker->sleeper.wake_up();
+  }
+
+  for (Worker* worker : workers)
+  {
+#if defined(_WIN32)
+    // FreeLibrary() holds the loader lock, which an exiting
+    // thread needs, hence join() would deadlock. Like LLVM
+    // OpenMP, we wait until the worker has left worker_loop().
+    while (!worker->exited.load(std::memory_order_acquire))
+      std::this_thread::yield();
+    worker->thread.detach();
+#else
+    worker->thread.join();
+#endif
+    delete worker;
+  }
+
+  // The last temporary worker of a job may
+  // still wake up the job's MainThreadSync.
+  while (temp_workers_alive_.load(std::memory_order_acquire) > 0)
+    std::this_thread::yield();
+
+  while (sync)
+  {
+    MainThreadSync* next = sync->next;
+    delete sync;
+    sync = next;
+  }
 }
 
 #if defined(HAVE_GET_CPUS_WIN32)
