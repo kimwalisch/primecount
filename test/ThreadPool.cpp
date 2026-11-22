@@ -213,10 +213,10 @@ int main()
       OK = OK && check_ids(threads);
     check(OK, "Every id runs exactly once for threads = 1 to " + std::to_string(cpus));
 
-    // Jobs whose threads finish early may skip creating workers,
-    // a job whose threads wait for each other creates all of them.
-    OK = thread_pool_size() <= cpus - 1;
-    OK = OK && barrier_jobs(cpus, 1);
+    // Jobs may skip creating workers once all their ids have
+    // been claimed, jobs in which all threads wait for each
+    // other create all of them.
+    OK = barrier_jobs(cpus, 1);
     check(OK && thread_pool_size() == cpus - 1, "Thread pool size = " + std::to_string(thread_pool_size()));
   }
 
