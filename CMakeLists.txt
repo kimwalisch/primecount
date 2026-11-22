@@ -148,6 +148,22 @@ set(LIB_SRC src/api.cpp
             src/gourdon/SegmentedPiTable.cpp
             src/gourdon/Sigma.cpp)
 
+# Threads ############################################################
+
+find_package(Threads REQUIRED)
+list(APPEND PRIMECOUNT_LINK_LIBRARIES "Threads::Threads")
+
+if(CMAKE_THREAD_LIBS_INIT)
+    string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "${CMAKE_THREAD_LIBS_INIT} ")
+endif()
+
+# WaitOnAddress() is in the synchronization library.
+# Requires Windows 8 or later.
+if(WIN32)
+    list(APPEND PRIMECOUNT_LINK_LIBRARIES "synchronization")
+    string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-lsynchronization ")
+endif()
+
 # Check if compiler supports CPU multiarch ###########################
 
 if(WITH_MULTIARCH)
@@ -211,22 +227,6 @@ include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
 # the int128_t check.
 if(WITH_FASTDIVIDER)
     include("${PROJECT_SOURCE_DIR}/cmake/FastDivider.cmake")
-endif()
-
-# Threads ############################################################
-
-find_package(Threads REQUIRED)
-list(APPEND PRIMECOUNT_LINK_LIBRARIES "Threads::Threads")
-
-if(CMAKE_THREAD_LIBS_INIT)
-    string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "${CMAKE_THREAD_LIBS_INIT} ")
-endif()
-
-# WaitOnAddress() is in the synchronization library.
-# Requires Windows 8 or later.
-if(WIN32)
-    list(APPEND PRIMECOUNT_LINK_LIBRARIES "synchronization")
-    string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-lsynchronization ")
 endif()
 
 # Check if libatomic is needed (old 32-bit systems) ##################
