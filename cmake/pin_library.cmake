@@ -26,15 +26,24 @@ check_cxx_source_compiles("${pin_library_TEST_SOURCE}" PRIMECOUNT_PIN_LIBRARY)
 # Older glibc versions require libdl
 if(NOT PRIMECOUNT_PIN_LIBRARY AND CMAKE_DL_LIBS)
     set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_DL_LIBS}")
-    check_cxx_source_compiles("${pin_library_TEST_SOURCE}" PRIMECOUNT_PIN_LIBRARY_WITH_LIBDL)
+    check_cxx_source_compiles("${pin_library_TEST_SOURCE}" PRIMECOUNT_PIN_LIBRARY_WITH_DL_LIBS)
 
-    if(PRIMECOUNT_PIN_LIBRARY_WITH_LIBDL)
-        list(APPEND PRIMECOUNT_LINK_LIBRARIES "${CMAKE_DL_LIBS}")
-        string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-l${CMAKE_DL_LIBS} ")
+    if(PRIMECOUNT_PIN_LIBRARY_WITH_DL_LIBS)
+        list(APPEND PRIMECOUNT_LINK_LIBRARIES ${CMAKE_DL_LIBS})
+
+        # CMAKE_DL_LIBS is a list of library names or linker
+        # flags, e.g. "dl" on Linux and "-lld" on AIX.
+        foreach(lib IN LISTS CMAKE_DL_LIBS)
+            if(lib MATCHES "^-")
+                string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "${lib} ")
+            else()
+                string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-l${lib} ")
+            endif()
+        endforeach()
     endif()
 endif()
 
-if(PRIMECOUNT_PIN_LIBRARY OR PRIMECOUNT_PIN_LIBRARY_WITH_LIBDL)
+if(PRIMECOUNT_PIN_LIBRARY OR PRIMECOUNT_PIN_LIBRARY_WITH_DL_LIBS)
     list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "HAVE_PIN_LIBRARY")
 endif()
 
