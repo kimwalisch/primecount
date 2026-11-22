@@ -27,13 +27,6 @@
 ///        jobs already use all CPUs. If the pool is full, the job
 ///        creates temporary workers that exit after the job.
 ///
-///        The workers run the library's code until the process exits,
-///        hence the thread pool pins the library: once the pool has
-///        been used, the library is never unloaded, e.g. by dlclose()
-///        when a language binding unloads its C module. Pinning
-///        requires dladdr(), see cmake/pin_library.cmake, unloading
-///        the library is not supported without it (e.g. Windows).
-///
 ///        fork() is not supported: if the parent process has used the
 ///        thread pool, parallel jobs in a child process created by
 ///        fork() may hang (similar to GCC OpenMP).
@@ -562,10 +555,20 @@ ThreadPool& get_pool()
   return *pool;
 }
 
-/// Prevents the library (or executable) containing the thread
-/// pool from being unloaded, e.g. by dlclose(). dlopen() with
-/// RTLD_NOLOAD increments the reference count of the already
-/// loaded library and we never close the handle.
+/// The thread pool's workers run the library's code until the
+/// process exits. If the shared library were unloaded, e.g. by
+/// dlclose() when a language binding unloads its C module at the
+/// end of a script, workers that are still busy-waiting after the
+/// last parallel job would crash the process. Idle workers
+/// would leak, and loading the library again would create another
+/// thread pool.
+///
+/// Hence we prevent the library (or executable) containing the
+/// thread pool from being unloaded: dlopen() with RTLD_NOLOAD
+/// increments the reference count of the already loaded library
+/// and we never close the handle. RTLD_NODELETE additionally marks
+/// the library as never to be unloaded. Like Rust's Rayon, the
+/// thread pool is never shut down.
 ///
 void pin_library()
 {
