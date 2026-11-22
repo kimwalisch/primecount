@@ -160,39 +160,6 @@ bool barrier_jobs(int threads, int jobs)
   return true;
 }
 
-/// Its destructor runs parallel jobs during exit(), usually
-/// after the thread pool has been shut down.
-///
-struct JobsAtExit
-{
-  ~JobsAtExit()
-  {
-    int threads = std::min(max_threads(), 8);
-    bool OK = check_ids(threads) && sum_ids(threads) == expected_sum_ids(threads);
-    bool caught = false;
-
-    try
-    {
-      parallel_for(threads, [](int id)
-      {
-        if (id == 0)
-          throw std::runtime_error("parallel_for test exception");
-      });
-    }
-    catch (const std::runtime_error&)
-    {
-      caught = true;
-    }
-
-    OK = OK && caught;
-    std::cout << "Parallel jobs during exit()   " << (OK ? "OK" : "ERROR") << std::endl;
-
-    // exit() must not be called again
-    if (!OK)
-      std::_Exit(1);
-  }
-};
-
 /// Nested jobs whose threads all wait for each other. The outer
 /// job has threads ids and each inner job has inner ids, hence
 /// threads * inner threads run at once and the pool is full if
@@ -219,9 +186,6 @@ bool nested_barrier_job(int threads, int inner)
 
 int main()
 {
-  // Constructed before the thread pool,
-  // hence destroyed after its shutdown.
-  static JobsAtExit jobs_at_exit;
   start_watchdog();
   int cpus = max_threads();
   // Jobs with 1 thread never create workers

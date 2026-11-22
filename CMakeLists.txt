@@ -233,6 +233,10 @@ endif()
 
 include("${PROJECT_SOURCE_DIR}/cmake/libatomic.cmake")
 
+# Check if libprimecount can prevent being unloaded ##################
+
+include("${PROJECT_SOURCE_DIR}/cmake/pin_library.cmake")
+
 # Required includes ##################################################
 
 include(GNUInstallDirs)
