@@ -870,7 +870,11 @@ void ThreadPool::give_back(WorkerGroup& group)
 
   // Skipped new workers were reserved in borrow()
   size_ -= group.new_workers;
-  int busy = busy_workers_ - (group.size + group.new_workers + group.temp_workers);
+
+  // Borrowed, created, skipped and temporary workers,
+  // i.e. all workers that borrow() counted as busy.
+  int job_workers = group.size + group.new_workers + group.temp_workers;
+  int busy = busy_workers_ - job_workers;
   if (busy < cpus_ && busy_workers_ >= cpus_)
     oversubscribed_.store(false, std::memory_order_relaxed);
   busy_workers_ = busy;
