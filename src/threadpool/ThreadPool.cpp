@@ -558,17 +558,17 @@ ThreadPool& get_pool()
 /// The thread pool's workers run the library's code until the
 /// process exits. If the shared library were unloaded, e.g. by
 /// dlclose() when a language binding unloads its C module at the
-/// end of a script, workers that are still busy-waiting after the
-/// last parallel job would crash the process. Idle workers
+/// end of a script, workers that are still busy-waiting after
+/// the last parallel job would crash the process. Idle workers
 /// would leak, and loading the library again would create another
 /// thread pool.
 ///
 /// Hence we prevent the library (or executable) containing the
 /// thread pool from being unloaded: dlopen() with RTLD_NOLOAD
 /// increments the reference count of the already loaded library
-/// and we never close the handle. RTLD_NODELETE additionally marks
-/// the library as never to be unloaded. Like Rust's Rayon, the
-/// thread pool is never shut down.
+/// and we never close the handle. RTLD_NODELETE additionally
+/// marks the library as never to be unloaded. Like Rust's Rayon
+/// library, the thread pool is never shut down.
 ///
 void pin_library()
 {
