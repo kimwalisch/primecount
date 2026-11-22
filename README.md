@@ -12,8 +12,7 @@ primecount includes implementations of all important combinatorial prime countin
 known up to this date all of which have been parallelized using a thread per CPU core architecture
 together with a custom [thread pool](https://github.com/kimwalisch/primecount/blob/master/src/threadpool/ThreadPool.cpp). primecount contains the first ever open
 source implementations of the Deleglise-Rivat algorithm and Xavier Gourdon's algorithm (that works).
-primecount also features a [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/LoadBalancerS2.cpp)
-that is shared amongst all implementations and that scales up to hundreds of CPU cores. primecount
+primecount also features novel lock-free load balancers that dynamically distribute the work among the threads, which allows primecount to scale up to hundreds of CPU cores. primecount
 has already been used to compute several prime counting function [world records](doc/Records.md)!
 
 ## Installation
