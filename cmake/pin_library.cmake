@@ -9,14 +9,16 @@ include(CMakePushCheckState)
 
 cmake_push_check_state()
 
+# Same code as pin_library() in ThreadPool.cpp, hence
+# ThreadPool.cpp compiles whenever this check succeeds.
 set(pin_library_TEST_SOURCE "
     #include <dlfcn.h>
     int main() {
         static char address;
         Dl_info info;
         if (dladdr(&address, &info) && info.dli_fname)
-            return dlopen(info.dli_fname, RTLD_LAZY | RTLD_NOLOAD | RTLD_NODELETE) ? 0 : 1;
-        return 1;
+            dlopen(info.dli_fname, RTLD_LAZY | RTLD_NOLOAD | RTLD_NODELETE);
+        return 0;
     }")
 
 # glibc >= 2.34, musl, macOS and the BSDs
