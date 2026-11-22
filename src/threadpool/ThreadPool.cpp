@@ -25,7 +25,9 @@
 ///
 ///        Like OpenMP, a job runs with all its threads, even if other
 ///        jobs already use all CPUs. If the pool is full, the job
-///        creates temporary workers that exit after the job.
+///        creates temporary workers that exit after the job. A job
+///        stops creating workers once its threads have been claimed,
+///        e.g. by workers whose threads finished early.
 ///
 ///        fork() is not supported: if the parent process has used the
 ///        thread pool, parallel jobs in a child process created by
@@ -282,7 +284,8 @@ struct WorkerGroup
   // The workers are sync->workers[0, size[
   MainThreadSync* sync = nullptr;
   int size = 0;
-  // New workers to create
+  // New workers to create, create_workers() moves the
+  // created ones to sync->workers[0, size[.
   int new_workers = 0;
   // Temporary workers to create, they exit after the job
   int temp_workers = 0;
@@ -302,6 +305,8 @@ public:
   void run_remaining_threads();
   void report_finished(int position);
   bool finished() const;
+  bool needs_threads() const;
+  void skip_workers(int workers);
   int threads() const;
   void rethrow_exception() const;
 
@@ -481,12 +486,11 @@ void Job::run_thread(int thread_id) noexcept
 
 void Job::run_remaining_threads()
 {
-  int threads = threads_;
-
-  // All threads may be assigned to worker positions,
-  // then a load avoids contention on next_thread_id_.
-  if (next_thread_id_.load(std::memory_order_relaxed) >= threads)
+  // Cheap check, reduces CPU cache line bouncing
+  if (!needs_threads())
     return;
+
+  int threads = threads_;
 
   for (int thread_id = next_thread_id_.fetch_add(1, std::memory_order_relaxed);
        thread_id < threads;
@@ -519,6 +523,24 @@ void Job::report_finished(int position)
 bool Job::finished() const
 {
   return pending_.load(std::memory_order_seq_cst) == 0;
+}
+
+/// Returns true while some of the job's threads have not been
+/// claimed yet. Afterwards, e.g. once workers whose threads
+/// finished early have claimed the remaining ones, a new
+/// worker would find no thread to run.
+///
+bool Job::needs_threads() const
+{
+  return next_thread_id_.load(std::memory_order_relaxed) < threads_;
+}
+
+/// Workers that the main thread does not create
+/// never report their completion.
+///
+void Job::skip_workers(int workers)
+{
+  pending_.fetch_sub(workers, std::memory_order_seq_cst);
 }
 
 int Job::threads() const
@@ -772,25 +794,30 @@ WorkerGroup ThreadPool::borrow(int workers)
 
 /// Creates the new workers, they start working on the job
 /// immediately. Creating threads is slow, hence we create them
-/// without holding the pool lock, the job's work proceeds and
-/// waiting threads keep spinning meanwhile. The workers already
-/// use the job, hence a failure cannot be thrown and we abort,
-/// like OpenMP runtimes do.
+/// without holding the mutex while the job's work proceeds. The
+/// main thread creates the workers one after another. We also
+/// tried creating them in parallel (workers creating workers),
+/// but on Linux 7.0 with 192 CPUs this made jobs up to 1.7x
+/// slower, because the new threads then allocated memory at the
+/// same time. Short jobs may finish before all workers are
+/// created: once the job's threads have been claimed, we skip
+/// the remaining workers.
 ///
 void ThreadPool::create_workers(WorkerGroup& group, Job& job) noexcept
 {
   creating_workers_.fetch_add(1, std::memory_order_relaxed);
+  int temp_workers = group.temp_workers;
 
   try
   {
-    for (int i = 0; i < group.new_workers; i++)
+    for (; group.new_workers > 0 && job.needs_threads(); group.new_workers--)
     {
       std::unique_ptr<Worker> worker(new Worker);
       std::thread(&ThreadPool::worker_loop, this, worker.get(), &job).detach();
       group.sync->workers[group.size++] = worker.release();
     }
 
-    for (int i = 0; i < group.temp_workers; i++)
+    for (; temp_workers > 0 && job.needs_threads(); temp_workers--)
       std::thread(&ThreadPool::worker_loop, this, nullptr, &job).detach();
   }
   catch (const std::exception& e)
@@ -800,6 +827,11 @@ void ThreadPool::create_workers(WorkerGroup& group, Job& job) noexcept
   }
 
   creating_workers_.fetch_sub(1, std::memory_order_relaxed);
+
+  // give_back() frees the pool slots of the skipped new workers
+  int skipped = group.new_workers + temp_workers;
+  if (skipped > 0)
+    job.skip_workers(skipped);
 }
 
 /// Waits until all workers of the job have finished
@@ -836,7 +868,9 @@ void ThreadPool::give_back(WorkerGroup& group)
   group.sync->next = unused_syncs_.load(std::memory_order_relaxed);
   unused_syncs_.store(group.sync, std::memory_order_relaxed);
 
-  int busy = busy_workers_ - (group.size + group.temp_workers);
+  // Skipped new workers were reserved in borrow()
+  size_ -= group.new_workers;
+  int busy = busy_workers_ - (group.size + group.new_workers + group.temp_workers);
   if (busy < cpus_ && busy_workers_ >= cpus_)
     oversubscribed_.store(false, std::memory_order_relaxed);
   busy_workers_ = busy;
