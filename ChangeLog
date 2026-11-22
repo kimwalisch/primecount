@@ -1,7 +1,7 @@
 Changes in primecount-9.1, 2026-11-22
 
 * ThreadPool.cpp: New thread pool designed for primecount, replaces OpenMP.
-* ThreadPool.cpp: Stop the workers and free all memory when libprimecount is unloaded and at exit.
+* ThreadPool.cpp: Stop the workers and free all memory when libprimecount is unloaded and at exit (not on Windows).
 * test/ThreadPool.cpp: Test parallel jobs during exit(), after the thread pool's shutdown.
 * CMake: Remove WITH_OPENMP option, primecount is always multi-threaded.
 * D.cpp: Tune threads, up to 1.5x faster, much faster for non-default alpha.
