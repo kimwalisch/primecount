@@ -73,6 +73,11 @@
     #define NOMINMAX
   #endif
   #include <windows.h>
+  // GetModuleHandleExW() requires Windows XP
+  #if defined(_WIN32_WINNT) && \
+      _WIN32_WINNT >= 0x0501
+    #define HAVE_PIN_LIBRARY_WIN32
+  #endif
   // get_cpus_win32() requires Windows 7
   #if defined(_WIN32_WINNT) && \
       _WIN32_WINNT >= 0x0601
@@ -579,22 +584,31 @@ ThreadPool& get_pool()
 
 /// The thread pool's workers run the library's code until the
 /// process exits. If the shared library were unloaded, e.g. by
-/// dlclose() when a language binding unloads its C module at the
-/// end of a script, workers that are still busy-waiting after
-/// the last parallel job would crash the process. Idle workers
-/// would leak, and loading the library again would create another
-/// thread pool.
+/// dlclose() or FreeLibrary() when a language binding unloads its
+/// C module at the end of a script, workers that are still
+/// busy-waiting after the last parallel job would crash the
+/// process. Idle workers would leak, and loading the library again
+/// would create another thread pool.
 ///
 /// Hence we prevent the library (or executable) containing the
-/// thread pool from being unloaded: dlopen() with RTLD_NOLOAD
-/// increments the reference count of the already loaded library
-/// and we never close the handle. RTLD_NODELETE additionally
-/// marks the library as never to be unloaded. Like Rust's Rayon
-/// library, the thread pool is never shut down.
+/// thread pool from being unloaded. On Windows we pin it using
+/// GetModuleHandleExW() with GET_MODULE_HANDLE_EX_FLAG_PIN, it
+/// then stays loaded until the process exits. On POSIX systems,
+/// dlopen() with RTLD_NOLOAD increments the reference count of
+/// the already loaded library and we never close the handle.
+/// RTLD_NODELETE additionally marks the library as never to be
+/// unloaded. Like Rust's Rayon library, the thread pool is never
+/// shut down.
 ///
 void pin_library()
 {
-#if defined(HAVE_PIN_LIBRARY)
+#if defined(HAVE_PIN_LIBRARY_WIN32)
+  // &handle is an address within the module to pin
+  static HMODULE handle;
+  GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                     GET_MODULE_HANDLE_EX_FLAG_PIN,
+                     (LPCWSTR) &handle, &handle);
+#elif defined(HAVE_PIN_LIBRARY)
   static char address;
   Dl_info info;
 

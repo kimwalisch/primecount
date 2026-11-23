@@ -2,7 +2,9 @@
 # unloaded, e.g. by dlclose(). The thread pool's workers run the
 # library's code until the process exits, see ThreadPool.cpp.
 # dladdr(), RTLD_NOLOAD and RTLD_NODELETE are not part of POSIX,
-# but they are supported by glibc, musl, macOS and the BSDs.
+# but they are supported by glibc, musl, macOS and the BSDs. On
+# Windows, ThreadPool.cpp uses GetModuleHandleExW() instead, which
+# requires no check.
 
 include(CheckCXXSourceCompiles)
 include(CMakePushCheckState)
