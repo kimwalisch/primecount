@@ -33,6 +33,7 @@
 #include <min.hpp>
 #include <threadpool/parallel.hpp>
 #include <PiTable.hpp>
+#include <Vector.hpp>
 
 #include <stdint.h>
 #include <arm_sve.h>
@@ -305,12 +306,146 @@ T C2_arm_sve(T xlow,
   return sum;
 }
 
-/// Compute A + C
+/// Compute this thread's contribution to A + C.
+/// The load balancer repeatedly assigns chunks covering
+/// [low, low + segment_size * segments[.
+///
 template <typename T,
           typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   PRIMECOUNT_TARGET_ENTRY("+sve")
 #endif
+T AC_thread_arm_sve(T x,
+                    int64_t y,
+                    int64_t k,
+                    int64_t x_star,
+                    int64_t x13,
+                    int64_t sqrtx,
+                    int64_t xy,
+                    int64_t pi_y,
+                    int64_t max_clustered_global,
+                    int64_t sqrty,
+                    int64_t pi_sqrty,
+                    int64_t pi_root3_xy,
+                    const PiTable& pi,
+                    const Primes& primes,
+                    const Vector<int64_t>& mertens_y,
+                    LoadBalancerAC& loadBalancer)
+{
+  T sum = 0;
+
+  // SegmentedPiTable is accessed very frequently.
+  // In order to get good performance it is important that
+  // SegmentedPiTable fits into the CPU's cache.
+  // Hence we use a small segment_size of x^(1/4).
+  SegmentedPiTable segmentedPi;
+  ThreadDataAC thread;
+
+  // for (low = 0; low < sqrt(x); low += segment_size)
+  while (loadBalancer.get_work(thread))
+  {
+    int64_t low = thread.low;
+    int64_t segment_size = thread.segment_size;
+    int64_t limit = low + thread.segments * segment_size;
+    limit = min(limit, sqrtx);
+
+    for (; low < limit; low += segment_size)
+    {
+      // Current segment [low, high[
+      int64_t high = low + segment_size;
+      high = min(high, sqrtx);
+      segmentedPi.init(low, high, limit);
+
+      // We measure the thread computation time excluding the
+      // first expensive initialization of the segmentedPi
+      // lookup table. If the thread computation time is close
+      // to 0 then we increase the number of segments in the
+      // loadBalancer which should improve performance.
+      if (low == thread.low)
+        thread.secs = get_time();
+
+      int64_t pi_sqrt_low = pi[isqrt(low)];
+      T xlow = x / max(low, 1);
+      T xhigh = x / high;
+
+      // The C1 hyperbola terms have positions < p^2 <= y
+      if (low < y)
+      {
+        int64_t min_c1 = max(k, pi_root3_xy);
+        int64_t min_c1_prime = min(xy / high, sqrty);
+        min_c1 = max3(min_c1, pi_sqrt_low, pi[min_c1_prime]) + 1;
+
+        // C1 formula: pi[(x/y)^(1/3)] < b <= pi[sqrt(y)]
+        for (int64_t b = min_c1; b <= pi_sqrty; b++)
+        {
+          T xp = x / primes[b];
+
+          if (xp <= pstd::numeric_limits<uint64_t>::max())
+            sum += C1_hyperbola_arm_sve(xlow, xhigh, uint64_t(xp), y, b, mertens_y[b], primes, pi, segmentedPi);
+          else
+            sum += C1_hyperbola_arm_sve(xlow, xhigh, xp, y, b, mertens_y[b], primes, pi, segmentedPi);
+        }
+      }
+
+      int64_t min_c2 = max3(k, pi_root3_xy, pi_sqrty);
+      int64_t min_c2_prime = min(xy / high, x_star);
+      min_c2 = max3(min_c2, pi_sqrt_low, pi[min_c2_prime]) + 1;
+      int64_t x_div_high2 = fast_div64(xhigh, high);
+      int64_t min_a = pi[in_between(x_star, x_div_high2, x13)] + 1;
+
+      // Upper bound of A & C2 formulas:
+      // x / (p * q) >= low
+      // p * next_prime(p) <= x / low
+      // p <= sqrt(x / low)
+      int64_t sqrt_xlow = isqrt(xlow);
+      int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
+      T max_c2_prime = xlow / max(max_clustered_global, 1);
+      int64_t max_c2_clustered = pi[min3(max_c2_prime, sqrt_xlow, x_star)];
+      int64_t min_c2_sparse = pi[min(x_div_high2, x_star)] + 1;
+      min_c2_sparse = max3(min_c2, min_c2_sparse, max_c2_clustered + 1);
+      int64_t max_a = pi[min(sqrt_xlow, x13)];
+
+      // C2 formula: pi[sqrt(y)] < b <= pi[x_star]
+      for (int64_t b = min_c2; b <= max_c2_clustered; b++)
+      {
+        T xp = x / primes[b];
+
+        if (xp <= pstd::numeric_limits<uint64_t>::max())
+          sum += C2_arm_sve(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
+        else
+          sum += C2_arm_sve(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
+      }
+
+      // C2 formula: pi[sqrt(y)] < b <= pi[x_star]
+      for (int64_t b = min_c2_sparse; b <= max_c2; b++)
+      {
+        T xp = x / primes[b];
+
+        if (xp <= pstd::numeric_limits<uint64_t>::max())
+          sum += C2_arm_sve(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
+        else
+          sum += C2_arm_sve(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
+      }
+
+      // A formula: pi[x_star] < b <= pi[x13]
+      for (int64_t b = min_a; b <= max_a; b++)
+      {
+        T xp = x / primes[b];
+
+        if (xp <= pstd::numeric_limits<uint64_t>::max())
+          sum += A_arm_sve(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi);
+        else
+          sum += A_arm_sve(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
+      }
+    }
+  }
+
+  return sum;
+}
+
+/// Compute A + C
+template <typename T,
+          typename Primes>
 T AC_parallel_arm_sve(T x,
                       int64_t y,
                       int64_t k,
@@ -352,115 +487,10 @@ T AC_parallel_arm_sve(T x,
   T sum = parallel_sum<T>(threads, [&, x, y, k, x_star, x13, sqrtx, xy, pi_y,
                                     max_clustered_global, sqrty, pi_sqrty, pi_root3_xy]()
   {
-    T sum = 0;
-
-    // SegmentedPiTable is accessed very frequently.
-    // In order to get good performance it is important that
-    // SegmentedPiTable fits into the CPU's cache.
-    // Hence we use a small segment_size of x^(1/4).
-    SegmentedPiTable segmentedPi;
-    ThreadDataAC thread;
-
-    // for (low = 0; low < sqrt(x); low += segment_size)
-    while (loadBalancer.get_work(thread))
-    {
-      int64_t low = thread.low;
-      int64_t segment_size = thread.segment_size;
-      int64_t limit = low + thread.segments * segment_size;
-      limit = min(limit, sqrtx);
-
-      for (; low < limit; low += segment_size)
-      {
-        // Current segment [low, high[
-        int64_t high = low + segment_size;
-        high = min(high, sqrtx);
-        segmentedPi.init(low, high, limit);
-
-        // We measure the thread computation time excluding the
-        // first expensive initialization of the segmentedPi
-        // lookup table. If the thread computation time is close
-        // to 0 then we increase the number of segments in the
-        // loadBalancer which should improve performance.
-        if (low == thread.low)
-          thread.secs = get_time();
-
-        int64_t pi_sqrt_low = pi[isqrt(low)];
-        T xlow = x / max(low, 1);
-        T xhigh = x / high;
-
-        // The C1 hyperbola terms have positions < p^2 <= y
-        if (low < y)
-        {
-          int64_t min_c1 = max(k, pi_root3_xy);
-          int64_t min_c1_prime = min(xy / high, sqrty);
-          min_c1 = max3(min_c1, pi_sqrt_low, pi[min_c1_prime]) + 1;
-
-          // C1 formula: pi[(x/y)^(1/3)] < b <= pi[sqrt(y)]
-          for (int64_t b = min_c1; b <= pi_sqrty; b++)
-          {
-            T xp = x / primes[b];
-
-            if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum += C1_hyperbola_arm_sve(xlow, xhigh, uint64_t(xp), y, b, mertens_y[b], primes, pi, segmentedPi);
-            else
-              sum += C1_hyperbola_arm_sve(xlow, xhigh, xp, y, b, mertens_y[b], primes, pi, segmentedPi);
-          }
-        }
-
-        int64_t min_c2 = max3(k, pi_root3_xy, pi_sqrty);
-        int64_t min_c2_prime = min(xy / high, x_star);
-        min_c2 = max3(min_c2, pi_sqrt_low, pi[min_c2_prime]) + 1;
-        int64_t x_div_high2 = fast_div64(xhigh, high);
-        int64_t min_a = pi[in_between(x_star, x_div_high2, x13)] + 1;
-
-        // Upper bound of A & C2 formulas:
-        // x / (p * q) >= low
-        // p * next_prime(p) <= x / low
-        // p <= sqrt(x / low)
-        int64_t sqrt_xlow = isqrt(xlow);
-        int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
-        T max_c2_prime = xlow / max(max_clustered_global, 1);
-        int64_t max_c2_clustered = pi[min3(max_c2_prime, sqrt_xlow, x_star)];
-        int64_t min_c2_sparse = pi[min(x_div_high2, x_star)] + 1;
-        min_c2_sparse = max3(min_c2, min_c2_sparse, max_c2_clustered + 1);
-        int64_t max_a = pi[min(sqrt_xlow, x13)];
-
-        // C2 formula: pi[sqrt(y)] < b <= pi[x_star]
-        for (int64_t b = min_c2; b <= max_c2_clustered; b++)
-        {
-          T xp = x / primes[b];
-
-          if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_arm_sve(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
-          else
-            sum += C2_arm_sve(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
-        }
-
-        // C2 formula: pi[sqrt(y)] < b <= pi[x_star]
-        for (int64_t b = min_c2_sparse; b <= max_c2; b++)
-        {
-          T xp = x / primes[b];
-
-          if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_arm_sve(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
-          else
-            sum += C2_arm_sve(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
-        }
-
-        // A formula: pi[x_star] < b <= pi[x13]
-        for (int64_t b = min_a; b <= max_a; b++)
-        {
-          T xp = x / primes[b];
-
-          if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += A_arm_sve(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi);
-          else
-            sum += A_arm_sve(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
-        }
-      }
-    }
-
-    return sum;
+    return AC_thread_arm_sve(x, y, k, x_star, x13, sqrtx, xy, pi_y,
+                             max_clustered_global, sqrty, pi_sqrty,
+                             pi_root3_xy, pi, primes, mertens_y,
+                             loadBalancer);
   });
 
   return sum;

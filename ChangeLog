@@ -1,10 +1,11 @@
-Changes in primecount-9.1, 2026-11-22
+Changes in primecount-9.1, 2026-11-23
 
 * ThreadPool.cpp: New thread pool designed for primecount, replaces OpenMP.
 * ThreadPool.cpp: Prevent unloading libprimecount (e.g. dlclose()) once the thread pool is used.
 * pin_library.cmake: Check for dladdr() and dlopen() with RTLD_NODELETE.
 * CMake: Remove WITH_OPENMP option, primecount is always multi-threaded.
 * D.cpp: Tune threads, up to 1.5x faster, much faster for non-default alpha.
+* AC_*.hpp: Extract AC workers with per-thread state and enable ARM SVE helper inlining.
 * phi.cpp: Tune threads for Legendre and Meissel, up to 2.5x faster pi_legendre(x).
 * Phi0.cpp: Limit threads to sqrt(y) / 160, up to 2x faster Phi0(x, y).
 * S2_hard.cpp: Tune threads, up to 3.5x faster pi_deleglise_rivat(x) for large alpha.
