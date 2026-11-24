@@ -13,7 +13,7 @@
 ///        workers busy-wait before they sleep, this way consecutive
 ///        jobs start without OS thread wake-ups.
 ///
-///        Each waiting thread measures its average wake-up time,
+///        Each waiting thread measures its average wake-up latency,
 ///        starting from 20 us. It busy-waits for 4x the time needed
 ///        to wake up all levels of its last job's binomial tree, but
 ///        at most for 3 ms (max_spin_time). While a job creates
@@ -122,13 +122,15 @@ struct Worker;
 /// check of ready(), the thread that wakes it up checks the flag
 /// after making ready() true, hence no wake-up is lost. The epoch
 /// is read before ready() is checked, hence a wake-up between
-/// the check and wait() makes wait() return immediately.
+/// the check and wait() makes wait() return immediately. The
+/// methods are noexcept because std::mutex::lock() may throw
+/// while a job is still in use.
 ///
 class Sleeper
 {
 public:
   template <typename Ready>
-  void sleep_until(Ready ready)
+  void sleep_until(Ready ready) noexcept
   {
     bool slept = false;
 
@@ -147,19 +149,19 @@ public:
     if (slept)
     {
       // Read before Clock::now(), hence the sample is >= 0
-      int64_t wake_time = wake_time_.load(std::memory_order_relaxed);
+      int64_t wake_timestamp_ns = wake_timestamp_ns_.load(std::memory_order_relaxed);
       std::chrono::nanoseconds now = Clock::now().time_since_epoch();
-      add_sample(now.count() - wake_time);
+      add_sample(now.count() - wake_timestamp_ns);
     }
   }
 
   /// Wakes up the thread after its condition became true
-  void wake_up()
+  void wake_up() noexcept
   {
     if (sleeping_.load(std::memory_order_seq_cst))
     {
       std::chrono::nanoseconds now = Clock::now().time_since_epoch();
-      wake_time_.store(now.count(), std::memory_order_relaxed);
+      wake_timestamp_ns_.store(now.count(), std::memory_order_relaxed);
       epoch_.fetch_add(1, std::memory_order_seq_cst);
       notify();
     }
@@ -168,9 +170,9 @@ public:
   /// Average time from wake_up() until the thread runs again.
   /// Only the thread that sleeps on the Sleeper accesses it.
   ///
-  int64_t wake_ns() const
+  int64_t wake_latency_ns() const
   {
-    return wake_ns_;
+    return wake_latency_ns_;
   }
 
 private:
@@ -211,17 +213,17 @@ private:
   {
     // An outlier counts at most 4x the average, the 1 us
     // keeps the average from getting stuck at 0.
-    int64_t max_ns = 4 * wake_ns_ + 1000;
+    int64_t max_ns = 4 * wake_latency_ns_ + 1000;
     ns = in_between(0, ns, max_ns);
-    wake_ns_ += (ns - wake_ns_) / 8;
+    wake_latency_ns_ += (ns - wake_latency_ns_) / 8;
   }
 
   std::atomic<bool> sleeping_{false};
   std::atomic<epoch_t> epoch_{0};
-  std::atomic<int64_t> wake_time_{0};
+  std::atomic<int64_t> wake_timestamp_ns_{0};
   // Until the thread has slept once, we assume
   // a typical wake-up latency of 20 us.
-  int64_t wake_ns_ = 20000;
+  int64_t wake_latency_ns_ = 20000;
 
 #if !defined(HAVE_WAIT_ON_ADDRESS) && \
     __cplusplus < 202002L
@@ -371,7 +373,9 @@ private:
   std::atomic<int> max_spin_time_us_{3000};
   // Waiting threads sleep instead of spinning while
   // busy_workers_ >= cpus_, it changes only when
-  // busy_workers_ crosses cpus_.
+  // busy_workers_ crosses cpus_. The main threads of
+  // concurrent jobs are not counted, which is a slight
+  // underestimate.
   std::atomic<bool> oversubscribed_{false};
   // Number of jobs creating workers, see wait_until(). It
   // changes rarely, only when a job creates workers.
@@ -851,6 +855,12 @@ void ThreadPool::create_workers(WorkerGroup& group, Job& job) noexcept
 /// Waits until all workers of the job have finished
 void ThreadPool::wait_for_workers(const WorkerGroup& group, const Job& job)
 {
+  // Small jobs have often finished already, then we skip
+  // updating waiting_main_threads_, whose cache line all
+  // spinning threads read.
+  if (job.finished())
+    return;
+
   waiting_main_threads_.fetch_add(1, std::memory_order_relaxed);
 
   wait_until(group.sync->sleeper, get_spin_factor(job.threads()), [&]()
@@ -861,7 +871,7 @@ void ThreadPool::wait_for_workers(const WorkerGroup& group, const Job& job)
   waiting_main_threads_.fetch_sub(1, std::memory_order_relaxed);
 }
 
-/// Returns the borrowed workers to the pool. The most recently
+/// Returns the group's workers to the pool. The most recently
 /// used workers are borrowed first next time because they are
 /// the most likely to still spin. Pushing them in reverse order
 /// gives them the same positions in the next job.
@@ -917,14 +927,10 @@ int ThreadPool::get_spin_factor(int threads)
   return 4 * tree_depth;
 }
 
-/// Waiting threads busy-wait for spin_factor times
-/// their measured wake-up latency, but at most for
-/// max_spin_time. Then they sleep.
-///
 Clock::time_point ThreadPool::spin_deadline(const Sleeper& sleeper, int spin_factor) const
 {
   int64_t max_ns = max_spin_time_us_.load(std::memory_order_relaxed) * 1000ll;
-  int64_t ns = std::min(spin_factor * sleeper.wake_ns(), max_ns);
+  int64_t ns = std::min(spin_factor * sleeper.wake_latency_ns(), max_ns);
   return Clock::now() + std::chrono::nanoseconds(ns);
 }
 

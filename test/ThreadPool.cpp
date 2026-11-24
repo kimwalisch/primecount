@@ -427,7 +427,7 @@ int main()
 #endif
 
     // More ids than partial sums on the stack
-    if (cpus > 128)
+    if (cpus > 64)
       OK = OK && sum_ids(cpus) == expected_sum_ids(cpus);
 
     // Dynamically claimed chunks of 16 iterations

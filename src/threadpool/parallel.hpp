@@ -62,8 +62,7 @@ auto invoke_func(const Func& func, int) -> decltype(func())
 class FunctionRef
 {
 public:
-  template <typename F,
-            typename std::enable_if<!std::is_same<typename std::decay<F>::type, FunctionRef>::value, int>::type = 0>
+  template <typename F>
   FunctionRef(const F& f) noexcept
     : obj_(&f),
       call_(&call<F>)
@@ -132,9 +131,9 @@ T parallel_sum(int threads, Func&& func)
   static_assert(std::is_same<decltype(invoke_func(func, 0)), T>::value,
                 "parallel_sum<T>(): func(thread_id) must return T");
 
-  // Partial sums, stored on the stack for up to 128 thread ids
+  // Partial sums, stored on the stack for up to 64 thread ids
   // to avoid a memory allocation per job.
-  INDETERMINATE Array<T, 128> array;
+  INDETERMINATE Array<T, 64> array;
   Vector<T> vector;
   T* sums = array.data();
   threads = std::max(threads, 1);
