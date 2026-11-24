@@ -296,8 +296,8 @@ void verify_pix(string_view_t pix_function,
     return;
 
   maxint_t Lix = Li(x);
-  double logx = std::log(x);
-  double sqrtx = std::sqrt(x);
+  double logx = std::log((double) x);
+  double sqrtx = std::sqrt((double) x);
   constexpr double PI = 3.14159265358979323846;
 
   // Lowell Schoenfeld, "Sharper bounds for the Chebyshev functions

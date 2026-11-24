@@ -1,4 +1,4 @@
-Changes in primecount-9.1, 2026-11-23
+Changes in primecount-9.1, 2026-11-24
 
 * ThreadPool.cpp: New thread pool designed for primecount, replaces OpenMP.
 * ThreadPool.cpp: Prevent unloading libprimecount (e.g. dlclose(), FreeLibrary()) once the thread pool is used.
@@ -24,6 +24,7 @@ Changes in primecount-9.1, 2026-11-23
 * LogarithmicIntegral.cpp: Use max() instead of infinity() for -ffast-math compatibility.
 * RiemannR.cpp: Use max() instead of infinity() for -ffast-math compatibility.
 * int128_t.hpp: Remove pstd::numeric_limits<T>::infinity().
+* util.cpp: Fix ambiguous log() and sqrt() calls with int128_t in strict C++14 builds.
 * Windows build scripts: Use primecount-9.0 archives for README.txt.
 
 Changes in primecount-9.0, 2026-11-05
