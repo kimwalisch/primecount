@@ -1,4 +1,4 @@
-Changes in primecount-9.1, 2026-11-24
+Changes in primecount-9.1, 2026-11-25
 
 * ThreadPool.cpp: New thread pool designed for primecount, replaces OpenMP.
 * ThreadPool.cpp: Prevent unloading libprimecount (e.g. dlclose(), FreeLibrary()) once the thread pool is used.
@@ -12,6 +12,8 @@ Changes in primecount-9.1, 2026-11-24
 * S2_easy.cpp: Limit threads to x^(1/3) / 500, up to 1.3x faster S2_easy(x, y).
 * P3.cpp: Increase number of threads, up to 1.5x faster P3(x, a).
 * FactorTable.hpp: Use sqrt(y) / 100 threads, up to 1.25x faster pi(x) for x ~ 1e15.
+* FactorTable.hpp: Reuse the primes and PiTable of the caller, up to 2.5x faster initialization.
+* FactorTable.hpp: Initialize the factor table in L2 cache sized segments, up to 2.5x faster.
 * PiTable.cpp: Use sqrt(x) / 300 threads in get_primes(), up to 1.05x faster pi(x).
 * PiTable.cpp: Use sqrt(x) / 400 threads to initialize the PiTable, up to 1.03x faster pi(x).
 * AC_fastdivider.hpp: Use sqrt(primes) / 60 threads to initialize FastDivider, up to 1.05x faster pi(x).

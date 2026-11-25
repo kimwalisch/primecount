@@ -50,12 +50,13 @@
 #define FACTORTABLE_HPP
 
 #include <primecount.hpp>
+#include <primecount-config.hpp>
 #include <primecount-internal.hpp>
 #include <BaseFactorTable.hpp>
-#include <primesieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
+#include <PiTable.hpp>
 #include <threadpool/parallel.hpp>
 #include <Vector.hpp>
 
@@ -74,13 +75,21 @@ public:
                 sizeof(T) == sizeof(uint32_t),
                 "FactorTable: T must be uint16_t or uint32_t!");
 
-  /// Factor numbers <= y
-  FactorTable(int64_t y, int threads)
+  /// Factor numbers <= y, requires a PiTable and
+  /// a primes array with the primes <= y / 13.
+  ///
+  template <typename Primes>
+  FactorTable(int64_t y,
+              const PiTable& pi,
+              const Primes& primes,
+              int threads)
   {
     if_unlikely(y > max())
       throw primecount_error("y must be <= FactorTable::max()");
 
     y = std::max<int64_t>(1, y);
+    ASSERT(uint64_t(y / first_coprime()) < pi.size());
+    ASSERT(uint64_t(pi[y / first_coprime()]) < primes.size());
     T T_MAX = pstd::numeric_limits<T>::max();
     factor_.resize(to_index(y) + 1);
 
@@ -101,64 +110,96 @@ public:
 
     parallel_for(threads, [&, y, T_MAX, sqrty, thread_dist](int thread_id)
     {
-      // Thread processes interval [low, high]
+      // Thread processes interval ]low, limit]
       int64_t low = thread_dist * thread_id;
-      int64_t high = low + thread_dist;
-      int64_t min_m = first_coprime() * first_coprime();
-      low = std::max(first_coprime(), low + 1);
-      high = std::min(high, y);
+      int64_t limit = std::min(low + thread_dist, y);
+      int64_t min_multiple = first_coprime() * first_coprime();
 
-      if (low <= high &&
-          min_m <= high)
+      // If y < 169, the entries 13 <= n <= y (all primes) are
+      // not initialized. This is fine since they are never
+      // read: S2_hard() and D() read the factor table only
+      // for k < b <= pi[sqrt(y)], an empty range if y < 169.
+      if (low < limit &&
+          min_multiple <= limit)
       {
-        // Default initialize memory to all bits set
-        int64_t low_idx = to_index(low);
-        int64_t size = (to_index(high) + 1) - low_idx;
-        std::fill_n(&factor_[low_idx], size, T_MAX);
+        int64_t pi_sqrty = pi[sqrty];
 
-        int64_t start = first_coprime();
-        int64_t stop = high / first_coprime();
-        primesieve::iterator it(start, stop);
+        // Each thread sieves its interval in segments that use
+        // L2_CACHE_SIZE bytes of factor table data. Like in
+        // the segmented sieve of Eratosthenes, a segment must
+        // contain O(sqrt(y)) numbers since it iterates over the
+        // primes <= sqrt(y) and over the m <= high / sqrt(y).
+        int64_t segment_size = L2_CACHE_SIZE / sizeof(T) * 2310ull / 480;
+        segment_size = std::max(segment_size, 16 * sqrty);
+        segment_size += 2310 - segment_size % 2310;
 
-        // PrimePi(13) = 6
-        ASSERT(first_coprime() == 13);
-        int64_t prime_index = 6;
-
-        for (; true; prime_index++)
+        // Segmented sieve of Eratosthenes
+        for (; low < limit; low += segment_size)
         {
-          int64_t i = 1;
-          int64_t prime = it.next_prime();
-          int64_t multiple = next_multiple(prime, low, &i);
-          min_m = prime * first_coprime();
+          // Current segment ]low, high]
+          int64_t high = std::min(low + segment_size, limit);
+          int64_t low1 = std::max(low + 1, first_coprime());
 
-          if (min_m > high)
-            break;
+          // Default initialize memory to all bits set
+          int64_t low_idx = to_index(low1);
+          int64_t size = (to_index(high) + 1) - low_idx;
+          std::fill_n(&factor_[low_idx], size, T_MAX);
 
-          for (; multiple <= high; multiple = prime * to_number(i++))
+          int64_t start = pi[first_coprime()];
+          int64_t stop = pi[high / first_coprime()];
+          stop = std::min(pi_sqrty, stop);
+
+          for (int64_t prime_idx = start; prime_idx <= stop; prime_idx++)
           {
-            int64_t mi = to_index(multiple);
-            // prime is smallest factor of multiple
-            if (factor_[mi] == T_MAX)
+            int64_t i = 1;
+            int64_t prime = primes[prime_idx];
+            int64_t multiple = next_multiple(prime, low1, &i);
+
+            for (; multiple <= high; multiple = prime * to_number(i++))
             {
-              ASSERT(encode(prime_index) <= T_MAX - 2);
-              factor_[mi] = (T) encode(prime_index);
+              int64_t multiple_idx = to_index(multiple);
+              // prime is smallest factor of multiple
+              if (factor_[multiple_idx] == T_MAX)
+              {
+                ASSERT(encode(prime_idx) <= T_MAX - 2);
+                factor_[multiple_idx] = (T) encode(prime_idx);
+              }
+              // the least significant bit indicates
+              // whether multiple has an even (0) or odd (1)
+              // number of prime factors
+              else if (factor_[multiple_idx] != 0)
+                factor_[multiple_idx] ^= 1;
             }
-            // the least significant bit indicates
-            // whether multiple has an even (0) or odd (1)
-            // number of prime factors
-            else if (factor_[mi] != 0)
-              factor_[mi] ^= 1;
-          }
 
-          if (prime <= sqrty)
-          {
             int64_t j = 0;
             int64_t square = prime * prime;
-            multiple = next_multiple(square, low, &j);
+            multiple = next_multiple(square, low1, &j);
 
             // moebius(n) = 0
             for (; multiple <= high; multiple = square * to_number(j++))
               factor_[to_index(multiple)] = 0;
+          }
+
+          // A prime > sqrt(y) is never the least prime factor of its
+          // multiples m * prime <= y as m < sqrt(y), hence it only
+          // flips their least significant bit. For each m, we look up
+          // the primes with low < m * prime <= high in the PiTable.
+          int64_t max_m = high / (sqrty + 1);
+          int64_t i = 1;
+
+          for (int64_t m = to_number(i); m <= max_m; m = to_number(++i))
+          {
+            start = std::max(pi_sqrty, pi[low / m]) + 1;
+            stop = pi[high / m];
+
+            for (int64_t prime_idx = start; prime_idx <= stop; prime_idx++)
+            {
+              int64_t multiple_idx = to_index(primes[prime_idx] * m);
+              ASSERT(factor_[multiple_idx] != T_MAX);
+
+              if (factor_[multiple_idx] != 0)
+                factor_[multiple_idx] ^= 1;
+            }
           }
         }
       }

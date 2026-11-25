@@ -259,10 +259,12 @@ int64_t S2_hard(int64_t x,
     time = get_time();
   }
 
-  FactorTable<uint16_t> factor(y, threads);
   int64_t max_prime = min(y, xy / isqrt(y));
+  // FactorTable requires the primes <= y / 13
+  max_prime = max(max_prime, y / 13);
   PiTable pi(max_prime, threads);
   auto primes = pi.get_primes<uint32_t>(max_prime, threads);
+  FactorTable<uint16_t> factor(y, pi, primes, threads);
   int64_t sum = S2_hard_parallel(x, y, xy, k, pi, primes, factor, threads, is_print);
 
   if (is_print)
@@ -291,31 +293,31 @@ int128_t S2_hard(int128_t x,
   }
 
   int128_t sum;
+  int64_t max_prime = min(y, xy / isqrt(y));
+  // FactorTable requires the primes <= y / 13
+  max_prime = max(max_prime, y / 13);
+  PiTable pi(max_prime, threads);
 
   // Uses less memory
   if (y <= FactorTable<uint16_t>::max())
   {
-    FactorTable<uint16_t> factor(y, threads);
-    int64_t max_prime = min(y, xy / isqrt(y));
-    PiTable pi(max_prime, threads);
-
     if (max_prime <= UINT32_MAX)
     {
       auto primes = pi.get_primes<uint32_t>(max_prime, threads);
+      FactorTable<uint16_t> factor(y, pi, primes, threads);
       sum = S2_hard_parallel(x, y, xy, k, pi, primes, factor, threads, is_print);
     }
     else
     {
       auto primes = pi.get_primes<int64_t>(max_prime, threads);
+      FactorTable<uint16_t> factor(y, pi, primes, threads);
       sum = S2_hard_parallel(x, y, xy, k, pi, primes, factor, threads, is_print);
     }
   }
   else
   {
-    FactorTable<uint32_t> factor(y, threads);
-    int64_t max_prime = min(y, xy / isqrt(y));
-    PiTable pi(max_prime, threads);
     auto primes = pi.get_primes<int64_t>(max_prime, threads);
+    FactorTable<uint32_t> factor(y, pi, primes, threads);
     sum = S2_hard_parallel(x, y, xy, k, pi, primes, factor, threads, is_print);
   }
 

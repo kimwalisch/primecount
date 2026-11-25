@@ -242,8 +242,8 @@ int64_t D(int64_t x,
     time = get_time();
   }
 
-  FactorTable<uint16_t> factor(y, threads);
   auto primes = pi.get_primes<uint32_t>(y, threads);
+  FactorTable<uint16_t> factor(y, pi, primes, threads);
   int64_t sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
 
   if (is_print)
@@ -278,23 +278,23 @@ int128_t D(int128_t x,
   // Uses less memory
   if (y <= FactorTable<uint16_t>::max())
   {
-    FactorTable<uint16_t> factor(y, threads);
-
     if (y <= UINT32_MAX)
     {
       auto primes = pi.get_primes<uint32_t>(y, threads);
+      FactorTable<uint16_t> factor(y, pi, primes, threads);
       sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
     }
     else
     {
       auto primes = pi.get_primes<int64_t>(y, threads);
+      FactorTable<uint16_t> factor(y, pi, primes, threads);
       sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
     }
   }
   else
   {
-    FactorTable<uint32_t> factor(y, threads);
     auto primes = pi.get_primes<int64_t>(y, threads);
+    FactorTable<uint32_t> factor(y, pi, primes, threads);
     sum = D_parallel(x, y, k, pi, primes, factor, threads, is_print);
   }
 

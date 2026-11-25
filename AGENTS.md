@@ -83,6 +83,7 @@ Prefer primecount's internal utilities over C++ standard library equivalents. Ch
 - For new min/max calls, follow the convention of the surrounding snippet or function when the arguments have the same type and require no casts. Use the internal helpers when mixed types would otherwise require explicit casts. Do not add `min.hpp` solely to replace suitable standard-library calls.
 - `include/min.hpp` also provides `min3(a, b, c)` and `max3(a, b, c)` for three arguments with similar mixed-type support; `min3()` returns the last argument's type and `max3()` returns the first argument's type.
 - Use `in_between(lower, value, upper)` from `include/imath.hpp` instead of `std::clamp()`. Note that the lower bound is the first argument and the value being clamped is the second.
+- When the related code uses a `PiTable`, get the vector of primes from it, e.g. `PiTable pi(max, threads); auto primes = pi.get_primes<int64_t>(max, threads);`. This uses multiple threads and extracts the primes from the already initialized `PiTable` using only O(n / log n) operations, whereas `generate_primes<int64_t>(max)` from `src/generate_primes.hpp` uses a single thread and the segmented sieve of Eratosthenes, which uses O(n log log n) operations. Use `generate_primes<T>(max)` only if no `PiTable` is used in the related code.
 
 ## Multi-threading
 
